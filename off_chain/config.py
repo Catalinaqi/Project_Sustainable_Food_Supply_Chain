@@ -1,0 +1,1 @@
+DB_PATH = "supply_chain_db.db"
