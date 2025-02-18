@@ -1,0 +1,1 @@
+# deploy_contract.py - Compiles and deploys the contract on the blockchain.
