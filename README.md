@@ -1,1 +1,1 @@
-# Project_SFS_Chain
+# Overview and technical steps for deploying the application

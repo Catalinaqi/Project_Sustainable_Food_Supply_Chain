@@ -1,0 +1,11 @@
+version: "3.13.2"
+services:
+  off_chain:
+    build: ./off_chain
+    ports:
+      - "5000:5000"
+
+  on_chain:
+    build: ./on_chain
+    depends_on:
+      - off_chain
