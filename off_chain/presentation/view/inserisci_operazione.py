@@ -3,7 +3,7 @@ from PyQt5.QtGui import QIcon, QRegExpValidator
 from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, QFormLayout, QLineEdit,
                              QHBoxLayout, QPushButton, QComboBox, QMessageBox, QDateEdit, QDialog, QTextEdit)
 
-from off_chain.presentation.controller.controller_company import CompanyController as ControllerAzienda
+from off_chain.presentation.controller.company_controller import ControllerAzienda
 from off_chain.presentation.view import funzioni_utili
 
 
@@ -22,7 +22,7 @@ class VistaInserisciOperazione(QMainWindow):
     def __init__(self, callback, azienda):
         super().__init__()
 
-        self.controller = ControllerAzienda()
+        #self.controller = ControllerAzienda
 
         self.callback = callback
         self.azienda = azienda
@@ -92,7 +92,7 @@ class VistaInserisciOperazione(QMainWindow):
         if self.tipo_azienda == "Trasportatore":
             self.destinazione_input.currentIndexChanged.connect(self.update_prodotti_combobox_trasportatore)
 
-        opzioni = self.controller.elementi_combo_box(
+        opzioni = ControllerAzienda.elementi_combo_box(
             self.tipo_azienda, self.operazione_input.currentText(), self.destinazione_input.currentText())
         if (self.tipo_azienda != "Agricola" or
                 (self.tipo_azienda == "Trasformazione" and self.operazione_input.currentText() == "Trasformazione")):
@@ -137,7 +137,7 @@ class VistaInserisciOperazione(QMainWindow):
 
         operazione_selezionata = self.operazione_input.currentText()
 
-        opzioni_prodotti = self.controller.elementi_combo_box(self.tipo_azienda, operazione_selezionata)
+        opzioni_prodotti = ControllerAzienda.elementi_combo_box(self.tipo_azienda, operazione_selezionata)
         if operazione_selezionata == "Trasformazione":
             opzioni_prodotti = [f"ID: {t[0]}, Nome: {t[1]}, Quantità: {t[2]}" for t in opzioni_prodotti]
 
@@ -152,7 +152,7 @@ class VistaInserisciOperazione(QMainWindow):
         destinazione_selezionata = self.destinazione_input.currentText()
         operazione_selezionata = self.operazione_input.currentText()
 
-        opzioni_prodotti = self.controller.elementi_combo_box(
+        opzioni_prodotti = ControllerAzienda.elementi_combo_box(
             self.tipo_azienda, operazione_selezionata, destinazione_selezionata
         )
         opzioni_prodotti = [f"ID: {t[0]}, Nome: {t[1]}, Quantità: {t[2]}" for t in opzioni_prodotti]
@@ -180,7 +180,7 @@ class VistaInserisciOperazione(QMainWindow):
                 "border-radius: 10px; border: 2px solid red; color: black; padding: 5px"
             )
         else:
-            prodotto = self.controller.elementi_combo_box(
+            prodotto = ControllerAzienda.elementi_combo_box(
                 self.tipo_azienda, operazione, destinazione
             )[prodotto_index]
 
@@ -206,24 +206,24 @@ class VistaInserisciOperazione(QMainWindow):
     def aggiungi(self, azienda, prodotto, quantita, operazione, co2, data, nuovo_stato):
         evento = ("", "")
         if self.tipo_azienda == "Agricola":
-            self.controller.aggiungi_operazione(
+            ControllerAzienda.aggiungi_operazione(
                 self.tipo_azienda, azienda, prodotto, data, co2, operazione, quantita=quantita
             )
             evento = (operazione, prodotto)
 
         elif self.tipo_azienda == "Trasportatore":
-            self.controller.aggiungi_operazione(
+            ControllerAzienda.aggiungi_operazione(
                 self.tipo_azienda, azienda, prodotto[0], data, co2, operazione, nuovo_stato=nuovo_stato
             )
             evento = (operazione, prodotto[1])
         elif self.tipo_azienda == "Trasformatore":
             if operazione == "Trasformazione":
-                self.controller.aggiungi_operazione(
+                ControllerAzienda.aggiungi_operazione(
                     self.tipo_azienda, azienda, prodotto, data, co2, operazione, quantita=quantita
                 )
                 evento = (operazione, prodotto[1])
             else:
-                opzioni = self.controller.get_prodotti_to_composizione(self.azienda[0])
+                opzioni = ControllerAzienda.get_prodotti_to_composizione(self.azienda[0])
                 dialog = ComposizioneDialog(opzioni)
                 if dialog.exec_():  # Se l'utente conferma
                     prodotti_composizione = dialog.get_composizione()
@@ -234,7 +234,7 @@ class VistaInserisciOperazione(QMainWindow):
                                             "composizione!")
                         return  # Se la composizione è vuota, esce senza chiudere la view
 
-                    self.controller.aggiungi_operazione(
+                    ControllerAzienda.aggiungi_operazione(
                         self.tipo_azienda, azienda, prodotto, data, co2, operazione,
                         quantita=quantita, materie_prime=prodotti_composizione
                     )
@@ -243,11 +243,11 @@ class VistaInserisciOperazione(QMainWindow):
                     return  # Se il dialog viene chiuso senza confermare, esce senza chiudere la view
 
         elif self.tipo_azienda == "Rivenditore":
-            self.controller.aggiungi_operazione(
+            ControllerAzienda.aggiungi_operazione(
                 self.tipo_azienda, azienda, prodotto[0], data, co2, operazione
             )
             evento = (operazione, prodotto[1])
-        scarto = self.controller.scarto_soglia(co2, evento[0], evento[1])
+        scarto = ControllerAzienda.scarto_soglia(co2, evento[0], evento[1])
         QMessageBox.information(self, "SupplyChain", f"Operazione inserita correttamente!\n"
                                                      f"Scarto CO2 consumata rispetto alla soglia massima: "
                                                      f"{scarto}")

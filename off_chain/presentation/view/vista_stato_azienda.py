@@ -44,7 +44,7 @@ class VistaStatoAzienda(QMainWindow):
 
         self.conferma_button = QPushButton('Conferma modifiche')
 
-        self.setWindowIcon(QIcon("images\\logo_centro.png"))
+        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         self.init_ui()
 

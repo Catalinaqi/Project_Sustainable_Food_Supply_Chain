@@ -3,7 +3,7 @@ from PyQt5.QtGui import QFont, QStandardItemModel, QStandardItem, QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QListView, QHBoxLayout, QPushButton, QMenu, \
     QDialog, QDialogButtonBox, QMessageBox, QDateEdit
 
-from off_chain.presentation.controller.controller_company import CompanyController as ControllerAzienda
+from off_chain.presentation.controller.company_controller import ControllerAzienda
 from off_chain.presentation.view import funzioni_utili
 from off_chain.presentation.view.inserisci_azione import VistaInserisciAzione
 
@@ -16,7 +16,7 @@ class VistaAzioniCompensative(QMainWindow):
         self.inserisci_azione = None
         self.azienda = azienda
 
-        self.controller = ControllerAzienda()
+        # self.controller = ControllerAzienda
 
         self.data_inizio_filtro = ''
         self.data_fine_filtro = ''
@@ -28,7 +28,7 @@ class VistaAzioniCompensative(QMainWindow):
         self.info_button = QPushButton("Visualizza informazioni azione")
         self.button_filtro = QPushButton("Filtri")
 
-        self.setWindowIcon(QIcon("images\\logo_centro.png"))
+        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         self.init_ui()
 
@@ -90,7 +90,7 @@ class VistaAzioniCompensative(QMainWindow):
         self.data_fine_filtro = ''
         self.ordinata = False
         model = QStandardItemModel()
-        lista = self.controller.lista_azioni_compensative(self.azienda[0])
+        lista = ControllerAzienda.lista_azioni_compensative(self.azienda[0])
         for f in lista:
             item = QStandardItem(f"Azione N. {f[0]}\n"
                                  f"Data: {f[1]}\n"
@@ -101,7 +101,7 @@ class VistaAzioniCompensative(QMainWindow):
         self.list_view.setModel(model)
 
     def genera_lista_filtrata_data(self, data_inizio, data_fine):
-        lista_by_data = self.controller.lista_azioni_per_data(
+        lista_by_data = ControllerAzienda.lista_azioni_per_data(
             self.azienda[0], data_inizio, data_fine
         )
         if len(lista_by_data) == 0:
@@ -167,7 +167,7 @@ class VistaAzioniCompensative(QMainWindow):
         self.ordinata = True
         self.data_inizio_filtro = ''
         self.data_fine_filtro = ''
-        lista_ordinata = self.controller.lista_azioni_compensative_ordinata(self.azienda[0])
+        lista_ordinata = ControllerAzienda.lista_azioni_compensative_ordinata(self.azienda[0])
         model = QStandardItemModel()
         for f in lista_ordinata:
             item = QStandardItem(f"Azione N. {f[0]}\n"
@@ -188,14 +188,14 @@ class VistaAzioniCompensative(QMainWindow):
         if selected_index:
             selected_item = selected_index[0].row()  # Ottieni l'indice dell'elemento selezionato
             if self.data_fine_filtro == '' and self.data_inizio_filtro == '' and not self.ordinata:
-                azione = self.controller.lista_azioni_compensative(self.azienda[0])[selected_item]
+                azione = ControllerAzienda.lista_azioni_compensative(self.azienda[0])[selected_item]
             else:
                 if not self.ordinata:
-                    azione = self.controller.lista_azioni_per_data(
+                    azione = ControllerAzienda.lista_azioni_per_data(
                         self.azienda[0], self.data_inizio_filtro, self.data_fine_filtro
                     )[selected_item]
                 else:
-                    azione = self.controller.lista_azioni_compensative_ordinata(
+                    azione = ControllerAzienda.lista_azioni_compensative_ordinata(
                         self.azienda[0])[selected_item]
 
             QMessageBox.information(self, "SupplyChain",

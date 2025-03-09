@@ -1,11 +1,48 @@
-2025-02-22 17:06:41,758 - app_logger - INFO - [log_setting.py:45] - Logger initialized successfully. (File logging: enabled)
-2025-02-22 17:06:41,765 - app_logger - INFO - [settings_load_yaml_test.py:12] - Archivo logging.yaml encontrado.
-2025-02-22 17:06:41,775 - app_logger - INFO - [settings_load_yaml_test.py:21] - Archivo logging.yaml cargado correctamente.
-2025-02-22 17:06:41,784 - app_logger - INFO - [log_setting.py:45] - Logger initialized successfully. (File logging: enabled)
-2025-02-22 17:06:41,785 - app_logger - INFO - [settings_load_yaml_test.py:31] - Logger configurado correctamente.
-2025-02-22 17:06:41,796 - app_logger - INFO - [log_setting.py:45] - Logger initialized successfully. (File logging: enabled)
-2025-02-22 17:06:41,797 - app_logger - INFO - [settings_load_yaml_test.py:40] - Mensaje de prueba
-2025-02-22 17:46:54,346 - app_logger - INFO - [log_setting.py:45] - Logger initialized successfully. (File logging: enabled)
-2025-02-22 17:48:46,666 - app_logger - INFO - [log_setting.py:45] - Logger initialized successfully. (File logging: enabled)
-2025-02-22 17:49:26,519 - app_logger - INFO - [log_setting.py:45] - Logger initialized successfully. (File logging: enabled)
-2025-02-22 17:49:55,417 - app_logger - INFO - [log_setting.py:45] - Logger initialized successfully. (File logging: enabled)
+2025-03-09 17:40:14,658 - app_logger - INFO - [log_load_setting.py:64] - BackEnd: INITIAL LOADING OF GLOBAL - LOGGER
+2025-03-09 17:40:14,659 - app_logger - INFO - [log_load_setting.py:65] - BackEnd: Logger initialized successfully (File logging: enabled)
+2025-03-09 17:40:14,782 - app_logger - INFO - [db_connection_setting.py:25] - BackEnd: get_connection: Name database is: sfs_chain_database.db
+2025-03-09 17:40:14,782 - app_logger - INFO - [db_connection_setting.py:26] - BackEnd: get_connection: Path for the database is: K:\00_Code\Cibersecurity_and_blockChain\Project_Sustainable_Food_Supply_Chain\off_chain\database\sfs_chain_database.db
+2025-03-09 17:40:14,782 - app_logger - INFO - [db_connection_setting.py:28] - BackEnd: get_connection: The database connection was created successfully.
+2025-03-09 17:40:14,782 - app_logger - INFO - [db_connection_setting.py:39] - BackEnd: get_connection: The database connection instance is: <sqlite3.Connection object at 0x000002094440E030>
+2025-03-09 17:40:14,782 - app_logger - INFO - [db_manager_setting.py:18] - BackEnd: DatabaseManagerSetting: DatabaseManagerSetting constructor.
+2025-03-09 17:40:14,784 - app_logger - INFO - [db_manager_setting.py:124] - BackEnd: execute_bd_migrations: Executing migration ...
+2025-03-09 17:40:14,784 - app_logger - INFO - [db_migrations.py:109] - BackEnd: run_migrations: Migrations completed successfully.
+2025-03-09 17:40:14,809 - app_logger - INFO - [sfsMain.py:28] - Frontend: Starting the PyQt application...
+2025-03-09 17:40:21,434 - app_logger - INFO - [db_connection_setting.py:39] - BackEnd: get_connection: The database connection instance is: <sqlite3.Connection object at 0x000002094440E030>
+2025-03-09 17:40:21,435 - app_logger - INFO - [db_manager_setting.py:18] - BackEnd: DatabaseManagerSetting: DatabaseManagerSetting constructor.
+2025-03-09 17:40:21,435 - app_logger - INFO - [credential_repository_impl.py:33] - BackEnd: Successfully initializing the instance for CredentialRepositoryImpl.
+2025-03-09 17:40:21,435 - app_logger - INFO - [db_manager_setting.py:43] - BackEnd: fetch_query: Info executing query: SELECT * FROM credenziali with params: () | Results: 5
+2025-03-09 17:40:21,435 - app_logger - INFO - [credential_repository_impl.py:42] - Credenziali obtained in get_lista_credenziali: [(1, 'aaa', '12345Aa@', 'TYVAGXENGDAXJMEV6HGUNU5IVLHI2OKT'), (2, 'ttt', '12345Aa@', 'E7LUIYJXWEKVPLQQVTSQAGANV4G57VMP'), (3, 'trasf', '12345Aa@', 'U2BMIH6JWUIMYLCVEMZ6RAYM6JAPU62P'), (4, 'rrr', '12345Aa@', 'F2B3G43PSLVSUZSFF6HGC3HZXUJFZCXA'), (5, 'cert', '12345Aa@', 'MP46OIKO3YWXDCEKU37NIWW3JXG5PB7S')]
+2025-03-09 17:40:21,435 - app_logger - INFO - [credential_controller.py:40] - Username inserito: aaa, Password inserita: ttt
+2025-03-09 17:40:21,435 - app_logger - INFO - [credential_controller.py:41] - Credenziali recuperate: [(1, 'aaa', '12345Aa@', 'TYVAGXENGDAXJMEV6HGUNU5IVLHI2OKT'), (2, 'ttt', '12345Aa@', 'E7LUIYJXWEKVPLQQVTSQAGANV4G57VMP'), (3, 'trasf', '12345Aa@', 'U2BMIH6JWUIMYLCVEMZ6RAYM6JAPU62P'), (4, 'rrr', '12345Aa@', 'F2B3G43PSLVSUZSFF6HGC3HZXUJFZCXA'), (5, 'cert', '12345Aa@', 'MP46OIKO3YWXDCEKU37NIWW3JXG5PB7S')]
+2025-03-09 17:40:22,740 - app_logger - INFO - [db_connection_setting.py:39] - BackEnd: get_connection: The database connection instance is: <sqlite3.Connection object at 0x000002094440E030>
+2025-03-09 17:40:22,740 - app_logger - INFO - [db_manager_setting.py:18] - BackEnd: DatabaseManagerSetting: DatabaseManagerSetting constructor.
+2025-03-09 17:40:22,740 - app_logger - INFO - [product_repository_impl.py:18] - BackEnd: Successfully initializing the instance for CertificationRepositoryImpl.
+2025-03-09 17:40:22,743 - app_logger - INFO - [db_manager_setting.py:43] - BackEnd: fetch_query: Info executing query: 
+        SELECT
+            Prodotto.Id_prodotto,
+            Prodotto.Nome,
+            Prodotto.Quantita,
+            Prodotto.Stato,
+            Azienda.Nome
+        FROM Operazione
+        JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
+        JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
+        WHERE Operazione.Operazione = "Messo sugli scaffali"
+        AND Operazione.Id_prodotto IN (
+            SELECT Id_prodotto FROM Certificato
+        );
+         with params: () | Results: 0
+2025-03-09 17:40:22,743 - app_logger - INFO - [product_repository_impl.py:116] - get_prodotti_certificati - prodotti: []
+2025-03-09 17:40:24,359 - app_logger - INFO - [db_manager_setting.py:43] - BackEnd: fetch_query: Info executing query: 
+          SELECT
+                Prodotto.Id_prodotto,
+                Prodotto.Nome,
+                Prodotto.Quantita,
+                Prodotto.Stato,
+                Azienda.Nome
+            FROM Operazione
+            JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
+            JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
+            WHERE Operazione.Operazione = "Messo sugli scaffali";        
+         with params: () | Results: 3

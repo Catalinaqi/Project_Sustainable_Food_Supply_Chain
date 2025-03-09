@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGridLayout, QPushButton, QMessageBox
 
-from off_chain.presentation.controller.controller_guest import ControllerGuest
+from off_chain.presentation.controller.guest_controller import ControllerGuest
 from off_chain.presentation.view import funzioni_utili
 from off_chain.presentation.view.vista_aziende import VistaAziende
 from off_chain.presentation.view.vista_prodotti import VistaProdotti
@@ -13,33 +13,33 @@ class HomePageGuest(QMainWindow):
     def __init__(self, callback):
         super().__init__()
 
-        self.controller = ControllerGuest()
+        #ControllerGuest = ControllerGuest
 
         self.vista_prodotti = None
         self.vista_sviluppatori = None
-        self.vista_prodotti_certificati = VistaProdotti(self.controller, filtro_certificazioni=True)
+        self.vista_prodotti_certificati = VistaProdotti(ControllerGuest, filtro_certificazioni=True)
         self.vista_aziende = None
 
         self.menu_bar = self.menuBar()
         self.menu_bar.setStyleSheet("background-color: rgb(240, 240, 240)")
         funzioni_utili.config_menubar(
-            self, "File", QIcon("images\\exit.png"),
+            self, "File", QIcon("presentation\\resources\\exit.png"),
             "Logout", 'Ctrl+Q', self.menu_bar
         ).triggered.connect(self.logout)
         funzioni_utili.config_menubar(
-            self, "Termini e condizioni d'uso", QIcon("images\\tcu.png"),
+            self, "Termini e condizioni d'uso", QIcon("presentation\\resources\\tcu.png"),
             "Leggi i termini e le condizioni d'uso", 'Ctrl+W', self.menu_bar
         ).triggered.connect(self.tcu)
         funzioni_utili.config_menubar(
-            self, "FAQ", QIcon("images\\faq.png"),
+            self, "FAQ", QIcon("presentation\\resources\\faq.png"),
             "Visualizza le domande più frequenti", 'Ctrl+E', self.menu_bar
         ).triggered.connect(self.faq)
         funzioni_utili.config_menubar(
-            self, "Tutorial", QIcon("images\\tutorial.png"),
+            self, "Tutorial", QIcon("presentation\\resources\\tutorial.png"),
             "Visualizza tutorial", 'Ctrl+R', self.menu_bar
         ).triggered.connect(self.tutorial)
 
-        self.setWindowIcon(QIcon("images\\logo_centro.png"))
+        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         self.callback = callback
 
@@ -83,7 +83,7 @@ class HomePageGuest(QMainWindow):
         funzioni_utili.insert_button_in_grid(self.button_sviluppatori, button_layout, 5, 4)
         self.button_sviluppatori.clicked.connect(self.show_sviluppatori)
 
-        funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("images\\logo_centro.png"))
+        funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("presentation\\resources\\logo_centro.png"))
 
         main_layout.addLayout(button_layout)
 
@@ -119,7 +119,7 @@ class HomePageGuest(QMainWindow):
             self, 'SupplyChain', "Termini e condizioni d'uso work in progress")
 
     def lista_prodotti_clicked(self):
-        self.vista_prodotti = VistaProdotti(self.controller)
+        self.vista_prodotti = VistaProdotti(ControllerGuest)
         self.vista_prodotti.show()
 
     def show_aziende(self):

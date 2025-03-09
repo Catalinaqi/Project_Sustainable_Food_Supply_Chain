@@ -3,7 +3,7 @@ from PyQt5.QtGui import QIcon, QRegExpValidator
 from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, QFormLayout, QLineEdit,
                              QHBoxLayout, QPushButton, QMessageBox, QDateEdit)
 
-from off_chain.presentation.controller.controller_company import CompanyController as ControllerAzienda
+from off_chain.presentation.controller.company_controller import ControllerAzienda
 from off_chain.presentation.view import funzioni_utili
 
 
@@ -14,7 +14,7 @@ class VistaInserisciAzione(QMainWindow):
         self.callback = callback
         self.azienda = azienda
 
-        self.controller = ControllerAzienda()
+        #self.controller = ControllerAzienda
 
         # Elementi di layout
         self.data_label = QLabel("Data")
@@ -31,7 +31,7 @@ class VistaInserisciAzione(QMainWindow):
 
         self.conferma_button = QPushButton('Conferma')
 
-        self.setWindowIcon(QIcon("images\\logo_centro.png"))
+        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         self.init_ui()
 
@@ -98,7 +98,7 @@ class VistaInserisciAzione(QMainWindow):
         self.aggiungi(azienda, co2_compensata, descrizione, data)
 
     def aggiungi(self, azienda, co2_compensata, descrizione, data):
-        self.controller.aggiungi_azione(data, azienda, co2_compensata, descrizione)
+        ControllerAzienda.aggiungi_azione(data, azienda, co2_compensata, descrizione)
         QMessageBox.information(self, "SupplyChain",
                                 "Azione compensativa inserita correttamente!")
         self.callback()

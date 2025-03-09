@@ -1,8 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGridLayout, QPushButton, QMessageBox
-
-from off_chain.presentation.controller.controller_company import CompanyController as ControllerAzienda
+from off_chain.presentation.controller.company_controller import ControllerAzienda
 from off_chain.presentation.view import funzioni_utili
 from off_chain.presentation.view.vista_stato_azienda import VistaStatoAzienda
 from off_chain.presentation.view.vista_azioni_compensative import VistaAzioniCompensative
@@ -12,10 +11,14 @@ from off_chain.presentation.view.vista_sviluppatori import VistaSviluppatori
 
 
 class HomePage(QMainWindow):
+
+    """
+    Constructor "__init__" of the class HomePage
+    """
     def __init__(self, callback, utente):
         super().__init__()
 
-        self.controller = ControllerAzienda()
+        #self.controller = ControllerAzienda
 
         self.vista_soglie = None
         self.vista_sviluppatori = None
@@ -27,23 +30,23 @@ class HomePage(QMainWindow):
         self.menu_bar = self.menuBar()
         self.menu_bar.setStyleSheet("background-color: rgb(240, 240, 240)")
         funzioni_utili.config_menubar(
-            self, "File", QIcon("images\\exit.png"),
+            self, "File", QIcon("presentation\\resources\\exit.png"),
             "Logout", 'Ctrl+Q', self.menu_bar
         ).triggered.connect(self.logout)
         funzioni_utili.config_menubar(
-            self, "Termini e condizioni d'uso", QIcon("images\\tcu.png"),
+            self, "Termini e condizioni d'uso", QIcon("presentation\\resources\\tcu.png"),
             "Leggi i termini e le condizioni d'uso", 'Ctrl+W', self.menu_bar
         ).triggered.connect(self.tcu)
         funzioni_utili.config_menubar(
-            self, "FAQ", QIcon("images\\faq.png"),
+            self, "FAQ", QIcon("presentation\\resources\\faq.png"),
             "Visualizza le domande più frequenti", 'Ctrl+E', self.menu_bar
         ).triggered.connect(self.faq)
         funzioni_utili.config_menubar(
-            self, "Tutorial", QIcon("images\\tutorial.png"),
+            self, "Tutorial", QIcon("presentation\\resources\\tutorial.png"),
             "Visualizza tutorial", 'Ctrl+R', self.menu_bar
         ).triggered.connect(self.tutorial)
 
-        self.setWindowIcon(QIcon("images\\logo_centro.png"))
+        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         self.callback = callback
 
@@ -60,6 +63,10 @@ class HomePage(QMainWindow):
 
         self.init_ui()
 
+
+    '''
+    Creazione dell'interfaccia grafica
+    '''
     def init_ui(self):
         self.setWindowTitle('SupplyChain')
         self.setGeometry(0, 0, 750, 650)
@@ -96,7 +103,7 @@ class HomePage(QMainWindow):
         funzioni_utili.insert_button_in_grid(self.button_sviluppatori, button_layout, 5, 4)
         self.button_sviluppatori.clicked.connect(self.show_sviluppatori)
 
-        funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("images\\logo_centro.png"))
+        funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("presentation\\resources\\logo_centro.png"))
 
         main_layout.addLayout(button_layout)
 
@@ -104,6 +111,10 @@ class HomePage(QMainWindow):
 
         funzioni_utili.center(self)
 
+
+    '''
+    Show a confirmation window before logout, if user clicks "Yes" the window will close and the callback function will be called
+    '''
     def logout(self):
         # Mostra una finestra di conferma
         reply = QMessageBox.question(
@@ -131,8 +142,12 @@ class HomePage(QMainWindow):
         QMessageBox.information(
             self, 'SupplyChain', "Termini e condizioni d'uso work in progress")
 
+
+    '''
+    Each "button" click will open a new window: VistaOperazioni, VistaAzioniCompensative, VistaStatoAzienda, VistaSoglie
+    '''
     def show_operazioni(self):
-        self.vista_operazioni = VistaOperazioni(self.controller, self.utente)
+        self.vista_operazioni = VistaOperazioni(ControllerAzienda, self.utente)
         self.vista_operazioni.show()
 
     def show_azioni(self):
@@ -140,9 +155,22 @@ class HomePage(QMainWindow):
         self.vista_azioni.show()
 
     def show_stato(self):
-        self.stato = VistaStatoAzienda(self.aggiorna_profilo, self.utente, self.controller)
+        self.stato = VistaStatoAzienda(self.aggiorna_profilo, self.utente, ControllerAzienda)
         self.stato.show()
 
+
+    def show_sviluppatori(self):
+        self.vista_sviluppatori = VistaSviluppatori()
+        self.vista_sviluppatori.show()
+
+    def show_soglie(self):
+        self.vista_soglie = VistaSoglie()
+        self.vista_soglie.show()
+
+
+    '''
+    Update the user profile
+    '''
     def aggiorna_profilo(self, utente):
         self.utente = utente
         self.welcome_label.setText(
@@ -150,14 +178,6 @@ class HomePage(QMainWindow):
             f"Prego selezionare un'opzione dal menu"
         )
 
-    def show_sviluppatori(self):
-        self.vista_sviluppatori = VistaSviluppatori()
-        self.vista_sviluppatori.show()
-
     def show_token(self):
         QMessageBox.information(
             self, 'SupplyChain', "Gestione token work in progress work in progress")
-
-    def show_soglie(self):
-        self.vista_soglie = VistaSoglie()
-        self.vista_soglie.show()

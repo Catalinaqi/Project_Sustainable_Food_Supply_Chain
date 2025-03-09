@@ -2,19 +2,20 @@ from dataclasses import dataclass
 
 
 @dataclass
-class ProductModel:
+class CompanyModel:
     """
     Data model for transporting product information between layers.
     """
-    Id_prodotto: int
-    Nome_prodotto: str
-    Quantita_prodotto: float
-    Stato_prodotto: int
+    Id_azienda: int
+    Tipo_azienda: str
     Nome_azienda: str
+    Indirizzo: str
+
 
     def save(self):
         pass
 
     @classmethod
-    def see_all_products(cls):
+    def get_company_emission(cls, company_id):
         pass
+

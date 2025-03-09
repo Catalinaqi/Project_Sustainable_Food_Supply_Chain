@@ -1,11 +1,3 @@
 database:
-  type: "sqlite"  # Change to "postgresql", "mongodb", ...
-  host: "localhost"
-  port: 5432
-  user: "admin"
-  password: "securepassword"
-  name: "blockchain_db"
-  base_dir: ".."
-  path_database: "database/sfs_chain_database.db"
-  path_sql_file: "database/script_database.sql"
+  path_database: "sfs_chain_database.db"
 

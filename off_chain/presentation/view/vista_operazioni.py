@@ -54,7 +54,7 @@ class VistaOperazioni(QMainWindow):
         self.button_filtro = QPushButton("Filtri")
         self.totale_label = QLabel()
 
-        self.setWindowIcon(QIcon("images\\logo_centro.png"))
+        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         self.init_ui()
 

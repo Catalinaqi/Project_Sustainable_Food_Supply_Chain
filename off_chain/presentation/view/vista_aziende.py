@@ -3,7 +3,7 @@ from PyQt5.QtGui import QFont, QStandardItemModel, QStandardItem, QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QListView, QHBoxLayout, QPushButton, QMenu, \
     QDialog, QComboBox, QDialogButtonBox, QMessageBox, QInputDialog
 
-from off_chain.presentation.controller.controller_guest import ControllerGuest
+from off_chain.presentation.controller.guest_controller import ControllerGuest
 from off_chain.presentation.view import funzioni_utili
 
 
@@ -12,7 +12,7 @@ class VistaAziende(QMainWindow):
         super().__init__()
 
         # self.callback = callback
-        self.controller = ControllerGuest()
+        # self.controller = ControllerGuest
 
         self.tipo_filtro = ''
         self.nome_filtro = ''
@@ -41,7 +41,7 @@ class VistaAziende(QMainWindow):
         self.info_button = QPushButton("Visualizza informazioni azienda")
         self.button_filtro = QPushButton("Filtri")
 
-        self.setWindowIcon(QIcon("images\\logo_centro.png"))
+        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         self.init_ui()
 
@@ -96,7 +96,7 @@ class VistaAziende(QMainWindow):
         self.tipo_filtro = ''
         self.ordinata = False
         model = QStandardItemModel()
-        for f in self.controller.lista_aziende():
+        for f in ControllerGuest.lista_aziende():
             saldo = f[2] - f[1]
             if saldo < 0:
                 saldo = f"({-saldo})"
@@ -107,7 +107,7 @@ class VistaAziende(QMainWindow):
         self.list_view.setModel(model)
 
     def genera_lista_filtrata_tipo(self, tipo):
-        lista_by_tipo = self.controller.lista_aziende_filtro_tipo(tipo)
+        lista_by_tipo = ControllerGuest.lista_aziende_filtro_tipo(tipo)
         if len(lista_by_tipo) == 0:
             QMessageBox.information(
                 self, 'SupplyChain', f'Non ci sono aziende del seguente tipo: {tipo}')
@@ -125,7 +125,7 @@ class VistaAziende(QMainWindow):
             self.list_view.setModel(model)
 
     def genera_lista_filtrata_nome(self, nome):
-        lista_by_nome = self.controller.azienda_by_nome(nome)
+        lista_by_nome = ControllerGuest.azienda_by_nome(nome)
         if len(lista_by_nome) == 0:
             QMessageBox.information(
                 self, 'SupplyChain', f'Non ci sono aziende con il seguente nome: {nome}')
@@ -200,7 +200,7 @@ class VistaAziende(QMainWindow):
         self.ordinata = True
         self.nome_filtro = ''
         self.tipo_filtro = ''
-        lista_ordinata = self.controller.lista_aziende_ordinata_co2()
+        lista_ordinata = ControllerGuest.lista_aziende_ordinata_co2()
         model = QStandardItemModel()
         for f in lista_ordinata:
             saldo = f[2] - f[1]
@@ -222,19 +222,19 @@ class VistaAziende(QMainWindow):
         if selected_index:
             selected_item = selected_index[0].row()  # Ottieni l'indice dell'elemento selezionato
             if self.tipo_filtro == '' and self.nome_filtro == '' and not self.ordinata:
-                azienda = self.controller.lista_aziende()[selected_item]
+                azienda = ControllerGuest.lista_aziende()[selected_item]
             else:
                 if not self.ordinata:
                     if self.nome_filtro == '':
-                        azienda = self.controller.lista_aziende_filtro_tipo(self.tipo_filtro)[
+                        azienda = ControllerGuest.lista_aziende_filtro_tipo(self.tipo_filtro)[
                             selected_item
                         ]
                     elif self.tipo_filtro == '':
-                        azienda = self.controller.azienda_by_nome(self.nome_filtro)[
+                        azienda = ControllerGuest.azienda_by_nome(self.nome_filtro)[
                             selected_item
                         ]
                 else:
-                    azienda = self.controller.lista_aziende_ordinata_co2()[selected_item]
+                    azienda = ControllerGuest.lista_aziende_ordinata_co2()[selected_item]
 
             saldo = azienda[2] - azienda[1]
             if saldo < 0:

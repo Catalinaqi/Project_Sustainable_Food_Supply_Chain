@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGridLayout, QPushButton, QMessageBox
 
-from off_chain.presentation.controller.controller_certificatore import ControllerCertificatore
+from off_chain.presentation.controller.certification_controller import ControllerCertificatore
 from off_chain.presentation.view import funzioni_utili
 from off_chain.presentation.view.vista_stato_azienda import VistaStatoAzienda
 from off_chain.presentation.view.vista_prodotti import VistaProdotti
@@ -14,7 +14,7 @@ class HomePageCertificatore(QMainWindow):
     def __init__(self, callback, utente):
         super().__init__()
 
-        self.controller = ControllerCertificatore()
+        #self.controller = ControllerCertificatore
 
         self.vista_soglie = None
         self.vista_sviluppatori = None
@@ -25,23 +25,23 @@ class HomePageCertificatore(QMainWindow):
         self.menu_bar = self.menuBar()
         self.menu_bar.setStyleSheet("background-color: rgb(240, 240, 240)")
         funzioni_utili.config_menubar(
-            self, "File", QIcon("images\\exit.png"),
+            self, "File", QIcon("presentation\\resources\\exit.png"),
             "Logout", 'Ctrl+Q', self.menu_bar
         ).triggered.connect(self.logout)
         funzioni_utili.config_menubar(
-            self, "Termini e condizioni d'uso", QIcon("images\\tcu.png"),
+            self, "Termini e condizioni d'uso", QIcon("presentation\\resources\\tcu.png"),
             "Leggi i termini e le condizioni d'uso", 'Ctrl+W', self.menu_bar
         ).triggered.connect(self.tcu)
         funzioni_utili.config_menubar(
-            self, "FAQ", QIcon("images\\faq.png"),
+            self, "FAQ", QIcon("presentation\\resources\\faq.png"),
             "Visualizza le domande più frequenti", 'Ctrl+E', self.menu_bar
         ).triggered.connect(self.faq)
         funzioni_utili.config_menubar(
-            self, "Tutorial", QIcon("images\\tutorial.png"),
+            self, "Tutorial", QIcon("presentation\\resources\\tutorial.png"),
             "Visualizza tutorial", 'Ctrl+E', self.menu_bar
         ).triggered.connect(self.tutorial)
 
-        self.setWindowIcon(QIcon("images\\logo_centro.png"))
+        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         self.callback = callback
 
@@ -86,7 +86,7 @@ class HomePageCertificatore(QMainWindow):
         funzioni_utili.insert_button_in_grid(self.button_sviluppatori, button_layout, 5, 4)
         self.button_sviluppatori.clicked.connect(self.show_sviluppatori)
 
-        funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("images\\logo_centro.png"))
+        funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("presentation\\resources\\logo_centro.png"))
 
         main_layout.addLayout(button_layout)
 
@@ -122,12 +122,12 @@ class HomePageCertificatore(QMainWindow):
             self, 'SupplyChain', 'TCU work in progress')
 
     def show_certificazioni(self):
-        self.vista_certificazioni = VistaProdotti(self.controller, self.utente)
+        self.vista_certificazioni = VistaProdotti(ControllerCertificatore, self.utente)
         self.vista_certificazioni.show()
 
     def show_azienda(self):
         self.vista_azienda = VistaStatoAzienda(self.aggiorna_profilo, self.utente,
-                                               self.controller, True)
+                                               ControllerCertificatore, True)
         self.vista_azienda.show()
 
     def aggiorna_profilo(self, utente):

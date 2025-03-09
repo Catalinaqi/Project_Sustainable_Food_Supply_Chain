@@ -28,7 +28,7 @@ class VistaSoglie(QMainWindow):
         self.list_view = QListView()
         self.modifica_button = QPushButton("Modifica soglia")
 
-        self.setWindowIcon(QIcon("images\\logo_centro.png"))
+        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         self.init_ui()
 

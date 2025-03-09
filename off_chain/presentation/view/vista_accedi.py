@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QFont
-from PyQt5.QtWidgets import QWidget, QFormLayout, QHBoxLayout, QMainWindow, QAction, QCheckBox, QStackedWidget, QComboBox
-
-from off_chain.presentation.controller.controller_autenticazione import ControllerAutenticazione
+from PyQt5.QtWidgets import QWidget, QFormLayout, QHBoxLayout, QMainWindow, QAction, QCheckBox, QStackedWidget, \
+    QComboBox
+from off_chain.presentation.controller.credential_controller import ControllerAutenticazione
 from off_chain.presentation.view import funzioni_utili
 from off_chain.presentation.view.home_page_aziende import HomePage
 from off_chain.presentation.view.home_page_certificatore import HomePageCertificatore
@@ -11,17 +11,24 @@ from off_chain.presentation.view.home_page_guest import HomePageGuest
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 import pyotp
 
+''''
+Class for authentication view main
+'''
+
 
 class VistaAccedi(QMainWindow):
+
+    """
+    Constructor "__init__" of the class VistaAccedi
+    """
     def __init__(self):
         super().__init__()
 
-        self.controller = ControllerAutenticazione()
-
+        #self.controller = ControllerAutenticazione() # instance of the class ControllerAutenticazione
         self.home_certificatore = None
         self.home_page = None
         self.home_guest = None
-        self.setWindowIcon(QIcon("images\\logo_centro.png"))
+        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         # Elementi di layout
         self.login_label = QLabel("Login")
@@ -59,6 +66,10 @@ class VistaAccedi(QMainWindow):
         self.password_visibile = False
 
         self.init_ui_()
+
+    ''''
+    Configure the UI main
+    '''
 
     def init_ui_(self):
         self.setWindowTitle('SupplyChain')
@@ -115,6 +126,10 @@ class VistaAccedi(QMainWindow):
 
         funzioni_utili.center(self)
 
+    ''''
+    Configure the UI for login
+    '''
+
     def init_login_ui(self, widget):
         main_layout = QVBoxLayout(widget)
 
@@ -153,10 +168,14 @@ class VistaAccedi(QMainWindow):
 
         main_layout.addLayout(button_layout)
 
-        self.logo.setPixmap(QPixmap("images\\logo_trasparente.png"))
+        self.logo.setPixmap(QPixmap("presentation\\resources\\logo_trasparente.png"))
         self.logo.setScaledContents(True)
         self.logo.setFixedSize(300, 300)
         main_layout.addWidget(self.logo, alignment=Qt.AlignCenter)
+
+    '''
+    Configure the UI for registration
+    '''
 
     def init_registrati_ui(self, widget):
         main_layout = QVBoxLayout(widget)
@@ -191,7 +210,7 @@ class VistaAccedi(QMainWindow):
             self.conferma_password_label, self.conferma_password_input, form_layout)
 
         for p in self.password:
-            self.icons_action.append(QAction(QIcon("images\\pass_invisibile.png"), "", p))
+            self.icons_action.append(QAction(QIcon("presentation\\resources\\pass_invisibile.png"), "", p))
         for index, p in enumerate(self.password):
             self.icons_action[index].triggered.connect(self.change_password_visibility)
             p.addAction(self.icons_action[index], QLineEdit.TrailingPosition)
@@ -217,11 +236,19 @@ class VistaAccedi(QMainWindow):
         QMessageBox.warning(
             self, "SupplyChain", f"Termini e condizioni d'uso work in progress!")
 
+    '''
+    Changed between login and registration
+    '''
+
     def switch_section(self, state):
         if state == Qt.Checked:
             self.stacked_widget.setCurrentIndex(1)
         else:
             self.stacked_widget.setCurrentIndex(0)
+
+    '''
+    Administer the authentication
+    '''
 
     def accedi(self):
         username = self.username_input.text()
@@ -229,7 +256,7 @@ class VistaAccedi(QMainWindow):
         otp_code = self.otp_input.text()
 
         # Verifica le credenziali dell'utente
-        utente = self.controller.login(username, password, otp_code)
+        utente = ControllerAutenticazione.login(username, password, otp_code)
 
         if not utente:
             QMessageBox.warning(self, "SupplyChain", "Credenziali o codice OTP errati!")
@@ -246,12 +273,20 @@ class VistaAccedi(QMainWindow):
 
             self.setVisible(False)  # Nascondi la finestra di login
 
+    '''
+    Allow the user to enter as a guest
+    '''
+
     def entra_guest(self):
         self.home_guest = HomePageGuest(self.reset)
         QMessageBox.information(
             self, "EdilGest", "Puoi entrare come guest!")
         self.home_guest.show()
         self.close()
+
+    '''
+    Allow the user to register
+    '''
 
     def registrati(self):
         if not self.tcu_cb.isChecked():
@@ -273,7 +308,7 @@ class VistaAccedi(QMainWindow):
                 QMessageBox.warning(
                     self, "SupplyChain", "Conferma password errata!")
             else:
-                success, message, secret_key = self.controller.registrazione(
+                success, message, secret_key = ControllerAutenticazione.registrazione(
                     username, password, tipo, indirizzo
                 )
                 if success:
@@ -296,16 +331,24 @@ class VistaAccedi(QMainWindow):
                 else:
                     QMessageBox.warning(self, "Errore", message)
 
+    '''
+    Allow the user to change the password visibility
+    '''
+
     def change_password_visibility(self):
         self.password_visibile = not self.password_visibile
         if not self.password_visibile:
             for index, p in enumerate(self.password):
                 p.setEchoMode(QLineEdit.Password)
-                self.icons_action[index].setIcon(QIcon("images\\pass_invisibile.png"))
+                self.icons_action[index].setIcon(QIcon("presentation\\resources\\pass_invisibile.png"))
         else:
             for index, p in enumerate(self.password):
                 p.setEchoMode(QLineEdit.Normal)
-                self.icons_action[index].setIcon(QIcon("images\\pass_visibile.png"))
+                self.icons_action[index].setIcon(QIcon("presentation\\resources\\pass_visibile.png"))
+
+    ''''
+    Resets input fields
+    '''
 
     def reset(self):
         self.tcu_cb.setChecked(False)
@@ -318,6 +361,9 @@ class VistaAccedi(QMainWindow):
         self.otp_input.setText("")
         self.password_visibile = False
         self.setVisible(True)
+
+
+#############################################################################################################
 
 
 class SecretKeyDialog(QDialog):

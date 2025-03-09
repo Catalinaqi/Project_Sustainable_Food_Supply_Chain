@@ -9,33 +9,33 @@ class VistaSviluppatori(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowIcon(QIcon("images\\logo_centro.png"))
+        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         # Elementi di layout
         self.logo = QLabel()
 
         self.button_inzaghi = QPushButton()
-        self.button_inzaghi.setIcon(QIcon("images\\inzaghi.png"))
+        self.button_inzaghi.setIcon(QIcon("presentation\\resources\\inzaghi.png"))
         self.button_inzaghi.setIconSize(QSize(100, 100))
 
         self.button_conte = QPushButton()
-        self.button_conte.setIcon(QIcon("images\\conte.png"))
+        self.button_conte.setIcon(QIcon("presentation\\resources\\conte.png"))
         self.button_conte.setIconSize(QSize(100, 100))
 
         self.button_conceicao = QPushButton()
-        self.button_conceicao.setIcon(QIcon("images\\conceicao.png"))
+        self.button_conceicao.setIcon(QIcon("presentation\\resources\\conceicao.png"))
         self.button_conceicao.setIconSize(QSize(100, 100))
 
         self.button_ranieri = QPushButton()
-        self.button_ranieri.setIcon(QIcon("images\\domenico.png"))
+        self.button_ranieri.setIcon(QIcon("presentation\\resources\\domenico.png"))
         self.button_ranieri.setIconSize(QSize(100, 100))
 
         self.button_mourinho = QPushButton()
-        self.button_mourinho.setIcon(QIcon("images\\mourinho.png"))
+        self.button_mourinho.setIcon(QIcon("presentation\\resources\\mourinho.png"))
         self.button_mourinho.setIconSize(QSize(100, 100))
 
         self.button_thiago = QPushButton()
-        self.button_thiago.setIcon(QIcon("images\\thiago.png"))
+        self.button_thiago.setIcon(QIcon("presentation\\resources\\thiago.png"))
         self.button_thiago.setIconSize(QSize(100, 100))
 
         self.init_ui()
@@ -74,7 +74,7 @@ class VistaSviluppatori(QMainWindow):
         funzioni_utili.insert_button_in_grid(self.button_thiago, button_layout, 5, 4, True)
         self.button_thiago.clicked.connect(self.show_thiago)
 
-        funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("images\\logo_centro.png"))
+        funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("presentation\\resources\\logo_centro.png"))
 
         main_layout.addLayout(button_layout)
 
