@@ -15,10 +15,14 @@ venv/
 .idea/
 *.iml
 
-# pytest caches
+# Pytest caches
 .pytest_cache/
 
 # Python caches
 __pycache__/
 *.pyc
 *.pyo
+
+
+# Ignore temporary databases but NOT the main one
+identifier.sqlite
