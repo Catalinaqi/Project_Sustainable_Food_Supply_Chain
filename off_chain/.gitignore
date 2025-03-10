@@ -14,3 +14,11 @@ venv/
 # Ignore PyCharm/IntelliJ IDEA settings
 .idea/
 *.iml
+
+# pytest caches
+.pytest_cache/
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
