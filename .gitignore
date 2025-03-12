@@ -26,3 +26,6 @@ __pycache__/
 
 # Ignore temporary databases but NOT the main one
 identifier.sqlite
+
+#Ignore log file
+.log
