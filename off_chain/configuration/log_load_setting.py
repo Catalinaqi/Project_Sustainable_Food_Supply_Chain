@@ -10,6 +10,11 @@ class LogConfig:
     Ensures logs are correctly formatted and written to both console and file.
     """
 
+
+    log_dir = os.path.join(os.path.dirname(__file__), "..", "..", "log")
+    os.makedirs(log_dir, exist_ok=True) 
+
+
     # Define absolute paths for logging file(log_setting.yaml) and log file(logOffChainApp.log)
     LOGGING_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "log_setting.yaml")
     LOG_FILE_PATH = os.path.join(os.path.dirname(__file__), "log/logOffChainApp.log")
