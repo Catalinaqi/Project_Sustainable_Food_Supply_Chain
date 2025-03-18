@@ -1,199 +1,23 @@
-2025-03-10 14:01:43,410 - app_logger - INFO - [log_load_setting.py:64] - BackEnd: INITIAL LOADING OF GLOBAL - LOGGER
-2025-03-10 14:01:43,411 - app_logger - INFO - [log_load_setting.py:65] - BackEnd: Logger initialized successfully (File logging: enabled)
-2025-03-10 14:01:43,540 - app_logger - INFO - [db_connection_setting.py:25] - BackEnd: get_connection: Name database is: sfs_chain_database.db
-2025-03-10 14:01:43,540 - app_logger - INFO - [db_connection_setting.py:26] - BackEnd: get_connection: Path for the database is: K:\00_Code\Cibersecurity_and_blockChain\Project_Sustainable_Food_Supply_Chain\off_chain\database\sfs_chain_database.db
-2025-03-10 14:01:43,540 - app_logger - INFO - [db_connection_setting.py:28] - BackEnd: get_connection: The database connection was created successfully.
-2025-03-10 14:01:43,540 - app_logger - INFO - [db_connection_setting.py:39] - BackEnd: get_connection: The database connection instance is: <sqlite3.Connection object at 0x000001C1EAE7B030>
-2025-03-10 14:01:43,540 - app_logger - INFO - [db_manager_setting.py:20] - BackEnd: DatabaseManagerSetting: DatabaseManagerSetting constructor.
-2025-03-10 14:01:43,541 - app_logger - INFO - [db_manager_setting.py:137] - BackEnd: execute_bd_migrations: Executing migration ...
-2025-03-10 14:01:43,541 - app_logger - INFO - [db_migrations.py:109] - BackEnd: run_migrations: Migrations completed successfully.
-2025-03-10 14:01:43,570 - app_logger - INFO - [sfs_off_chain_app.py:27] - Frontend: Starting the PyQt application...
-2025-03-10 14:01:44,745 - app_logger - INFO - [db_connection_setting.py:39] - BackEnd: get_connection: The database connection instance is: <sqlite3.Connection object at 0x000001C1EAE7B030>
-2025-03-10 14:01:44,746 - app_logger - INFO - [db_manager_setting.py:20] - BackEnd: DatabaseManagerSetting: DatabaseManagerSetting constructor.
-2025-03-10 14:01:44,746 - app_logger - INFO - [credential_repository_impl.py:54] - BackEnd: Successfully initializing the instance for CredentialRepositoryImpl.
-2025-03-10 14:01:44,746 - app_logger - INFO - [credential_controller.py:12] - BackEnd: Successful initialization of 'class instances' for repository implements
-2025-03-10 14:01:46,451 - app_logger - INFO - [db_connection_setting.py:39] - BackEnd: get_connection: The database connection instance is: <sqlite3.Connection object at 0x000001C1EAE7B030>
-2025-03-10 14:01:46,452 - app_logger - INFO - [db_manager_setting.py:20] - BackEnd: DatabaseManagerSetting: DatabaseManagerSetting constructor.
-2025-03-10 14:01:46,452 - app_logger - INFO - [certification_repository_impl.py:20] - BackEnd: Successfully initializing the instance for CertificationRepositoryImpl.
-2025-03-10 14:01:46,452 - app_logger - INFO - [db_connection_setting.py:39] - BackEnd: get_connection: The database connection instance is: <sqlite3.Connection object at 0x000001C1EAE7B030>
-2025-03-10 14:01:46,452 - app_logger - INFO - [db_manager_setting.py:20] - BackEnd: DatabaseManagerSetting: DatabaseManagerSetting constructor.
-2025-03-10 14:01:46,452 - app_logger - INFO - [product_repository_impl.py:18] - BackEnd: Successfully initializing the instance for ProductRepositoryImpl.
-2025-03-10 14:01:46,452 - app_logger - INFO - [db_connection_setting.py:39] - BackEnd: get_connection: The database connection instance is: <sqlite3.Connection object at 0x000001C1EAE7B030>
-2025-03-10 14:01:46,452 - app_logger - INFO - [db_manager_setting.py:20] - BackEnd: DatabaseManagerSetting: DatabaseManagerSetting constructor.
-2025-03-10 14:01:46,452 - app_logger - INFO - [threshold_repository_impl.py:16] - BackEnd: Successfully initializing the instance for ThresholdRepositoryImpl.
-2025-03-10 14:01:46,452 - app_logger - INFO - [db_connection_setting.py:39] - BackEnd: get_connection: The database connection instance is: <sqlite3.Connection object at 0x000001C1EAE7B030>
-2025-03-10 14:01:46,452 - app_logger - INFO - [db_manager_setting.py:20] - BackEnd: DatabaseManagerSetting: DatabaseManagerSetting constructor.
-2025-03-10 14:01:46,452 - app_logger - INFO - [company_repository_impl.py:20] - BackEnd: Successfully initializing the instance for CompanyRepositoryImpl.
-2025-03-10 14:01:46,452 - app_logger - INFO - [guest_controller.py:23] - BackEnd: Successful initialization of 'class instances' for repository implements
-2025-03-10 14:01:46,462 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-        SELECT
-            Prodotto.Id_prodotto,
-            Prodotto.Nome,
-            Prodotto.Quantita,
-            Prodotto.Stato,
-            Azienda.Nome
-        FROM Operazione
-        JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-        JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-        WHERE Operazione.Operazione = "Messo sugli scaffali"
-        AND Operazione.Id_prodotto IN (
-            SELECT Id_prodotto FROM Certificato
-        );
-         with params: () | Results: 2
-2025-03-10 14:01:46,463 - app_logger - INFO - [product_repository_impl.py:126] - Obtained in get_lista_credenziali: [(24, 'Cipolle', '70kg', 111, 'rrr'), (25, 'Carote', '70kg', 111, 'rrr')]
-2025-03-10 14:01:46,463 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-        SELECT
-            Operazione.Id_operazione,
-            Azienda.Nome,
-            Prodotto.Nome,
-            Operazione.Data_operazione,
-            Operazione.Consumo_CO2,
-            Operazione.Operazione
-        FROM Operazione
-        JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-        JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-        WHERE Operazione.Id_prodotto IN (
-            SELECT Materia_prima
-            FROM Composizione
-            WHERE Prodotto = ?
-        );
-             with params: (24,) | Results: 3
-2025-03-10 14:01:46,463 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-        SELECT
-            Operazione.Id_operazione,
-            Azienda.Nome,
-            Prodotto.Nome,
-            Operazione.Data_operazione,
-            Operazione.Consumo_CO2,
-            Operazione.Operazione
-        FROM Operazione
-        JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-        JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-        WHERE Operazione.Id_prodotto IN (
-            SELECT Materia_prima
-            FROM Composizione
-            WHERE Prodotto = ?
-        );
-             with params: (25,) | Results: 3
-2025-03-10 14:01:46,464 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-        SELECT * FROM Certificato WHERE Id_prodotto = ?;
-         with params: (24,) | Results: 1
-2025-03-10 14:01:46,464 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-        SELECT * FROM Certificato WHERE Id_prodotto = ?;
-         with params: (25,) | Results: 1
-2025-03-10 14:01:48,194 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-          SELECT
-                Prodotto.Id_prodotto,
-                Prodotto.Nome,
-                Prodotto.Quantita,
-                Prodotto.Stato,
-                Azienda.Nome
-            FROM Operazione
-            JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-            JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-            WHERE Operazione.Operazione = "Messo sugli scaffali";        
-         with params: () | Results: 3
-2025-03-10 14:01:48,194 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-        SELECT
-            Operazione.Id_operazione,
-            Azienda.Nome,
-            Prodotto.Nome,
-            Operazione.Data_operazione,
-            Operazione.Consumo_CO2,
-            Operazione.Operazione
-        FROM Operazione
-        JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-        JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-        WHERE Operazione.Id_prodotto IN (
-            SELECT Materia_prima
-            FROM Composizione
-            WHERE Prodotto = ?
-        );
-             with params: (23,) | Results: 9
-2025-03-10 14:01:48,195 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-        SELECT
-            Operazione.Id_operazione,
-            Azienda.Nome,
-            Prodotto.Nome,
-            Operazione.Data_operazione,
-            Operazione.Consumo_CO2,
-            Operazione.Operazione
-        FROM Operazione
-        JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-        JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-        WHERE Operazione.Id_prodotto IN (
-            SELECT Materia_prima
-            FROM Composizione
-            WHERE Prodotto = ?
-        );
-             with params: (24,) | Results: 3
-2025-03-10 14:01:48,195 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-        SELECT
-            Operazione.Id_operazione,
-            Azienda.Nome,
-            Prodotto.Nome,
-            Operazione.Data_operazione,
-            Operazione.Consumo_CO2,
-            Operazione.Operazione
-        FROM Operazione
-        JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-        JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-        WHERE Operazione.Id_prodotto IN (
-            SELECT Materia_prima
-            FROM Composizione
-            WHERE Prodotto = ?
-        );
-             with params: (25,) | Results: 3
-2025-03-10 14:01:48,195 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-        SELECT * FROM Certificato WHERE Id_prodotto = ?;
-         with params: (23,) | Results: 0
-2025-03-10 14:01:48,195 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-        SELECT * FROM Certificato WHERE Id_prodotto = ?;
-         with params: (24,) | Results: 1
-2025-03-10 14:01:48,195 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-        SELECT * FROM Certificato WHERE Id_prodotto = ?;
-         with params: (25,) | Results: 1
-2025-03-10 14:01:50,353 - app_logger - INFO - [guest_controller.py:23] - BackEnd: Successful initialization of 'class instances' for repository implements
-2025-03-10 14:01:50,362 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-        SELECT Id_azienda, Tipo, Indirizzo, Nome 
-        FROM Azienda WHERE Tipo != "Certificatore"
-         with params: () | Results: 4
-2025-03-10 14:01:50,362 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Consumo_CO2) FROM Operazione WHERE Id_azienda = ?;
-             with params: (8,) | Results: 1
-2025-03-10 14:01:50,363 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Consumo_CO2) FROM Operazione WHERE Id_azienda = ?;
-             with params: (8,) | Results: 1
-2025-03-10 14:01:50,363 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Co2_compensata) FROM Azioni_compensative WHERE Id_azienda = ?;
-             with params: (8,) | Results: 1
-2025-03-10 14:01:50,363 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Co2_compensata) FROM Azioni_compensative WHERE Id_azienda = ?;
-             with params: (8,) | Results: 1
-2025-03-10 14:01:50,363 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Consumo_CO2) FROM Operazione WHERE Id_azienda = ?;
-             with params: (9,) | Results: 1
-2025-03-10 14:01:50,363 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Consumo_CO2) FROM Operazione WHERE Id_azienda = ?;
-             with params: (9,) | Results: 1
-2025-03-10 14:01:50,363 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Co2_compensata) FROM Azioni_compensative WHERE Id_azienda = ?;
-             with params: (9,) | Results: 1
-2025-03-10 14:01:50,363 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Consumo_CO2) FROM Operazione WHERE Id_azienda = ?;
-             with params: (10,) | Results: 1
-2025-03-10 14:01:50,364 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Consumo_CO2) FROM Operazione WHERE Id_azienda = ?;
-             with params: (10,) | Results: 1
-2025-03-10 14:01:50,364 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Co2_compensata) FROM Azioni_compensative WHERE Id_azienda = ?;
-             with params: (10,) | Results: 1
-2025-03-10 14:01:50,364 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Consumo_CO2) FROM Operazione WHERE Id_azienda = ?;
-             with params: (11,) | Results: 1
-2025-03-10 14:01:50,364 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Consumo_CO2) FROM Operazione WHERE Id_azienda = ?;
-             with params: (11,) | Results: 1
-2025-03-10 14:01:50,364 - app_logger - INFO - [db_manager_setting.py:45] - BackEnd: fetch_query: Info executing query: 
-            SELECT SUM(Co2_compensata) FROM Azioni_compensative WHERE Id_azienda = ?;
-             with params: (11,) | Results: 1
+2025-03-18 19:33:27,000 - app_logger - INFO - [log_load_setting.py:66] - BackEnd: INITIAL LOADING OF GLOBAL - LOGGER
+2025-03-18 19:33:27,000 - app_logger - INFO - [log_load_setting.py:67] - BackEnd: Logger initialized successfully (File logging: enabled)
+2025-03-18 19:33:27,156 - app_logger - INFO - [db_connection_setting.py:25] - BackEnd: get_connection: Name database is: sfs_chain_database.db
+2025-03-18 19:33:27,156 - app_logger - INFO - [db_connection_setting.py:26] - BackEnd: get_connection: Path for the database is: K:\00_Code\Cibersecurity_and_blockChain\main\Project_Sustainable_Food_Supply_Chain\off_chain\database\sfs_chain_database.db
+2025-03-18 19:33:27,156 - app_logger - INFO - [db_connection_setting.py:28] - BackEnd: get_connection: The database connection was created successfully.
+2025-03-18 19:33:27,156 - app_logger - INFO - [db_connection_setting.py:39] - BackEnd: get_connection: The database connection instance is: <sqlite3.Connection object at 0x000002A716703120>
+2025-03-18 19:33:27,156 - app_logger - INFO - [db_manager_setting.py:20] - BackEnd: DatabaseManagerSetting: DatabaseManagerSetting constructor.
+2025-03-18 19:33:27,157 - app_logger - INFO - [db_manager_setting.py:137] - BackEnd: execute_bd_migrations: Executing migration ...
+2025-03-18 19:33:27,158 - app_logger - INFO - [db_migrations.py:109] - BackEnd: run_migrations: Migrations completed successfully.
+2025-03-18 19:33:27,185 - app_logger - INFO - [sfs_off_chain_app.py:27] - Frontend: Starting the PyQt application...
+2025-03-18 19:33:28,360 - app_logger - INFO - [db_connection_setting.py:39] - BackEnd: get_connection: The database connection instance is: <sqlite3.Connection object at 0x000002A716703120>
+2025-03-18 19:33:28,360 - app_logger - INFO - [db_manager_setting.py:20] - BackEnd: DatabaseManagerSetting: DatabaseManagerSetting constructor.
+2025-03-18 19:33:28,360 - app_logger - INFO - [credential_repository_impl.py:54] - BackEnd: Successfully initializing the instance for CredentialRepositoryImpl.
+2025-03-18 19:33:28,361 - app_logger - INFO - [credential_controller.py:12] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-03-18 19:34:12,031 - app_logger - INFO - [db_manager_setting.py:75] - Info executing query(execute_query): 
+                    INSERT INTO Credenziali (Username, Password, totp_secret)
+                    VALUES (?, ?, ?);
+                     with params: ('Catalina', 'Catalina7.', 'VAVFJVA3YH3Q42HRZUZCGTQYQKXB2RJQ')
+2025-03-18 19:34:12,044 - app_logger - INFO - [db_manager_setting.py:31] - BackEnd: fetch_one: Info executing query: SELECT last_insert_rowid(); with params: () | Results: 1
+2025-03-18 19:34:12,044 - app_logger - INFO - [db_manager_setting.py:75] - Info executing query(execute_query): 
+                    INSERT INTO Azienda (Id_credenziali, Tipo, Nome, Indirizzo)
+                    VALUES (?, ?, ?, ?);
+                     with params: (13, 'Certificatore', 'Catalina', 'Recanati')

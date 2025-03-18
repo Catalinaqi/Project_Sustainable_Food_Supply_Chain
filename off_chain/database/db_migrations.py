@@ -17,7 +17,7 @@ class DatabaseMigrations:
                 Id_credenziali INTEGER PRIMARY KEY AUTOINCREMENT,
                 Username TEXT UNIQUE NOT NULL,
                 Password TEXT NOT NULL,
-                topt_secret TEXT NOT NULL
+                totp_secret TEXT NOT NULL
             )
             ''',
             '''
