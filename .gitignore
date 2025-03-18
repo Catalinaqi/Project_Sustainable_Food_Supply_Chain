@@ -14,7 +14,6 @@ venv/
 # Ignore PyCharm/IntelliJ IDEA settings
 .idea/
 *.iml
-.vscode
 
 # Pytest caches
 .pytest_cache/
@@ -27,3 +26,6 @@ __pycache__/
 
 # Ignore temporary databases but NOT the main one
 identifier.sqlite
+
+#Ignore log file
+.log
