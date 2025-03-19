@@ -1,8 +1,8 @@
 from abc import ABC
 
-from off_chain.configuration.db_manager_setting import DatabaseManagerSetting
-from off_chain.configuration.log_load_setting import logger
-from off_chain.domain.repository.threshold_repository import ThresholdRepository
+from configuration.db_manager_setting import DatabaseManagerSetting
+from configuration.log_load_setting import logger
+from domain.repository.threshold_repository import ThresholdRepository
 
 
 class ThresholdRepositoryImpl(ThresholdRepository, ABC):

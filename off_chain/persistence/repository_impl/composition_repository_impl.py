@@ -1,7 +1,7 @@
 from abc import ABC
-from off_chain.configuration.db_manager_setting import DatabaseManagerSetting
-from off_chain.configuration.log_load_setting import logger
-from off_chain.domain.repository.composition_repository import CompositionRepository
+from configuration.db_manager_setting import DatabaseManagerSetting
+from configuration.log_load_setting import logger
+from domain.repository.composition_repository import CompositionRepository
 
 
 class CompositionRepositoryImpl(CompositionRepository, ABC):

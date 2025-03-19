@@ -5,9 +5,9 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QSplashScreen
 
-from off_chain.configuration.log_load_setting import logger
-from off_chain.database.db_migrations import DatabaseMigrations
-from off_chain.presentation.view.vista_accedi import VistaAccedi
+from configuration.log_load_setting import logger
+from database.db_migrations import DatabaseMigrations
+from presentation.view.vista_accedi import VistaAccedi
 
 
 def setup_database():

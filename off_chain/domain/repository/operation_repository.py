@@ -1,6 +1,6 @@
 import datetime
 from abc import ABC, abstractmethod
-from off_chain.model.operation_model import OperationModel
+from model.operation_model import OperationModel
 
 
 class OperationRepository(ABC):

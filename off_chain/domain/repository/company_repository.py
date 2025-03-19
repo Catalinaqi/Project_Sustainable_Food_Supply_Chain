@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from off_chain.model.company_model import CompanyModel
+from model.company_model import CompanyModel
 
 
 class CompanyRepository(ABC):

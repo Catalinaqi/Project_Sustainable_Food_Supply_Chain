@@ -1,8 +1,8 @@
 from abc import ABC
-from off_chain.configuration.db_manager_setting import DatabaseManagerSetting
-from off_chain.configuration.log_load_setting import logger
-from off_chain.domain.repository.company_repository import CompanyRepository
-from off_chain.model.company_model import CompanyModel
+from configuration.db_manager_setting import DatabaseManagerSetting
+from configuration.log_load_setting import logger
+from domain.repository.company_repository import CompanyRepository
+from model.company_model import CompanyModel
 
 
 class CompanyRepositoryImpl(CompanyRepository, ABC):

@@ -2,8 +2,8 @@ import atexit
 import sqlite3
 import os
 
-from off_chain.configuration.db_load_setting import DATABASE_PATH
-from off_chain.configuration.log_load_setting import logger
+from configuration.db_load_setting import DATABASE_PATH
+from configuration.log_load_setting import logger
 
 
 class DatabaseConnectionSetting:

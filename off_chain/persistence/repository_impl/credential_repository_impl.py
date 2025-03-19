@@ -1,11 +1,11 @@
 from abc import ABC
 import re
 import sqlite3
-from off_chain.domain.exception.authentication_exceptions import PasswordTooShortError, PasswordWeakError
-from off_chain.domain.exception.database_exceptions import UniqueConstraintError
-from off_chain.domain.repository.credential_repository import CredentialRepository
-from off_chain.configuration.db_manager_setting import DatabaseManagerSetting
-from off_chain.configuration.log_load_setting import logger
+from domain.exception.authentication_exceptions import PasswordTooShortError, PasswordWeakError
+from domain.exception.database_exceptions import UniqueConstraintError
+from domain.repository.credential_repository import CredentialRepository
+from configuration.db_manager_setting import DatabaseManagerSetting
+from configuration.log_load_setting import logger
 
 """
 class "CredentialRepositoryImpl(CredentialRepository, ABC)"

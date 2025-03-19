@@ -1,5 +1,5 @@
-from off_chain.configuration.log_load_setting import logger
-from off_chain.configuration.db_manager_setting import DatabaseManagerSetting
+from configuration.log_load_setting import logger
+from configuration.db_manager_setting import DatabaseManagerSetting
 
 
 class DatabaseMigrations:

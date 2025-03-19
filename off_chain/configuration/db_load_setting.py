@@ -1,7 +1,7 @@
 import os
 import yaml
 
-from off_chain.configuration.log_load_setting import logger
+from configuration.log_load_setting import logger
 
 
 class DatabaseForYamlLoadOfSetting:
@@ -35,7 +35,7 @@ class DatabaseForYamlLoadOfSetting:
 # Load configuration from database setting file
 configDatabase = DatabaseForYamlLoadOfSetting.load_config()
 
-# Go up two levels from the current folder to point to `off_chain/database/`
+# Go up two levels from the current folder to point to `database/`
 BASE_DIR_DB = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "database"))
 
 # Build the absolute path of the database file

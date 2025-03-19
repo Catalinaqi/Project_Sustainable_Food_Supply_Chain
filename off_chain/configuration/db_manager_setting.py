@@ -1,7 +1,7 @@
 import sqlite3
 
-from off_chain.configuration.db_connection_setting import DatabaseConnectionSetting
-from off_chain.configuration.log_load_setting import logger
+from configuration.db_connection_setting import DatabaseConnectionSetting
+from configuration.log_load_setting import logger
 
 
 class DatabaseManagerSetting:

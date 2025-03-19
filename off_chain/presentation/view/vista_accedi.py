@@ -2,11 +2,11 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtWidgets import QWidget, QFormLayout, QHBoxLayout, QMainWindow, QAction, QCheckBox, QStackedWidget, \
     QComboBox
-from off_chain.presentation.controller.credential_controller import ControllerAutenticazione
-from off_chain.presentation.view import funzioni_utili
-from off_chain.presentation.view.home_page_aziende import HomePage
-from off_chain.presentation.view.home_page_certificatore import HomePageCertificatore
-from off_chain.presentation.view.home_page_guest import HomePageGuest
+from presentation.controller.credential_controller import ControllerAutenticazione
+from presentation.view import funzioni_utili
+from presentation.view.home_page_aziende import HomePage
+from presentation.view.home_page_certificatore import HomePageCertificatore
+from presentation.view.home_page_guest import HomePageGuest
 
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 import pyotp

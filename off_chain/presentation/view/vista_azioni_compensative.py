@@ -3,9 +3,9 @@ from PyQt5.QtGui import QFont, QStandardItemModel, QStandardItem, QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QListView, QHBoxLayout, QPushButton, QMenu, \
     QDialog, QDialogButtonBox, QMessageBox, QDateEdit
 
-from off_chain.presentation.controller.company_controller import ControllerAzienda
-from off_chain.presentation.view import funzioni_utili
-from off_chain.presentation.view.inserisci_azione import VistaInserisciAzione
+from presentation.controller.company_controller import ControllerAzienda
+from presentation.view import funzioni_utili
+from presentation.view.inserisci_azione import VistaInserisciAzione
 
 
 class VistaAzioniCompensative(QMainWindow):

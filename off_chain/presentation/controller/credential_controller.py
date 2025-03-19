@@ -1,8 +1,8 @@
 import pyotp
-from off_chain.configuration.log_load_setting import logger
-from off_chain.domain.exception.authentication_exceptions import PasswordTooShortError, PasswordWeakError
-from off_chain.domain.exception.database_exceptions import UniqueConstraintError, DatabaseError
-from off_chain.persistence.repository_impl.credential_repository_impl import CredentialRepositoryImpl
+from configuration.log_load_setting import logger
+from domain.exception.authentication_exceptions import PasswordTooShortError, PasswordWeakError
+from domain.exception.database_exceptions import UniqueConstraintError, DatabaseError
+from persistence.repository_impl.credential_repository_impl import CredentialRepositoryImpl
 
 
 class ControllerAutenticazione:

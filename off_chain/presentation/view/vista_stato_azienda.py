@@ -3,7 +3,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, QFormLayout, QLineEdit,
                              QHBoxLayout, QPushButton, QMessageBox)
 
-from off_chain.presentation.view import funzioni_utili
+from presentation.view import funzioni_utili
 
 
 class VistaStatoAzienda(QMainWindow):

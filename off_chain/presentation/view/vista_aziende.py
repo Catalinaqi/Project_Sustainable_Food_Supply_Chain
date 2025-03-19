@@ -3,8 +3,8 @@ from PyQt5.QtGui import QFont, QStandardItemModel, QStandardItem, QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QListView, QHBoxLayout, QPushButton, QMenu, \
     QDialog, QComboBox, QDialogButtonBox, QMessageBox, QInputDialog
 
-from off_chain.presentation.controller.guest_controller import ControllerGuest
-from off_chain.presentation.view import funzioni_utili
+from presentation.controller.guest_controller import ControllerGuest
+from presentation.view import funzioni_utili
 
 
 class VistaAziende(QMainWindow):

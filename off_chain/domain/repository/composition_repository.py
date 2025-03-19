@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from off_chain.model.product_model import ProductModel
+from model.product_model import ProductModel
 
 
 class CompositionRepository(ABC):

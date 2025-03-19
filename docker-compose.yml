@@ -1,6 +1,6 @@
 version: "3.13.2"
 services:
-  off_chain:
+  
     build: ./off_chain
     ports:
       - "5000:5000"
