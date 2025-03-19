@@ -5,6 +5,13 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QListView
 
 from presentation.view import funzioni_utili
 from presentation.view.inserisci_operazione import VistaInserisciOperazione
+from presentation.controller.company_controller import ControllerAzienda
+from presentation.controller.certification_controller import ControllerCertificatore
+from presentation.controller.credential_controller import ControllerAutenticazione
+from presentation.controller.guest_controller import ControllerGuest
+
+from configuration.log_load_setting import logger
+
 
 
 def stringa_giusta(f, is_storico, scarto):
@@ -25,13 +32,16 @@ def stringa_giusta(f, is_storico, scarto):
             f"Tipo operazione: {f[6]}\n"
             f"Scarto CO2 consumata: {scarto}")
 
-
 class VistaOperazioni(QMainWindow):
     def __init__(self, controller, azienda=(), is_storico=False, prodotto=()):
         super().__init__()
 
         # self.callback = callback
         self.controller = controller
+        self.controllerCertificatore = ControllerCertificatore()
+        self.controllerAzienda = ControllerAzienda()
+        self.controllerAutenticazione = ControllerAutenticazione()
+        self.controllerGuest = ControllerGuest()
         self.inserisci_operazione = None
         self.azienda = azienda
         self.is_storico = is_storico
@@ -136,6 +146,10 @@ class VistaOperazioni(QMainWindow):
         self.ordinata = False
         model = QStandardItemModel()
         for f in self.lista_giusta(self.is_storico):
+            print(f"Elemento f: {f}, tipo: {type(f)}")
+            if not isinstance(f, (list, tuple)):
+                logger.error(f"Elemento non valido: {f}")
+                continue  # Saltar este elemento
             if self.is_storico:
                 scarto = self.controller.scarto_soglia(f[4], f[5], f[2])
             else:

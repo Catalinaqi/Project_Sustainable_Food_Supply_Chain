@@ -4,6 +4,7 @@ from persistence.repository_impl.threshold_repository_impl import ThresholdRepos
 from persistence.repository_impl.compensation_action_repository_impl import CompensationActionRepositoryImpl
 from persistence.repository_impl.operation_repository_impl import OperationRepositoryImpl
 from persistence.repository_impl.product_repository_impl import ProductRepositoryImpl
+from configuration.log_load_setting import logger
 from persistence.repository_impl.composition_repository_impl import CompositionRepositoryImpl
 from model.company_model import CompanyModel
 
@@ -15,11 +16,12 @@ class ControllerAzienda:
             OperationRepositoryImpl()
             ProductRepositoryImpl()
             ThresholdRepositoryImpl()
-            CompanyRepositoryImpl()    
+            CompanyRepositoryImpl()
     """
 
     def __init__(self):
         self.operation = OperationRepositoryImpl()
+        self.compensation_action = CompensationActionRepositoryImpl()
         self.product = ProductRepositoryImpl()
         self.threshold = ThresholdRepositoryImpl()
         self.company = CompanyRepositoryImpl()
@@ -32,7 +34,7 @@ class ControllerAzienda:
         lista_soglie = self.threshold.get_lista_soglie()
         return lista_soglie
 
-    # Restituisce il dettaglio della soglia selezionata dato l'indice n    def get_dettaglio_soglia(self, n):
+        # Restituisce il dettaglio della soglia selezionata dato l'indice n    def get_dettaglio_soglia(self, n):
         pass
 
     # Restituisce il dettaglio della co2/il numero di certificati della sua azienda
@@ -46,9 +48,14 @@ class ControllerAzienda:
 
     # Restituisce la lista di tutte le azioni compensative della sua azienda
     def lista_azioni_compensative(self, azienda):
-        # repo = CompensationActionRepositoryImpl()
-        lista_azioni_compensative = self.company.get_lista_azioni(azienda)
-        return lista_azioni_compensative
+        logger.info(f"el id_azienda es: {azienda}")
+        try:
+            lista_azioni_compensative = self.compensation_action.get_lista_azioni(azienda)
+            return lista_azioni_compensative
+        except Exception as e:
+            logger.error(f"Error al obtener la lista de azioni compensative: {e}", exc_info=True)
+            return []  # o None, según lo que necesites retornar en caso de error
+
 
     # Restituisce la lista delle sue azioni compensative filtrate per data
     def lista_azioni_per_data(self, azienda, d1, d2):
@@ -75,7 +82,7 @@ class ControllerAzienda:
     # Restituisce la lista di tutte le operazioni della sua azienda
     def lista_operazioni(self, azienda):
         # repo = OperationRepositoryImpl()
-        lista_operazioni = self.company.get_operazioni_by_azienda(azienda)
+        lista_operazioni = self.operation.get_operazioni_by_azienda(azienda)
         return lista_operazioni
 
     # Restituisce la lista delle sue operazioni filtrate per data
@@ -130,13 +137,13 @@ class ControllerAzienda:
 
     # Restituisce le opzioni per la combo box del dialog per la composizione
     def get_prodotti_to_composizione(self, id_azienda):
-        #repo = CompositionRepositoryImpl()
+        # repo = CompositionRepositoryImpl()
         lista = self.product.get_prodotti_to_composizione(id_azienda)
         return lista
 
     # Restituisce lo scarto dalla soglia di riferimento
     def scarto_soglia(self, co2, operazione, prodotto):
-        #repo = ThresholdRepositoryImpl()
+        # repo = ThresholdRepositoryImpl()
         soglia = self.threshold.get_soglia_by_operazione_and_prodotto(operazione, prodotto)
         return soglia - float(co2)
 

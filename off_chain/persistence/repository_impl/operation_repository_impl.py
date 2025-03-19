@@ -48,7 +48,7 @@ class OperationRepositoryImpl(OperationRepository, ABC):
         ON Operazione.Id_prodotto = Prodotto.Id_prodotto
         WHERE Operazione.Id_azienda = ?;
         """
-        return self.db_manager_setting.fetch_one(query, (azienda,))
+        return self.db_manager_setting.fetch_query(query, (azienda,))
 
     def inserisci_operazione_azienda_rivenditore(self, azienda: int, prodotto: int, data: datetime, co2: float,
                                                  evento: str):
