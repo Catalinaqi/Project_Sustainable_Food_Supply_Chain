@@ -107,7 +107,7 @@ class ControllerCertificatore:
 
     def is_certificato(self, id_prodotto):
         # repo = CertificationRepositoryImpl()
-        return self.product.is_certificato(id_prodotto)
+        return " certificato" """self.product.is_certificato(id_prodotto)"""
 
     # Restituisce la lista delle operazioni per la produzione del prodotto selezionato
     def lista_operazioni_prodotto(self, id_prodotto):
