@@ -28,4 +28,5 @@ __pycache__/
 identifier.sqlite
 
 #Ignore log file
-.log
+*.log
+*.db
