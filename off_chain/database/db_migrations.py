@@ -1,4 +1,5 @@
 from configuration.log_load_setting import logger
+from configuration.database import Database
 from configuration.db_manager_setting import DatabaseManagerSetting
 
 
@@ -99,10 +100,6 @@ class DatabaseMigrations:
         try:
             queries_with_params = [(query, ()) for query in TABLE_CREATION_QUERIES]
 
-            xx = DatabaseManagerSetting()
-
-            # Execute migrations
-            xx.execute_bd_migrations(queries_with_params)
 
             # Check if the migrations were executed
             DatabaseMigrations._migrations_executed = True

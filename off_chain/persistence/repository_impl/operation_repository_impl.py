@@ -1,6 +1,6 @@
 import datetime
 from abc import ABC
-from configuration.db_manager_setting import DatabaseManagerSetting
+from configuration.database import Database
 from configuration.log_load_setting import logger
 from domain.repository.operation_repository import OperationRepository
 from model.operation_model import OperationModel
@@ -13,7 +13,7 @@ class OperationRepositoryImpl(OperationRepository, ABC):
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(OperationRepositoryImpl, cls).__new__(cls)
-            cls._instance.db_manager_setting = DatabaseManagerSetting()
+            cls._instance.db_manager_setting = Database()
             logger.info("BackEnd: Successfully initializing the instance for OperationRepositoryImpl.")
         return cls._instance
 
@@ -26,7 +26,7 @@ class OperationRepositoryImpl(OperationRepository, ABC):
         WHERE Operazione.Id_azienda = ?
         ORDER BY Operazione.Consumo_CO2 ASC;
         """
-        return self.db_manager_setting.fetch_query(query, (azienda,))
+        return self.db_manager_setting.fetch_results(query, (azienda,))
 
     def get_operazioni_by_data(self, azienda: int, d1: datetime, d2: datetime) -> list:
         """Restituisce la lista di tutte le operazioni effettuate da una certa azienda filtrate per data """
@@ -37,7 +37,7 @@ class OperationRepositoryImpl(OperationRepository, ABC):
         WHERE Operazione.Id_azienda = ?
         AND Operazione.Data_operazione BETWEEN ? AND ?;
         """
-        return self.db_manager_setting.fetch_query(query, (azienda, d1, d2))
+        return self.db_manager_setting.fetch_results(query, (azienda, d1, d2))
 
     def get_operazioni_by_azienda(self, azienda: int) -> list:
         """Restituisce la lista di tutte le operazioni effettuate da una certa azienda """
@@ -48,7 +48,7 @@ class OperationRepositoryImpl(OperationRepository, ABC):
         ON Operazione.Id_prodotto = Prodotto.Id_prodotto
         WHERE Operazione.Id_azienda = ?;
         """
-        return self.db_manager_setting.fetch_query(query, (azienda,))
+        return self.db_manager_setting.fetch_results(query, (azienda,))
 
     def inserisci_operazione_azienda_rivenditore(self, azienda: int, prodotto: int, data: datetime, co2: float,
                                                  evento: str):

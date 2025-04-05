@@ -96,11 +96,15 @@ class VistaAziende(QMainWindow):
         self.tipo_filtro = ''
         self.ordinata = False
         model = QStandardItemModel()
-        for f in self.controller.lista_aziende():
-            saldo = f[2] - f[1]
-            if saldo < 0:
-                saldo = f"({-saldo})"
-            item = QStandardItem(f"Nome Azienda: {f[0][3]}\nSaldo CO2: {saldo}")
+        for azienda in self.controller.lista_aziende():
+            try:
+                saldo = int(azienda.Co2_consumata) - int(azienda.Co2_compensata)
+                if saldo < 0:
+                    saldo = f"({-saldo})"
+                item = QStandardItem(f"Nome Azienda: {azienda.Nome} \nSaldo CO2: {saldo}")
+            except:
+                item = QStandardItem(f"Nome Azienda: {azienda.Nome} \nSaldo CO2: Errore nel calcolo dei dai")
+           
             item.setEditable(False)
             item.setFont(QFont("Times Roman", 11))
             model.appendRow(item)

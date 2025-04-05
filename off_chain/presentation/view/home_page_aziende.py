@@ -8,6 +8,7 @@ from presentation.view.vista_azioni_compensative import VistaAzioniCompensative
 from presentation.view.vista_operazioni import VistaOperazioni
 from presentation.view.vista_soglie import VistaSoglie
 from presentation.view.vista_sviluppatori import VistaSviluppatori
+from session import Session
 
 
 class HomePage(QMainWindow):
@@ -52,7 +53,7 @@ class HomePage(QMainWindow):
 
         # Elementi di layout
         self.logo = QLabel()
-        self.welcome_label = QLabel(f"Ciao {self.utente[3]} 👋!\nBenvenuto in SupplyChain.\n"
+        self.welcome_label = QLabel(f"Ciao {Session().current_user["username"]} 👋!\nBenvenuto in SupplyChain.\n"
                                     f"Prego selezionare un'opzione dal menu")
         self.button_operazioni = QPushButton('Operazioni')
         self.button_azioni_compensative = QPushButton('Azioni compensative')
@@ -174,7 +175,7 @@ class HomePage(QMainWindow):
     def aggiorna_profilo(self, utente):
         self.utente = utente
         self.welcome_label.setText(
-            f"Ciao {utente[4]} 👋!\nBenvenuto in SupplyChain.\n"
+            f"Ciao {Session().current_user.Nome} 👋!\nBenvenuto in SupplyChain.\n"
             f"Prego selezionare un'opzione dal menu"
         )
 

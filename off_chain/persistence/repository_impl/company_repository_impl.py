@@ -1,8 +1,10 @@
 from abc import ABC
-from configuration.db_manager_setting import DatabaseManagerSetting
+from configuration.database import Database
 from configuration.log_load_setting import logger
 from domain.repository.company_repository import CompanyRepository
 from model.company_model import CompanyModel
+from persistence.query_builder import QueryBuilder
+from persistence.repository_impl.database_standard import *
 
 
 class CompanyRepositoryImpl(CompanyRepository, ABC):
@@ -10,128 +12,39 @@ class CompanyRepositoryImpl(CompanyRepository, ABC):
      Implementing the aziende repository.
      """
 
-    # Class variable that stores the single instance
-    _instance = None
+    def __init__(self):
+        super().__init__()
+        self.db = Database()
+        self.query_builder = QueryBuilder()
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(CompanyRepositoryImpl, cls).__new__(cls)
-            cls._instance.db_manager_setting = DatabaseManagerSetting()
-            logger.info("BackEnd: Successfully initializing the instance for CompanyRepositoryImpl.")
-        return cls._instance
+    def get_lista_aziende(self, tipo: aziende_enum = None, 
+                          nome : str = None, id : int = None ) -> list[CompanyModel]:
+        
+        self.query_builder.select("*").table("Azienda")
+        #TODO aggiungere colonne
+        #self.query_builder.select("Id_azienda","Tipo","Indirizzo","Nome","Co2_consumata", "Co2_compensata").table("Azienda")
 
-    def get_lista_rivenditori(self) -> list:
-        query = """
-        SELECT Id_azienda, Tipo, Indirizzo, Nome 
-        FROM Azienda WHERE Tipo = "Rivenditore"
-        """
-        return self.db_manager_setting.fetch_query(query)
 
-    def get_lista_aziende(self) -> list:
-        query = """
-        SELECT Id_azienda, Tipo, Indirizzo, Nome 
-        FROM Azienda WHERE Tipo != "Certificatore"
-        """
-        aziende = self.db_manager_setting.fetch_query(query)
-        lista_con_co2 = []
-        for azienda in aziende:
-            query_co2_consumata = """
-            SELECT SUM(Consumo_CO2) FROM Operazione WHERE Id_azienda = ?;
-            """
-            query_co2_compensata = """
-            SELECT SUM(Co2_compensata) FROM Azioni_compensative WHERE Id_azienda = ?;
-            """
-            if not self.db_manager_setting.fetch_query(query_co2_consumata, (azienda[0],))[0][0]:
-                co2_consumata = 0
-            else:
-                co2_consumata = self.db_manager_setting.fetch_query(query_co2_consumata, (azienda[0],))[0][0]
-            if not self.db_manager_setting.fetch_query(query_co2_compensata, (azienda[0],))[0][0]:
-                co2_compensata = 0
-            else:
-                co2_compensata = self.db_manager_setting.fetch_query(query_co2_compensata, (azienda[0],))[0][0]
-            lista_con_co2.append((azienda, co2_consumata, co2_compensata))
-        return lista_con_co2
+        if not tipo: 
+                self.query_builder.where("Tipo", "!=" , str(aziende_enum.CERIFICATORE.value))
 
-    def get_lista_aziende_ordinata(self) -> list:
-        lista_ordinata = sorted(self.get_lista_aziende(), key=lambda x: (x[2] or 0) - (x[1] or 0),
-                                reverse=True)
-        return lista_ordinata
+        if nome:
+            self.query_builder.where("Nome", "=",nome)
 
-    def get_lista_aziende_filtrata_tipo(self, tipo: str) -> list:
-        query = """
-        SELECT Id_azienda, Tipo, Indirizzo, Nome 
-        FROM Azienda WHERE Tipo != "Certificatore"
-        AND Tipo = ?
-        """
-        aziende = self.db_manager_setting.fetch_query(query, (tipo,))
-        lista_con_co2 = []
-        for azienda in aziende:
-            query_co2_consumata = """
-            SELECT SUM(Consumo_CO2) FROM Operazione WHERE Id_azienda = ?;
-            """
-            query_co2_compensata = """
-            SELECT SUM(Co2_compensata) FROM Azioni_compensative WHERE Id_azienda = ?;
-            """
-            if not self.db_manager_setting.fetch_query(query_co2_consumata, (azienda[0],))[0][0]:
-                co2_consumata = 0
-            else:
-                co2_consumata = self.db_manager_setting.fetch_query(query_co2_consumata, (azienda[0],))[0][0]
-            if not self.db_manager_setting.fetch_query(query_co2_compensata, (azienda[0],))[0][0]:
-                co2_compensata = 0
-            else:
-                co2_compensata = self.db_manager_setting.fetch_query(query_co2_compensata, (azienda[0],))[0][0]
-            lista_con_co2.append((azienda, co2_consumata, co2_compensata))
-        return lista_con_co2
+        if id:
+            self.query_builder.where("Id_azienda", "=",id)
 
-    def get_azienda_by_nome(self, nome: str) -> list:
-        query = """
-        SELECT Id_azienda, Tipo, Indirizzo, Nome 
-        FROM Azienda WHERE Tipo != "Certificatore"
-        AND Nome = ?
-        """
-        aziende = self.db_manager_setting.fetch_query(query, (nome,))
-        lista_con_co2 = []
-        for azienda in aziende:
-            query_co2_consumata = """
-            SELECT SUM(Consumo_CO2) FROM Operazione WHERE Id_azienda = ?;
-            """
-            query_co2_compensata = """
-            SELECT SUM(Co2_compensata) FROM Azioni_compensative WHERE Id_azienda = ?;
-            """
-            if not self.db_manager_setting.fetch_query(query_co2_consumata, (azienda[0],))[0][0]:
-                co2_consumata = 0
-            else:
-                co2_consumata = self.db_manager_setting.fetch_query(query_co2_consumata, (azienda[0],))[0][0]
-            if not self.db_manager_setting.fetch_query(query_co2_compensata, (azienda[0],))[0][0]:
-                co2_compensata = 0
-            else:
-                co2_compensata = self.db_manager_setting.fetch_query(query_co2_compensata, (azienda[0],))[0][0]
-            lista_con_co2.append((azienda, co2_consumata, co2_compensata))
-        return lista_con_co2
+        query, value= (self.query_builder.get_query())
+        result = self.db.fetch_results(query,value)
+        try:
+            print(result[0])
+            return [CompanyModel(*x) for x in result]
+        
+        except Exception as e:
+            print(e)
+            return []
+            
 
-    def get_azienda_by_id(self, id_: int) -> list:
-        query = """
-        SELECT Id_azienda, Tipo, Indirizzo, Nome FROM Azienda WHERE Id_azienda = ?;
-        """
-        aziende = self.db_manager_setting.fetch_query(query, (id_,))
-        lista_con_co2 = []
-        for azienda in aziende:
-            query_co2_consumata = """
-            SELECT SUM(Consumo_CO2) FROM Operazione WHERE Id_azienda = ?;
-            """
-            query_co2_compensata = """
-            SELECT SUM(Co2_compensata) FROM Azioni_compensative WHERE Id_azienda = ?;
-            """
-            if not self.db_manager_setting.fetch_query(query_co2_consumata, (azienda[0],))[0][0]:
-                co2_consumata = 0
-            else:
-                co2_consumata = self.db_manager_setting.fetch_query(query_co2_consumata, (azienda[0],))[0][0]
-            if not self.db_manager_setting.fetch_query(query_co2_compensata, (azienda[0],))[0][0]:
-                co2_compensata = 0
-            else:
-                co2_compensata = self.db_manager_setting.fetch_query(query_co2_compensata, (azienda[0],))[0][0]
-            lista_con_co2.append((azienda, co2_consumata, co2_compensata))
-        return lista_con_co2
 
-    def get_azienda(self, n):
+    def get_azienda(self, n: int) -> CompanyModel:
         return self.get_lista_aziende()[n]

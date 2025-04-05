@@ -7,6 +7,7 @@ from presentation.view import funzioni_utili
 from presentation.view.home_page_aziende import HomePage
 from presentation.view.home_page_certificatore import HomePageCertificatore
 from presentation.view.home_page_guest import HomePageGuest
+from session import Session
 
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 import pyotp
@@ -264,7 +265,7 @@ class VistaAccedi(QMainWindow):
             QMessageBox.information(self, "SupplyChain", "Accesso effettuato correttamente!")
 
             # Procedi con il resto del login come prima
-            if utente[2] == 'Certificatore':
+            if Session().current_user["role"] == 'Certificatore':
                 self.home_certificatore = HomePageCertificatore(self.reset, utente)
                 self.home_certificatore.show()
             else:

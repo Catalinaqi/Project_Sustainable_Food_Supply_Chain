@@ -1,21 +1,15 @@
 from dataclasses import dataclass
-
+from typing import Optional
 
 @dataclass
 class CompanyModel:
     """
-    Data model for transporting product information between layers.
+    Data model for transporting company information between layers.
     """
     Id_azienda: int
-    Tipo_azienda: str
-    Nome_azienda: str
+    Id_credenziali: int
+    Tipo: str
+    Nome: str
     Indirizzo: str
-
-
-    def save(self):
-        pass
-
-    @classmethod
-    def get_company_emission(cls, company_id):
-        pass
-
+    Co2_consumata: Optional[int] = None
+    Co2_compensata: Optional[int] = None

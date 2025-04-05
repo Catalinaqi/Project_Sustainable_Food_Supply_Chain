@@ -35,7 +35,7 @@ class DatabaseManagerSetting:
         except Exception as e:
             raise Exception(f"Error executing SELECT query: {e}")
 
-    def fetch_query(self, query, params=()):
+    def fetch_results(self, query, params=()):
         """
         Executes a SELECT query and returns multiple results.
         """
@@ -43,7 +43,7 @@ class DatabaseManagerSetting:
             results = self.cursor.execute(query, params)
             results_precise = [tuple(row) for row in results.fetchall()]
             logger.info(
-                f"BackEnd: fetch_query: Info executing query: {query} with params: {params} | Results: {len(results_precise)}")
+                f"BackEnd: fetch_results: Info executing query: {query} with params: {params} | Results: {len(results_precise)}")
             # conn.close()
             return results_precise if results_precise else []
         except Exception as e:
@@ -111,30 +111,6 @@ class DatabaseManagerSetting:
                 logger.info(f"BackEnd: execute_transaction: Info executing query: {query} with params: {params}")
                 self.cursor.execute(query, params)
 
-            self.conn.commit()  # Commit all changes
-        except Exception as e:
-            self.conn.rollback()  # Rollback on error
-            raise Exception(f"Transaction error: {e}")
-
-    def execute_bd_migrations(self, queries):
-        """
-        Executes multiple SQL queries within a single transaction.
-
-        Parameters:
-        - queries: List of tuples containing (query, params).
-        """
-        try:
-            # conn = DatabaseConnectionSetting.get_connection()
-            # cursor = conn.cursor()
-
-            # Begin transaction
-            self.cursor.execute("BEGIN TRANSACTION;")
-
-            for query, params in queries:
-                # logger.info(f"BackEnd: execute_bd_migrations: Executing migration, the query executed was: {query}")
-
-                self.cursor.execute(query, params)
-            logger.info(f"BackEnd: execute_bd_migrations: Executing migration ...")
             self.conn.commit()  # Commit all changes
         except Exception as e:
             self.conn.rollback()  # Rollback on error

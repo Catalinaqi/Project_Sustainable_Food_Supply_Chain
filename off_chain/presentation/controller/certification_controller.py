@@ -13,6 +13,7 @@ class ControllerCertificatore:
             ProductRepositoryImpl()
             ThresholdRepositoryImpl()
             CompanyRepositoryImpl()
+            get_certifications_by_product_interface
     """
 
     def __init__(self):

@@ -6,14 +6,15 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QSplashScreen
 
 from configuration.log_load_setting import logger
-from database.db_migrations import DatabaseMigrations
+from session import Session
 from presentation.view.vista_accedi import VistaAccedi
 
 
 def setup_database():
 
     try:
-        DatabaseMigrations.run_migrations()
+        pass
+        #DatabaseMigrations.run_migrations()
     except Exception as e:
         logger.error(f"Error initializing database: {e}")
         sys.exit(1)  # Stops the application if there is a critical error
@@ -25,6 +26,9 @@ if __name__ == "__main__":
     # Starting the PyQt application
     app = QApplication(sys.argv)
     logger.info("Frontend: Starting the PyQt application...")
+
+    session = Session()
+    logger.info(f"Start session on  {session.start_app}")
 
     # Show Splash Screen
     splash = QSplashScreen(QPixmap("presentation/resources/logo_splash.png"), Qt.WindowStaysOnTopHint)

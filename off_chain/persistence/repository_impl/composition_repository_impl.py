@@ -1,19 +1,17 @@
 from abc import ABC
-from configuration.db_manager_setting import DatabaseManagerSetting
+from configuration.database import Database
 from configuration.log_load_setting import logger
 from domain.repository.composition_repository import CompositionRepository
+from persistence.query_builder import QueryBuilder
 
 
 class CompositionRepositoryImpl(CompositionRepository, ABC):
-    # Class variable that stores the single instance
-    _instance = None
+    
+    def __init__(self):
+        super().__init__()
+        self.db = Database()
+        self.query_builder = QueryBuilder()
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(CompositionRepositoryImpl, cls).__new__(cls)
-            cls._instance.db_manager_setting = DatabaseManagerSetting()
-            logger.info("BackEnd: Successfully initializing the instance for CompositionRepositoryImpl.")
-        return cls._instance
 
     def get_prodotti_to_composizione(self, azienda: int) -> list:
         query = """
@@ -26,4 +24,4 @@ class CompositionRepositoryImpl(CompositionRepository, ABC):
             WHERE Id_azienda = ? AND Operazione = "Trasformazione"
         )
         """
-        return self.db_manager_setting.fetch_query(query, (azienda,))
+        return self.db_manager_setting.fetch_results(query, (azienda,))

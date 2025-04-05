@@ -1,8 +1,10 @@
 from configuration.log_load_setting import logger
+from model.company_model import CompanyModel
 from persistence.repository_impl.company_repository_impl import CompanyRepositoryImpl
 from persistence.repository_impl.threshold_repository_impl import ThresholdRepositoryImpl
 from persistence.repository_impl.product_repository_impl import ProductRepositoryImpl
 from persistence.repository_impl.certification_repository_impl import CertificationRepositoryImpl
+from persistence.repository_impl.database_standard import aziende_enum
 
 
 class ControllerGuest:
@@ -13,6 +15,8 @@ class ControllerGuest:
             ProductRepositoryImpl()
             ThresholdRepositoryImpl()
             CompanyRepositoryImpl()
+
+            get_certifications_by_product_interface
     """
 
     def __init__(self):
@@ -23,32 +27,30 @@ class ControllerGuest:
         logger.info(
             "BackEnd: Successful initialization of 'class instances' for repository implements")
 
-    def lista_rivenditori(self):
-        # repo1 = CompanyRepositoryImpl()
-        rivenditori = self.company.get_lista_rivenditori()
+    def lista_rivenditori(self)-> list[CompanyModel]:
+        rivenditori = self.company.get_lista_aziende(tipo= aziende_enum.RIVENDIORE)
         return rivenditori
 
     # Restituisce la lista di tutte le aziende
-    def lista_aziende(self):
-        # repo2 = CompanyRepositoryImpl()
+    def lista_aziende(self) -> list[CompanyModel]:
         lista_aziende = self.company.get_lista_aziende()
         return lista_aziende
 
     # Restituisce la lista di tutte le aziende filtrate per tipo
-    def lista_aziende_filtro_tipo(self, tipo):
-        # repo3 = CompanyRepositoryImpl()
-        lista_aziende = self.company.get_lista_aziende_filtrata_tipo(tipo)
+    def lista_aziende_filtro_tipo(self, tipo_azienda : aziende_enum) -> list[CompanyModel]:
+        
+        lista_aziende = self.company.get_lista_aziende(tipo = tipo_azienda)
         return lista_aziende
 
     # Restituisce la lista di tutte le aziende filtrate per nome (unica azienda)
-    def azienda_by_nome(self, nome):
-        # repo4 = CompanyRepositoryImpl()
-        azienda = self.company.get_azienda_by_nome(nome)
+    def azienda_by_nome(self, nome_azienda)-> CompanyModel:
+        
+        azienda = self.company.get_lista_aziende(nome = nome_azienda)
         return azienda
 
     # Restituisce la lista di tutte le aziende ordinata per saldo co2
     def lista_aziende_ordinata_co2(self):
-        # repo5 = CompanyRepositoryImpl()
+
         lista_ordinata = self.company.get_lista_aziende_ordinata()
         return lista_ordinata
 
