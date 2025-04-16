@@ -1,164 +1,144 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGridLayout, QPushButton, QMessageBox
+from PyQt5.QtWidgets import (
+    QMainWindow, QWidget, QVBoxLayout, QLabel, QGridLayout,
+    QPushButton, QMessageBox
+)
+
 from presentation.controller.company_controller import ControllerAzienda
 from presentation.view import funzioni_utili
 from presentation.view.vista_stato_azienda import VistaStatoAzienda
 from presentation.view.vista_azioni_compensative import VistaAzioniCompensative
-from presentation.view.vista_operazioni import VistaOperazioni
+from presentation.view.vista_operazioni_azienda import OperazioniAziendaView
+from presentation.view.vista_azioni_compensative_azienda import AzioniAziendaView
 from presentation.view.vista_soglie import VistaSoglie
 from presentation.view.vista_sviluppatori import VistaSviluppatori
 from session import Session
 
 
 class HomePage(QMainWindow):
-
-    """
-    Constructor "__init__" of the class HomePage
-    """
     def __init__(self, callback, utente):
         super().__init__()
 
         self.controller = ControllerAzienda()
-
-        self.vista_soglie = None
-        self.vista_sviluppatori = None
-        self.stato = None
-        self.vista_azioni = None
-        self.vista_operazioni = None
+        self.callback = callback
         self.utente = utente
 
-        self.menu_bar = self.menuBar()
-        self.menu_bar.setStyleSheet("background-color: rgb(240, 240, 240)")
-        funzioni_utili.config_menubar(
-            self, "File", QIcon("presentation\\resources\\exit.png"),
-            "Logout", 'Ctrl+Q', self.menu_bar
-        ).triggered.connect(self.logout)
-        funzioni_utili.config_menubar(
-            self, "Termini e condizioni d'uso", QIcon("presentation\\resources\\tcu.png"),
-            "Leggi i termini e le condizioni d'uso", 'Ctrl+W', self.menu_bar
-        ).triggered.connect(self.tcu)
-        funzioni_utili.config_menubar(
-            self, "FAQ", QIcon("presentation\\resources\\faq.png"),
-            "Visualizza le domande più frequenti", 'Ctrl+E', self.menu_bar
-        ).triggered.connect(self.faq)
-        funzioni_utili.config_menubar(
-            self, "Tutorial", QIcon("presentation\\resources\\tutorial.png"),
-            "Visualizza tutorial", 'Ctrl+R', self.menu_bar
-        ).triggered.connect(self.tutorial)
-
-        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
-
-        self.callback = callback
-
-        # Elementi di layout
-        self.logo = QLabel()
-        self.welcome_label = QLabel(f"Ciao {Session().current_user["username"]} 👋!\nBenvenuto in SupplyChain.\n"
-                                    f"Prego selezionare un'opzione dal menu")
-        self.button_operazioni = QPushButton('Operazioni')
-        self.button_azioni_compensative = QPushButton('Azioni compensative')
-        self.button_soglie = QPushButton('Soglie CO2')
-        self.button_stato_azienda = QPushButton('Stato azienda')
-        self.button_token = QPushButton('Gestione token')
-        self.button_sviluppatori = QPushButton('Sviluppatori')
-
+        self.init_views()
         self.init_ui()
+        self.setup_menu()
 
+    def init_views(self):
+        self.vista_soglie = None
+        self.vista_sviluppatori = None
+        self.vista_stato = None
+        self.vista_azioni = None
+        self.vista_operazioni = None
 
-    '''
-    Creazione dell'interfaccia grafica
-    '''
+    def setup_menu(self):
+        menu = self.menuBar()
+        menu.setStyleSheet("background-color: rgb(240, 240, 240)")
+
+        funzioni_utili.config_menubar(
+            self, "File", QIcon("presentation/resources/exit.png"),
+            "Logout", 'Ctrl+Q', menu).triggered.connect(self.logout)
+
+        funzioni_utili.config_menubar(
+            self, "Termini e condizioni d'uso", QIcon("presentation/resources/tcu.png"),
+            "Leggi i termini e condizioni d'uso", 'Ctrl+W', menu).triggered.connect(self.tcu)
+
+        funzioni_utili.config_menubar(
+            self, "FAQ", QIcon("presentation/resources/faq.png"),
+            "Visualizza le domande frequenti", 'Ctrl+E', menu).triggered.connect(self.faq)
+
+        funzioni_utili.config_menubar(
+            self, "Tutorial", QIcon("presentation/resources/tutorial.png"),
+            "Visualizza tutorial", 'Ctrl+R', menu).triggered.connect(self.tutorial)
+
     def init_ui(self):
         self.setWindowTitle('SupplyChain')
         self.setGeometry(0, 0, 750, 650)
+        self.setWindowIcon(QIcon("presentation/resources/logo_centro.png"))
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
         outer_layout = QVBoxLayout(central_widget)
-
         main_layout = QVBoxLayout()
         main_layout.setSpacing(50)
         main_layout.setAlignment(Qt.AlignCenter)
 
+        welcome_msg = f"Ciao {Session().current_user['username']} !\nBenvenuto in SupplyChain.\nPrego selezionare un'opzione dal menu"
+        self.welcome_label = QLabel(welcome_msg)
         funzioni_utili.insert_label(self.welcome_label, main_layout)
 
+        self.logo = QLabel()
         button_layout = QGridLayout()
         button_layout.setSpacing(1)
 
-        funzioni_utili.insert_button_in_grid(self.button_operazioni, button_layout, 1, 2)
-        self.button_operazioni.clicked.connect(self.show_operazioni)
-
-        funzioni_utili.insert_button_in_grid(self.button_azioni_compensative, button_layout, 1, 4)
-        self.button_azioni_compensative.clicked.connect(self.show_azioni)
-
-        funzioni_utili.insert_button_in_grid(self.button_soglie, button_layout, 3, 1)
-        self.button_soglie.clicked.connect(self.show_soglie)
-
-        funzioni_utili.insert_button_in_grid(self.button_stato_azienda, button_layout, 3, 5)
-        self.button_stato_azienda.clicked.connect(self.show_stato)
-
-        funzioni_utili.insert_button_in_grid(self.button_token, button_layout, 5, 2)
-        self.button_token.clicked.connect(self.show_token)
-
-        funzioni_utili.insert_button_in_grid(self.button_sviluppatori, button_layout, 5, 4)
-        self.button_sviluppatori.clicked.connect(self.show_sviluppatori)
-
-        funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("presentation\\resources\\logo_centro.png"))
+        self.setup_buttons(button_layout)
+        funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("presentation/resources/logo_centro.png"))
 
         main_layout.addLayout(button_layout)
-
         outer_layout.addLayout(main_layout)
 
         funzioni_utili.center(self)
 
+    def setup_buttons(self, layout):
+        self.button_operazioni = QPushButton('Operazioni')
+        self.button_operazioni.clicked.connect(self.show_operazioni)
+        funzioni_utili.insert_button_in_grid(self.button_operazioni, layout, 1, 2)
 
-    '''
-    Show a confirmation window before logout, if user clicks "Yes" the window will close and the callback function will be called
-    '''
+        self.button_azioni_compensative = QPushButton('Azioni compensative')
+        self.button_azioni_compensative.clicked.connect(self.show_azioni)
+        funzioni_utili.insert_button_in_grid(self.button_azioni_compensative, layout, 1, 4)
+
+        self.button_soglie = QPushButton('Soglie CO2')
+        self.button_soglie.clicked.connect(self.show_soglie)
+        funzioni_utili.insert_button_in_grid(self.button_soglie, layout, 3, 1)
+
+        self.button_stato_azienda = QPushButton('Stato azienda')
+        self.button_stato_azienda.clicked.connect(self.show_stato)
+        funzioni_utili.insert_button_in_grid(self.button_stato_azienda, layout, 3, 5)
+
+        self.button_token = QPushButton('Gestione token')
+        self.button_token.clicked.connect(self.show_token)
+        funzioni_utili.insert_button_in_grid(self.button_token, layout, 5, 2)
+
+        self.button_sviluppatori = QPushButton('Sviluppatori')
+        self.button_sviluppatori.clicked.connect(self.show_sviluppatori)
+        funzioni_utili.insert_button_in_grid(self.button_sviluppatori, layout, 5, 4)
+
     def logout(self):
-        # Mostra una finestra di conferma
         reply = QMessageBox.question(
-            self,
-            "Conferma logout",
-            "Sei sicuro di voler effettuare il logout?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
+            self, "Conferma logout", "Sei sicuro di voler effettuare il logout?",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No
         )
-
-        # Procede solo se l'utente clicca "Yes"
         if reply == QMessageBox.Yes:
             self.close()
             self.callback()
 
     def tutorial(self):
-        QMessageBox.information(
-            self, 'SupplyChain', "Tutorial work in progress")
+        QMessageBox.information(self, 'SupplyChain', "Tutorial in lavorazione")
 
     def faq(self):
-        QMessageBox.information(
-            self, 'SupplyChain', "FAQ work in progress")
+        QMessageBox.information(self, 'SupplyChain', "FAQ in lavorazione")
 
     def tcu(self):
-        QMessageBox.information(
-            self, 'SupplyChain', "Termini e condizioni d'uso work in progress")
+        QMessageBox.information(self, 'SupplyChain', "Termini e condizioni d'uso in lavorazione")
 
-
-    '''
-    Each "button" click will open a new window: VistaOperazioni, VistaAzioniCompensative, VistaStatoAzienda, VistaSoglie
-    '''
     def show_operazioni(self):
-        self.vista_operazioni = VistaOperazioni(self.controller, self.utente)
+        self.vista_operazioni = OperazioniAziendaView()
+        self.vista_operazioni.setWindowModality(Qt.ApplicationModal)
         self.vista_operazioni.show()
 
     def show_azioni(self):
-        self.vista_azioni = VistaAzioniCompensative(self.utente)
+        self.vista_azioni = AzioniAziendaView()
         self.vista_azioni.show()
 
     def show_stato(self):
-        self.stato = VistaStatoAzienda(self.aggiorna_profilo, self.utente, self.controller)
-        self.stato.show()
-
+        self.vista_stato = VistaStatoAzienda(self.aggiorna_profilo, self.utente, self.controller)
+        self.vista_stato.show()
 
     def show_sviluppatori(self):
         self.vista_sviluppatori = VistaSviluppatori()
@@ -168,17 +148,11 @@ class HomePage(QMainWindow):
         self.vista_soglie = VistaSoglie()
         self.vista_soglie.show()
 
+    def show_token(self):
+        QMessageBox.information(self, 'SupplyChain', "Gestione token in lavorazione")
 
-    '''
-    Update the user profile
-    '''
     def aggiorna_profilo(self, utente):
         self.utente = utente
         self.welcome_label.setText(
-            f"Ciao {Session().current_user.Nome} 👋!\nBenvenuto in SupplyChain.\n"
-            f"Prego selezionare un'opzione dal menu"
+            f"Ciao {Session().current_user['username']} !\nBenvenuto in SupplyChain.\nPrego selezionare un'opzione dal menu"
         )
-
-    def show_token(self):
-        QMessageBox.information(
-            self, 'SupplyChain', "Gestione token work in progress work in progress")

@@ -9,10 +9,10 @@ class OperationModel:
     """
     Id_operazione: int
     Id_prodotto: int
-    Nome_azienda: str
-    None_prodotto: str
+    Quantita_prodotto: float
+    Nome_prodotto: str
     Data_operazione: datetime
     Consumo_co2_operazione: float
-    Data_operazione: datetime
     Nome_operazione: str
-    Quantita_prodotto: float
+    Nome_azienda: str
+   

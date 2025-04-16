@@ -14,20 +14,42 @@ class CompensationActionRepositoryImpl( ABC):
         self.db = Database()
         self.query_builder = QueryBuilder()
 
+
+
+
     def get_lista_azioni(self, id_azienda: int,  data_start: datetime = None, data_end: datetime = None, ordinamento: str = None) -> list[CompensationActionModel]:
 
-        self.query_builder.select("*").table("Azioni_compensative").where("Id_azienda", "=", id_azienda)
+        self.query_builder.select("Id_azione","Id_azienda","Data","Co2_compensata","Nome_azione").table("Azioni_compensative").where("Id_azienda", "=", id_azienda)
 
-        if data_start & data_end:
+        if data_start and data_end:
             self.query_builder.where("Data", ">", data_start).where("Data", "<", data_end)
-            s
+            
         if ordinamento:
             self.query_builder.order_by("Co2_compensata", "DESC")
 
         query,value = (
             self.query_builder.get_query()
         )
-        return [CompensationActionModel(*x) for x in self.db.fetch_results(query, value)]
+        results = self.db.fetch_results(query, value)
+        lista_op= [
+                CompensationActionModel(
+                    Id_azione=row[0],
+                    Id_azienda=row[1],
+                    Data_azione=row[2],
+                    Co2_compensata=row[3],
+                    Nome_azione=row[4],               
+            )
+            for row in results
+            ]
+
+        return lista_op
+    
+
+
+
+
+
+
 
     def get_co2_compensata(self, id_azienda: int) -> float:
         query,value = (

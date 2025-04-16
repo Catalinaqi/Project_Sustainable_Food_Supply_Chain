@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-
+from dataclasses import dataclass, field
+from model.componente_model import Componente
 
 @dataclass
 class ProductModel:
@@ -8,9 +8,12 @@ class ProductModel:
     """
     Id_prodotto: int
     Nome_prodotto: str
-    Quantita_prodotto: float
+    
+    """Quantita_prodotto: float
     Stato_prodotto: int
-    Nome_azienda: str
+    Nome_azienda: str"""
+
+    componenti: list[Componente] = field(default_factory=list)
 
     def save(self):
         pass

@@ -43,3 +43,28 @@ if __name__ == "__main__":
     # Close the database connection when the app closes
     # app.aboutToQuit.connect(DatabaseConnectionSetting.close_connection)
 
+
+
+import sys
+from PyQt5.QtWidgets import QApplication
+from model.product_model import ProductModel, Componente
+from model.operation_model import OperationModel
+from presentation.view.vista_operazioni_azienda import OperazioniAziendaView
+
+# Fake data per test
+
+# Avvia l'app per test manuale
+
+"""
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+
+
+
+
+    finestra = OperazioniAziendaView()
+
+
+
+    finestra.show()
+    sys.exit(app.exec_())"""

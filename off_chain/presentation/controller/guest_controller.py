@@ -1,5 +1,8 @@
 from configuration.log_load_setting import logger
 from model.company_model import CompanyModel
+from model.product_model import ProductModel
+from model.componente_model import Componente
+from model.operation_model import OperationModel
 from persistence.repository_impl.company_repository_impl import CompanyRepositoryImpl
 from persistence.repository_impl.threshold_repository_impl import ThresholdRepositoryImpl
 from persistence.repository_impl.product_repository_impl import ProductRepositoryImpl
@@ -136,3 +139,67 @@ class ControllerGuest:
         # repo17 = ThresholdRepositoryImpl()
         soglia = self.threshold.get_soglia_by_operazione_and_prodotto(operazione, prodotto)
         return soglia - float(co2)
+    
+
+    def carica_prodotto_con_storia(self, prodotto_id : int) -> ProductModel:
+        """
+        Carica un prodotto con la sua storia a partire dal suo ID.
+        """
+        try:
+            prodotto = self.get_fake_prodotto(prodotto_id )  # Simulazione del caricamento del prodotto
+            return prodotto
+        except Exception as e:
+            logger.error(f"Errore durante il caricamento del prodotto con ID {prodotto_id}: {str(e)}")
+            return None
+        
+
+    """ Funzioni Mock"""
+
+
+    def get_fake_prodotto(self,prodotto_id : int) -> ProductModel:
+        if prodotto_id == 1:
+            return ProductModel(
+                Id_prodotto=1,
+                Nome_prodotto="Pomodori",
+                componenti=[
+                    Componente(
+                        prodotto_id=0,
+                        trasformazioni=[
+                            OperationModel(Nome_operazione="Coltivazione", Nome_azienda="Luca"),
+                            OperationModel(Nome_operazione="Trasporto", Nome_azienda="Alberto")
+                        ]
+                    )
+                ]
+            )
+        elif prodotto_id == 2:
+            return ProductModel(
+                Id_prodotto=2,
+                Nome_prodotto="Basilico",
+                componenti=[
+                    Componente(
+                        prodotto_id=0,
+                        trasformazioni=[
+                            OperationModel(Nome_operazione="Coltivazione", Nome_azienda="Luca"),
+                            OperationModel(Nome_operazione="Trasporto", Nome_azienda="Franco")
+                        ]
+                    )
+                ]
+            )
+        elif prodotto_id == 3:
+            return ProductModel(
+                Id_prodotto=3,
+                Nome_prodotto="Sale",
+                componenti=[]
+            )
+        elif prodotto_id == 4:
+            return ProductModel(
+                Id_prodotto=4,
+                Nome_prodotto="Passata di Pomodoro",
+                componenti=[
+                    Componente(prodotto_id=1, trasformazioni=[]),
+                    Componente(prodotto_id=2, trasformazioni=[]),
+                    Componente(prodotto_id=3, trasformazioni=[])
+                ]
+            )
+        else:
+            return ProductModel(Id_prodotto=prodotto_id, Nome_prodotto=f"Prodotto sconosciuto {prodotto_id}", componenti=[])

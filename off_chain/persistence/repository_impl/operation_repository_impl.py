@@ -4,18 +4,20 @@ from configuration.database import Database
 from configuration.log_load_setting import logger
 from domain.repository.operation_repository import OperationRepository
 from model.operation_model import OperationModel
+from model.operation_estesa_model import OperazioneEstesaModel
+from persistence.query_builder import QueryBuilder
 
 
 class OperationRepositoryImpl(OperationRepository, ABC):
     # Class variable that stores the single instance
-    _instance = None
+    
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(OperationRepositoryImpl, cls).__new__(cls)
-            cls._instance.db_manager_setting = Database()
-            logger.info("BackEnd: Successfully initializing the instance for OperationRepositoryImpl.")
-        return cls._instance
+    def __init__(self):
+        super().__init__()
+        self.db = Database()
+        self.query_builder = QueryBuilder()
+        logger.info("BackEnd: Successfully initializing the instance for OperationRepositoryImpl.")
+        
 
     def get_operazioni_ordinate_co2(self, azienda: int) -> list:
         """Restituisce la lista di tutte le operazioni effettuate da una certa azienda ordinate per co2 consumata """
@@ -39,16 +41,48 @@ class OperationRepositoryImpl(OperationRepository, ABC):
         """
         return self.db_manager_setting.fetch_results(query, (azienda, d1, d2))
 
-    def get_operazioni_by_azienda(self, azienda: int) -> list:
+    def get_operazioni_by_azienda(self, azienda: int) -> list[OperazioneEstesaModel]:
         """Restituisce la lista di tutte le operazioni effettuate da una certa azienda """
-        query = """
-        SELECT Operazione.Id_operazione, Prodotto.Id_prodotto, Prodotto.Nome, Prodotto.Quantita, 
-        Operazione.Data_operazione, Operazione.Consumo_CO2, Operazione.Operazione
-        FROM Operazione JOIN Prodotto
-        ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-        WHERE Operazione.Id_azienda = ?;
-        """
-        return self.db_manager_setting.fetch_results(query, (azienda,))
+
+        query, value = (
+            self.query_builder
+                .select(
+                    "Operazione.Id_operazione",
+                    "Prodotto.Id_prodotto",
+                    "Prodotto.Nome",
+                    "Prodotto.Quantita",
+                    "Operazione.Data_operazione",
+                    "Operazione.Consumo_CO2",
+                    "Operazione.Operazione"
+                )
+                .table("Operazione")
+                .join("Prodotto", "Operazione.Id_prodotto", "Prodotto.Id_prodotto")
+                .where("Operazione.Id_azienda", "=", azienda)
+                .get_query()
+        )
+
+        try:
+            results = self.db.fetch_results(query, value)
+            operazioni_estese = [
+                    OperazioneEstesaModel(
+                        Id_operazione=row[0],
+                        Id_prodotto=row[1],
+                        Nome_prodotto=row[2],
+                        Quantita_prodotto=row[3],
+                        Data_operazione=row[4],
+                        Consumo_CO2=row[5],
+                        Nome_operazione=row[6]                  
+            )
+            for row in results
+            ]
+
+            return operazioni_estese   
+        except Exception as e:
+            logger.error(f"Error fetching operations by company: {e}", exc_info=True)
+            return[]
+    
+
+
 
     def inserisci_operazione_azienda_rivenditore(self, azienda: int, prodotto: int, data: datetime, co2: float,
                                                  evento: str):

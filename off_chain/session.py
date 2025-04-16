@@ -48,6 +48,8 @@ class Session:
             return {
                 "id": self._current_user.Id_azienda,
                 "username": self._current_user.Nome,
-                "role": self._current_user.Tipo  # Solo info essenziali
+                "role": self._current_user.Tipo,
+                "id_azienda" : self._current_user.Id_azienda
+                 # Solo info essenziali
             }
         return None

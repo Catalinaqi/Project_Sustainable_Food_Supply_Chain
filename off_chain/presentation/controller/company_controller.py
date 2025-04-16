@@ -1,4 +1,5 @@
 from configuration.log_load_setting import logger
+from model.operation_model import OperationModel
 from persistence.repository_impl.company_repository_impl import CompanyRepositoryImpl
 from persistence.repository_impl.threshold_repository_impl import ThresholdRepositoryImpl
 from persistence.repository_impl.compensation_action_repository_impl import CompensationActionRepositoryImpl
@@ -7,6 +8,8 @@ from persistence.repository_impl.product_repository_impl import ProductRepositor
 from configuration.log_load_setting import logger
 from persistence.repository_impl.composition_repository_impl import CompositionRepositoryImpl
 from model.company_model import CompanyModel
+from model.operation_estesa_model import OperazioneEstesaModel
+from model.compensation_action_model import CompensationActionModel
 
 
 class ControllerAzienda:
@@ -20,7 +23,7 @@ class ControllerAzienda:
     """
 
     def __init__(self):
-        self.operation = OperationRepositoryImpl()
+        self.operation_repository = OperationRepositoryImpl()
         self.compensation_action = CompensationActionRepositoryImpl()
         self.product = ProductRepositoryImpl()
         self.threshold = ThresholdRepositoryImpl()
@@ -46,16 +49,6 @@ class ControllerAzienda:
     def modifica_dati_azienda(self, azienda):
         pass
 
-    # Restituisce la lista di tutte le azioni compensative della sua azienda
-    def lista_azioni_compensative(self, azienda):
-        logger.info(f"el id_azienda es: {azienda}")
-        try:
-            lista_azioni_compensative = self.compensation_action.get_lista_azioni(azienda)
-            return lista_azioni_compensative
-        except Exception as e:
-            logger.error(f"Error al obtener la lista de azioni compensative: {e}", exc_info=True)
-            return []  # o None, según lo que necesites retornar en caso de error
-
 
     # Restituisce la lista delle sue azioni compensative filtrate per data
     def lista_azioni_per_data(self, azienda, d1, d2):
@@ -79,11 +72,6 @@ class ControllerAzienda:
         # repo = CompensationActionRepositoryImpl()
         self.company.inserisci_azione(data, azienda, co2_compensata, nome_azione)
 
-    # Restituisce la lista di tutte le operazioni della sua azienda
-    def lista_operazioni(self, azienda):
-        # repo = OperationRepositoryImpl()
-        lista_operazioni = self.operation.get_operazioni_by_azienda(azienda)
-        return lista_operazioni
 
     # Restituisce la lista delle sue operazioni filtrate per data
     def lista_operazioni_per_data(self, azienda, d1, d2):
@@ -119,19 +107,19 @@ class ControllerAzienda:
     ):
 
         if tipo_azienda == "Agricola":
-            self.operation.inserisci_operazione_azienda_agricola(
+            self.operation_repository.inserisci_operazione_azienda_agricola(
                 prodotto, quantita, azienda, data, co2, evento
             )
         elif tipo_azienda == "Trasportatore":
-            self.operation.inserisci_operazione_azienda_trasporto(
+            self.operation_repository.inserisci_operazione_azienda_trasporto(
                 azienda, prodotto, data, co2, evento, nuovo_stato
             )
         elif tipo_azienda == "Trasformatore":
-            self.operation.inserisci_operazione_azienda_trasformazione(
+            self.operation_repository.inserisci_operazione_azienda_trasformazione(
                 azienda, prodotto, data, co2, evento, quantita, materie_prime
             )
         elif tipo_azienda == "Rivenditore":
-            self.operation.inserisci_operazione_azienda_rivenditore(
+            self.operation_repository.inserisci_operazione_azienda_rivenditore(
                 azienda, prodotto, data, co2, evento
             )
 
@@ -153,3 +141,31 @@ class ControllerAzienda:
     def newCompany(self, name, address, emissions):
         company = CompanyModel(1, name, address, emissions)
         company.save()
+
+
+
+    """ funzioni Mock"""
+
+    
+   
+
+
+    """ Funzioni funzionali """
+
+    def lista_operazioni(self, azienda : int) -> list[OperazioneEstesaModel]:
+        # repo = OperationRepositoryImpl()
+        try:
+            lista_operazioni = self.operation_repository.get_operazioni_by_azienda(azienda)
+            return lista_operazioni
+        except Exception as e:
+            logger.error(f"Error al obtener la lista di operazioni: {e}", exc_info=True)
+            return []
+
+
+    def lista_azioni_compensative(self, azienda : int) -> list[CompensationActionModel]:
+        try:
+            lista_azioni_compensative = self.compensation_action.get_lista_azioni(azienda)
+            return lista_azioni_compensative
+        except Exception as e:
+            logger.error(f"Error al obtener la lista de azioni compensative: {e}", exc_info=True)
+            return [] 
