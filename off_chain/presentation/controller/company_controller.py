@@ -1,5 +1,9 @@
+import datetime
 from configuration.log_load_setting import logger
 from model.operation_model import OperationModel
+from model.threshold_model import ThresholdModel
+from model.product_model import ProductModel
+from session import Session
 from persistence.repository_impl.company_repository_impl import CompanyRepositoryImpl
 from persistence.repository_impl.threshold_repository_impl import ThresholdRepositoryImpl
 from persistence.repository_impl.compensation_action_repository_impl import CompensationActionRepositoryImpl
@@ -10,6 +14,14 @@ from persistence.repository_impl.composition_repository_impl import CompositionR
 from model.company_model import CompanyModel
 from model.operation_estesa_model import OperazioneEstesaModel
 from model.compensation_action_model import CompensationActionModel
+
+
+PERMESSI_OPERAZIONI = {
+    "Agricola": ["Produzione" ],
+    "Trasportatore": ["Trasporto"],
+    "Trasformatore": ["Trasformazione"],
+    "Rivenditore": ["Rivendita"]
+}
 
 
 class ControllerAzienda:
@@ -32,9 +44,9 @@ class ControllerAzienda:
 
     # Restituisce tutte le soglie
 
-    def lista_soglie(self):
+    def lista_soglie(self, tipo_azienda: str) -> list[ThresholdModel]:
         # repo = ThresholdRepositoryImpl()
-        lista_soglie = self.threshold.get_lista_soglie()
+        lista_soglie = self.threshold.get_lista_soglie(tipo_azienda=tipo_azienda)
         return lista_soglie
 
         # Restituisce il dettaglio della soglia selezionata dato l'indice n    def get_dettaglio_soglia(self, n):
@@ -69,6 +81,8 @@ class ControllerAzienda:
 
     # Aggiunge un'azione compensativa
     def aggiungi_azione(self, data, azienda, co2_compensata, nome_azione):
+
+
         # repo = CompensationActionRepositoryImpl()
         self.company.inserisci_azione(data, azienda, co2_compensata, nome_azione)
 
@@ -100,34 +114,16 @@ class ControllerAzienda:
         elif azienda == "Rivenditore":
             return self.product.get_prodotti_to_rivenditore()
 
-    # Aggiunge un'operazione
-    def aggiungi_operazione(
-            self, tipo_azienda, azienda, prodotto, data, co2, evento,
-            quantita='', nuovo_stato=00, materie_prime=None
-    ):
-
-        if tipo_azienda == "Agricola":
-            self.operation_repository.inserisci_operazione_azienda_agricola(
-                prodotto, quantita, azienda, data, co2, evento
-            )
-        elif tipo_azienda == "Trasportatore":
-            self.operation_repository.inserisci_operazione_azienda_trasporto(
-                azienda, prodotto, data, co2, evento, nuovo_stato
-            )
-        elif tipo_azienda == "Trasformatore":
-            self.operation_repository.inserisci_operazione_azienda_trasformazione(
-                azienda, prodotto, data, co2, evento, quantita, materie_prime
-            )
-        elif tipo_azienda == "Rivenditore":
-            self.operation_repository.inserisci_operazione_azienda_rivenditore(
-                azienda, prodotto, data, co2, evento
-            )
-
     # Restituisce le opzioni per la combo box del dialog per la composizione
     def get_prodotti_to_composizione(self, id_azienda):
         # repo = CompositionRepositoryImpl()
-        lista = self.product.get_prodotti_to_composizione(id_azienda)
-        return lista
+        #TODO: AGGIUSTARE QUERY
+        #lista = self.product.get_prodotti_to_composizione(id_azienda)
+        return  [
+            ProductModel(1, "Prodotto A", []),
+            ProductModel(2, "Prodotto B", []),
+            ProductModel(3, "Prodotto C", [])
+        ]
 
     # Restituisce lo scarto dalla soglia di riferimento
     def scarto_soglia(self, co2, operazione, prodotto):
@@ -168,4 +164,83 @@ class ControllerAzienda:
             return lista_azioni_compensative
         except Exception as e:
             logger.error(f"Error al obtener la lista de azioni compensative: {e}", exc_info=True)
-            return [] 
+            return []
+        
+    def aggiungi_operazione(
+            self, tipo_operazione : str,   quantità : int, tipo_azienda, azienda, prodotto, data, co2, evento,
+            quantita='', nuovo_stato=00, materie_prime=None
+    ):
+        if not self.check_utente(tipo_operazione):
+            raise PermissionError("Operazione non consentita per questo utente.")
+        
+
+        if tipo_azienda == "Agricola":
+            self.operation_repository.inserisci_operazione_azienda_agricola(
+                prodotto, quantita, azienda, data, co2, evento
+            )
+        elif tipo_azienda == "Trasportatore":
+            self.operation_repository.inserisci_operazione_azienda_trasporto(
+                azienda, prodotto, data, co2, evento, nuovo_stato
+            )
+        elif tipo_azienda == "Trasformatore":
+            self.operation_repository.inserisci_operazione_azienda_trasformazione(
+                azienda, prodotto, data, co2, evento, quantita, materie_prime
+            )
+        elif tipo_azienda == "Rivenditore":
+            self.operation_repository.inserisci_operazione_azienda_rivenditore(
+                azienda, prodotto, data, co2, evento
+            )
+
+
+
+    def salva_operazione_agricola(self,id_azienda : int, tipo : str, data : datetime,
+                                  co2 : float,nome_prodotto : str, quantita : int
+                ):
+            if not self.check_utente(tipo):
+                raise PermissionError("Operazione non consentita per questo utente.")
+            self.operation_repository.inserisci_operazione_azienda_agricola(
+                nome_prodotto, quantita, id_azienda, data, co2,
+            )
+
+           
+
+    def salva_operazione_trasformazione(self, 
+                    id_azienda : int,
+                    tipo : str,
+                    data = datetime,
+                    co2 = float,
+                    nome_nuovo_prodotto = str,
+                    prodotti_usati = list[ProductModel],
+                ):
+            self.operation_repository.inserisci_operazione_azienda_trasformazione(
+                azienda, prodotto, data, co2, evento, nuovo_stato
+            )
+    
+
+    def salva_operazione_trasportatore(self,
+                    id_azienda : int,
+                    tipo : str,
+                    data = datetime,
+                    co2 = float
+                ): 
+        self.operation_repository.inserisci_operazione_azienda_trasporto(
+            id_azienda, prodotto, data, co2, evento, nuovo_stato
+            )
+
+    def salva_operazione_distributore(
+                    id_azienda : int,
+                    tipo : str,
+                    data = datetime,
+                    co2 = float
+                ):
+        self.operation_repository.inserisci_operazione_azienda_rivenditore(
+            id_azienda, prodotto, data, co2, evento, nuovo_stato
+            )
+
+
+
+    
+        
+    def check_utente(self, tipo_operazione : str) -> bool:
+        return tipo_operazione in PERMESSI_OPERAZIONI.get(Session().current_user["role"], [])
+        

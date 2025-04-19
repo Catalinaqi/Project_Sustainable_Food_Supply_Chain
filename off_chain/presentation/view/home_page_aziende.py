@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import (
     QPushButton, QMessageBox
 )
 
+from presentation.view.vista_richieste import VisualizzaRichiesteView
+from presentation.view.vista_magazzino import VisualizzaMagazzinoView
 from presentation.controller.company_controller import ControllerAzienda
 from presentation.view import funzioni_utili
 from presentation.view.vista_stato_azienda import VistaStatoAzienda
@@ -14,6 +16,7 @@ from presentation.view.vista_azioni_compensative_azienda import AzioniAziendaVie
 from presentation.view.vista_soglie import VistaSoglie
 from presentation.view.vista_sviluppatori import VistaSviluppatori
 from session import Session
+from presentation.view.vista_soglie_azienda import SoglieAziendaView
 
 
 class HomePage(QMainWindow):
@@ -30,10 +33,11 @@ class HomePage(QMainWindow):
 
     def init_views(self):
         self.vista_soglie = None
-        self.vista_sviluppatori = None
+        self.vista_richieste = None
         self.vista_stato = None
         self.vista_azioni = None
         self.vista_operazioni = None
+        self.vista_magazzino = None
 
     def setup_menu(self):
         menu = self.menuBar()
@@ -93,21 +97,25 @@ class HomePage(QMainWindow):
         self.button_azioni_compensative.clicked.connect(self.show_azioni)
         funzioni_utili.insert_button_in_grid(self.button_azioni_compensative, layout, 1, 4)
 
+        self.button_magazzino = QPushButton('Magazzino')
+        self.button_magazzino.clicked.connect(self.show_magazzino)
+        funzioni_utili.insert_button_in_grid(self.button_magazzino, layout, 1, 6)
+
         self.button_soglie = QPushButton('Soglie CO2')
         self.button_soglie.clicked.connect(self.show_soglie)
-        funzioni_utili.insert_button_in_grid(self.button_soglie, layout, 3, 1)
+        funzioni_utili.insert_button_in_grid(self.button_soglie, layout, 3, 2)
 
         self.button_stato_azienda = QPushButton('Stato azienda')
         self.button_stato_azienda.clicked.connect(self.show_stato)
-        funzioni_utili.insert_button_in_grid(self.button_stato_azienda, layout, 3, 5)
+        funzioni_utili.insert_button_in_grid(self.button_stato_azienda, layout, 3, 4)
 
         self.button_token = QPushButton('Gestione token')
         self.button_token.clicked.connect(self.show_token)
         funzioni_utili.insert_button_in_grid(self.button_token, layout, 5, 2)
 
-        self.button_sviluppatori = QPushButton('Sviluppatori')
-        self.button_sviluppatori.clicked.connect(self.show_sviluppatori)
-        funzioni_utili.insert_button_in_grid(self.button_sviluppatori, layout, 5, 4)
+        self.button_richieste = QPushButton('Richieste')
+        self.button_richieste.clicked.connect(self.show_richieste)
+        funzioni_utili.insert_button_in_grid(self.button_richieste, layout, 5, 4)
 
     def logout(self):
         reply = QMessageBox.question(
@@ -136,16 +144,20 @@ class HomePage(QMainWindow):
         self.vista_azioni = AzioniAziendaView()
         self.vista_azioni.show()
 
+    def show_magazzino(self):
+        self.vista_magazzino = VisualizzaMagazzinoView()
+        self.vista_magazzino.show()
+
     def show_stato(self):
         self.vista_stato = VistaStatoAzienda(self.aggiorna_profilo, self.utente, self.controller)
         self.vista_stato.show()
 
-    def show_sviluppatori(self):
-        self.vista_sviluppatori = VistaSviluppatori()
-        self.vista_sviluppatori.show()
+    def show_richieste(self):
+        self.vista_richieste = VisualizzaRichiesteView()
+        self.vista_richieste.show()
 
     def show_soglie(self):
-        self.vista_soglie = VistaSoglie()
+        self.vista_soglie = SoglieAziendaView()
         self.vista_soglie.show()
 
     def show_token(self):

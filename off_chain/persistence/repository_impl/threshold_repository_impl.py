@@ -3,24 +3,48 @@ from abc import ABC
 from configuration.database import Database
 from configuration.log_load_setting import logger
 from domain.repository.threshold_repository import ThresholdRepository
+from model.threshold_model import ThresholdModel
+from persistence.query_builder import QueryBuilder
 
 
 class ThresholdRepositoryImpl(ThresholdRepository, ABC):
     # Class variable that stores the single instance
-    _instance = None
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(ThresholdRepositoryImpl, cls).__new__(cls)
-            cls._instance.db_manager_setting = Database()
-            logger.info("BackEnd: Successfully initializing the instance for ThresholdRepositoryImpl.")
-        return cls._instance
+    def __init__(self):
+        super().__init__()
+        self.db = Database()
+        self.query_builder = QueryBuilder()
+   
 
-    def get_lista_soglie(self) -> list:
-        query = """
-        SELECT * FROM Soglie;
-        """
-        return self.db_manager_setting.fetch_results(query)
+    def get_lista_soglie(self, tipo_azienda : str) -> list[ThresholdModel]:
+            self.query_builder.select("*").table("Soglie")
+
+
+            #TODO aggiungere stringhe giuste
+            if tipo_azienda == "Agricola":
+                self.query_builder.where("Operazione", "=", "Produzione")
+                self.query_builder.where("Tipo", "=", "materia prima")
+            elif tipo_azienda == "Azienda di trasformazione":
+                self.query_builder.where("Tipo", "=", "prodotto finale")
+            elif tipo_azienda == "Azienda di trasporto":
+                self.query_builder.where("Tipo", "=", "trasporto")
+            else:
+                logger.error("Tipo di azienda non valido") 
+                
+            query, value = (self.query_builder.get_query() )
+
+            try:
+            
+                return [ThresholdModel(*x) for x in self.db.fetch_results(query, value)]
+        
+            except Exception as e:
+               logger.error(f"Errore durante il recupero delle soglie: {e}")
+            return []
+        
+            
+    
+
+
 
     def get_prodotti_to_azienda_agricola(self):
         query = """

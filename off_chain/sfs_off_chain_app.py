@@ -6,8 +6,20 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QSplashScreen
 
 from configuration.log_load_setting import logger
+from presentation.view.vista_magazzino import VisualizzaMagazzinoView
+from presentation.view.vista_richieste import VisualizzaRichiesteView
+from presentation.view.vista_richiesta_prodotto import RichiestaProdottoView
 from session import Session
 from presentation.view.vista_accedi import VistaAccedi
+
+
+
+import sys
+from PyQt5.QtWidgets import QApplication
+from model.product_model import ProductModel, Componente
+from model.operation_model import OperationModel
+from presentation.view.vista_operazioni_azienda import OperazioniAziendaView
+from presentation.view.vista_aggiungi_operazione import AggiungiOperazioneView
 
 
 def setup_database():
@@ -43,13 +55,6 @@ if __name__ == "__main__":
     # Close the database connection when the app closes
     # app.aboutToQuit.connect(DatabaseConnectionSetting.close_connection)
 
-
-
-import sys
-from PyQt5.QtWidgets import QApplication
-from model.product_model import ProductModel, Componente
-from model.operation_model import OperationModel
-from presentation.view.vista_operazioni_azienda import OperazioniAziendaView
 
 # Fake data per test
 

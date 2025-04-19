@@ -64,7 +64,7 @@ class OperazioniAziendaView(QWidget):
             self.tabella.setItem(row, 1, QTableWidgetItem(op.Nome_prodotto))
 
     def apri_aggiungi_operazione(self):
-        self.finestra_aggiungi = AggiungiOperazioneView(self.id_azienda, self)
+        self.finestra_aggiungi = AggiungiOperazioneView(self)
         self.finestra_aggiungi.operazione_aggiunta.connect(self.ricarica_operazioni)
         self.finestra_aggiungi.exec_()  
 
