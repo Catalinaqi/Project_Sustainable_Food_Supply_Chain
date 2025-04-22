@@ -43,7 +43,7 @@ class AggiungiOperazioneView(QDialog):
         self.lista_prodotti = QListWidget()
         self.lista_prodotti.setSelectionMode(QListWidget.NoSelection)  
 
-        if self.role_azienda== "Trasformatore" or  self.role_azienda == "Agricola":
+        if self.role_azienda == "Agricola" :
             
             # Se il ruolo è Trasformatore o Agricola, mostra il campo di testo per il nome del nuovo prodotto
             self.input_testo.setPlaceholderText("Nome nuovo prodotto")
@@ -65,16 +65,13 @@ class AggiungiOperazioneView(QDialog):
 
         
 
-        if self.role_azienda == "Trasformatore" or self.role_azienda == "Trasportatore" or self.role_azienda == "Rivenditore":
+        if  self.role_azienda == "Trasportatore" or self.role_azienda == "Rivenditore":
 
             # Se il ruolo è Trasformatore, Trasportatore o Rivenditore, mostra la lista dei prodotti
 
-            layout.addWidget(QLabel("Seleziona i prodotti utilizzati:"))
+            layout.addWidget(QLabel("Seleziona il prodotto:"))
 
-            # Imposta modalità di selezione in base al ruolo
-            if self.role_azienda in ["Trasformatore", ]:
-                self.abilita_selezione_multipla()
-            elif self.role_azienda in ["Distributore", "Trasportatore"]:  
+            if self.role_azienda in ["Distributore", "Trasportatore"]:  
                 self.abilita_selezione_singola()
 
 
@@ -92,6 +89,15 @@ class AggiungiOperazioneView(QDialog):
 
             # Collegamento del filtro
             self.input_ricerca_prodotto.textChanged.connect(self.filtra_lista_prodotti)
+
+
+            self.input_quantita = QDoubleSpinBox()
+            self.input_quantita.setMinimum(0.0)            
+            self.input_quantita.setMaximum(10000.0)       
+            self.input_quantita.setDecimals(0)          
+            self.input_quantita.setSingleStep(1)                    
+            layout.addWidget(QLabel("Inserisci quantità prodotto:"))
+            layout.addWidget(self.input_quantita)
 
 
 
@@ -235,16 +241,6 @@ class AggiungiOperazioneView(QDialog):
         ]
         self.popola_lista_prodotti(prodotti_filtrati)
 
-
-    def abilita_selezione_multipla(self):
-        try:
-            self.lista_prodotti.itemChanged.disconnect(self.gestisci_selezione_singola)
-        except TypeError:
-            pass
-
-        for i in range(self.lista_prodotti.count()):
-            item = self.lista_prodotti.item(i)
-            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
 
 
     def abilita_selezione_singola(self):

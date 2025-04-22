@@ -6,6 +6,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QSplashScreen
 
 from configuration.log_load_setting import logger
+from presentation.view.vista_composizione_prodotto import VistaCreaProdottoTrasformato
+from presentation.view.vista_invia_richiesta import VistaInviaRichiesta
 from presentation.view.vista_magazzino import VisualizzaMagazzinoView
 from presentation.view.vista_richieste import VisualizzaRichiesteView
 from presentation.view.vista_richiesta_prodotto import RichiestaProdottoView

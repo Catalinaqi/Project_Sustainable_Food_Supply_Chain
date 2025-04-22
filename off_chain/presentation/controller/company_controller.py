@@ -3,6 +3,7 @@ from configuration.log_load_setting import logger
 from model.operation_model import OperationModel
 from model.threshold_model import ThresholdModel
 from model.product_model import ProductModel
+from model.materia_prima_model import MateriaPrimaModel
 from session import Session
 from persistence.repository_impl.company_repository_impl import CompanyRepositoryImpl
 from persistence.repository_impl.threshold_repository_impl import ThresholdRepositoryImpl
@@ -163,8 +164,31 @@ class ControllerAzienda:
             lista_azioni_compensative = self.compensation_action.get_lista_azioni(azienda)
             return lista_azioni_compensative
         except Exception as e:
-            logger.error(f"Error al obtener la lista de azioni compensative: {e}", exc_info=True)
+            logger.error(f"Errore nell'ottenere la lista delle azioni compensative: {e}", exc_info=True)
             return []
+        
+    def get_materie_prime_magazzino_azienda(self) -> list[MateriaPrimaModel]:
+        try:
+            materie_prime = self.product.get_materie_prime_magazzino_azienda(1)
+            return materie_prime
+        except Exception as e:
+            logger.error(f"Errore nell'ottenere la lista delle materie prime: {e}", exc_info=True)
+            return  []
+        
+    def crea_prodotto_trasformato(self,nome : str, quantita :int,quantita_usata_per_materia : dict[MateriaPrimaModel, int]):
+        try:
+            self.product.inserisci_prodotto_trasformato(nome, quantita, quantita_usata_per_materia, id_azienda=Session().current_user["id_azienda"])
+        except Exception as e:
+            logger.error(f"Errore nella creazione del prodotto trasformato: {e}", exc_info=True)
+            return None
+        
+
+
+
+
+
+
+
         
     def aggiungi_operazione(
             self, tipo_operazione : str,   quantità : int, tipo_azienda, azienda, prodotto, data, co2, evento,

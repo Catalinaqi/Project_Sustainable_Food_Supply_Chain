@@ -39,8 +39,13 @@ class QueryBuilder:
 
     def update(self, **kwargs):
         self.query_type = 'update'
-        self.query_update.update(kwargs)
+        for k, v in kwargs.items():
+            if isinstance(v, tuple):  
+                self.query_update[k] = v  
+            else:
+                self.query_update[k] = ("?", [v])
         return self
+
 
     def delete(self):
         self.query_type = 'delete'
@@ -126,9 +131,13 @@ class QueryBuilder:
         return query, values
 
     def _build_update_query(self):
-        set_clauses = ", ".join([f"{col} = ?" for col in self.query_update.keys()])
-        query = f"UPDATE {self.query_table} SET {set_clauses}"
-        values = list(self.query_update.values())
+        set_clauses = []
+        values = []
+        for col, (expr, vals) in self.query_update.items():
+            set_clauses.append(f"{col} = {expr}")
+            values.extend(vals)
+
+        query = f"UPDATE {self.query_table} SET " + ", ".join(set_clauses)
 
         if self.query_where:
             where_clauses = [f"{field} {operator} ?" for field, operator, _ in self.query_where]
@@ -136,6 +145,7 @@ class QueryBuilder:
             values += [val for _, _, val in self.query_where]
 
         return query, values
+
 
     def _build_delete_query(self):
         query = f"DELETE FROM {self.query_table}"

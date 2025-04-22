@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 
 from model.operation_estesa_model import OperazioneEstesaModel 
+from presentation.view.vista_composizione_prodotto import VistaCreaProdottoTrasformato
 from presentation.controller.company_controller import ControllerAzienda
 from presentation.view.vista_aggiungi_operazione import AggiungiOperazioneView
 from session import Session
@@ -14,6 +15,7 @@ class OperazioniAziendaView(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.id_azienda : int = Session().current_user["id_azienda"]
+        self.role = Session().current_user["role"]
         self.controller = ControllerAzienda()
         
 
@@ -64,7 +66,11 @@ class OperazioniAziendaView(QWidget):
             self.tabella.setItem(row, 1, QTableWidgetItem(op.Nome_prodotto))
 
     def apri_aggiungi_operazione(self):
-        self.finestra_aggiungi = AggiungiOperazioneView(self)
+        if Session().current_user["role"] == "Trasformatore":
+            self.finestra_aggiungi = VistaCreaProdottoTrasformato(self)
+        else:
+            self.finestra_aggiungi = AggiungiOperazioneView(self)
+
         self.finestra_aggiungi.operazione_aggiunta.connect(self.ricarica_operazioni)
         self.finestra_aggiungi.exec_()  
 
