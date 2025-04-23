@@ -98,9 +98,7 @@ class RichiestaProdottoView(QDialog):
                 f"Richiesta inviata con successo.\nTrasporto affidato a: {nome_azienda}."
             )
             
-        
+            self.salva_richiesta.emit()
+            self.accept()
         except Exception as e:
             QMessageBox.critical(self, "Errore", f"Errore durante l'invio della richiesta: {str(e)}")
-
-        self.salva_richiesta.emit()
-        self.accept()

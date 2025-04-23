@@ -17,6 +17,7 @@ from model.company_model import CompanyModel
 from model.operation_estesa_model import OperazioneEstesaModel
 from model.compensation_action_model import CompensationActionModel
 from persistence.repository_impl.richieste_repository_impl import RichiesteRepositoryImpl
+from model.richiesta_model import RichiestaModel
 
 
 PERMESSI_OPERAZIONI = {
@@ -218,7 +219,22 @@ class ControllerAzienda:
         except Exception as e:
             logger.error(f"Errore nell'invio della richiesta: {e}", exc_info=True)
         pass
-
+    
+    def get_richieste_ricevute(self) -> list[RichiestaModel]:
+        try:
+            richieste = self.richieste.get_richieste_ricevute(Session().current_user["id_azienda"])
+            return richieste
+        except Exception as e:
+            logger.error(f"Errore nell'ottenere la lista delle richieste ricevute: {e}", exc_info=True)
+            return []
+        
+    def get_richieste_effettuate(self) -> list[RichiestaModel]:
+        try:
+            richieste = self.richieste.get_richieste_effettuate(Session().current_user["id_azienda"])
+            return richieste
+        except Exception as e:
+            logger.error(f"Errore nell'ottenere la lista delle richieste effettuate: {e}", exc_info=True)
+            return []
             
 
 
