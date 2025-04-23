@@ -124,7 +124,6 @@ class DatabaseMigrations:
             '''
             CREATE TABLE  Richiesta (
                 Id_richiesta INTEGER PRIMARY KEY AUTOINCREMENT,
-                Id_azienda INTEGER NOT NULL,
                 Id_richiedente INTEGER NOT NULL,
                 Id_ricevente INTEGER NOT NULL,
                 Id_trasportatore INTEGER NOT NULL,
@@ -133,7 +132,9 @@ class DatabaseMigrations:
                 Stato_ricevente TEXT CHECK(Stato_ricevente IN ('In attesa', 'Accettata', 'Rifiutata')),
                 Stato_trasportatore TEXT CHECK(Stato_trasportatore IN ('In attesa', 'Accettata', 'Rifiutata')),
                 Data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (Id_azienda) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
+                FOREIGN KEY (Id_richiedente) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
+                FOREIGN KEY (Id_ricevente) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
+                FOREIGN KEY (Id_trasportatore) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
             )
             '''
         ]

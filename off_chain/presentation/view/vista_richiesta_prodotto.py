@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, pyqtSignal
 
 from model.info_product_for_choice_model import ProductForChoiceModel
+from model.company_model import CompanyModel
 from session import Session
 from presentation.controller.company_controller import ControllerAzienda
 
@@ -20,10 +21,7 @@ class RichiestaProdottoView(QDialog):
         self.prodotti: list[ProductForChoiceModel] = self.controller.get_prodotti_ordinabili()  # Placeholder per il caricamento dei prodotti
         
         # Aziende disponibili (placeholder o da controller)
-        #self.aziende_trasporto = self.controller.get_aziende_trasporto()  
-        self.aziende_trasporto= [{'id': 1, 'nome': 'Azienda X'}, 
-                                 {'id': 2, 'nome': 'Azienda Y'}, 
-                                 {'id': 3, 'nome': 'Azienda Z'}]
+        self.aziende_trasporto : list[CompanyModel] = self.controller.get_aziende_trasporto()
 
         self.initUI()
 
@@ -53,7 +51,7 @@ class RichiestaProdottoView(QDialog):
         layout.addWidget(QLabel("Seleziona azienda di trasporto:"))
         self.combo_azienda = QComboBox()
         for azienda in self.aziende_trasporto:
-            self.combo_azienda.addItem(azienda["nome"], azienda["id"])  # Mostra nome, ma salva id
+            self.combo_azienda.addItem(azienda.Nome, azienda.Id_credenziali)  # Mostra nome, ma salva id
         layout.addWidget(self.combo_azienda)
 
         # Bottone richiesta
@@ -89,12 +87,12 @@ class RichiestaProdottoView(QDialog):
         nome_azienda = self.combo_azienda.currentText()
 
         try:
-            """self.controller.invia_richiesta_prodotto(
-                id_richiedente=Session().current_user["id_azienda"],
-                id_prodotto=prodotto.Id_prodotto,
+            self.controller.invia_richiesta(
+                id_az_ricevente= prodotto.id_azienda,
+                id_prodotto=prodotto.id_prodotto,
                 quantita=quantita,
-                id_azienda_trasporto=id_azienda_trasporto
-            )"""
+                id_az_trasporto=id_azienda_trasporto
+            )
             QMessageBox.information(
                 self, "Successo",
                 f"Richiesta inviata con successo.\nTrasporto affidato a: {nome_azienda}."

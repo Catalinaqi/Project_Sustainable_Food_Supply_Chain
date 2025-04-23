@@ -16,6 +16,7 @@ from persistence.repository_impl.composition_repository_impl import CompositionR
 from model.company_model import CompanyModel
 from model.operation_estesa_model import OperazioneEstesaModel
 from model.compensation_action_model import CompensationActionModel
+from persistence.repository_impl.richieste_repository_impl import RichiesteRepositoryImpl
 
 
 PERMESSI_OPERAZIONI = {
@@ -42,6 +43,7 @@ class ControllerAzienda:
         self.product = ProductRepositoryImpl()
         self.threshold = ThresholdRepositoryImpl()
         self.company = CompanyRepositoryImpl()
+        self.richieste = RichiesteRepositoryImpl()
         logger.info("BackEnd: Successful initialization of 'class instances' for repository implements")
 
     # Restituisce tutte le soglie
@@ -201,6 +203,21 @@ class ControllerAzienda:
         except Exception as e:
             logger.error(f"Errore nell'ottenere la lista dei prodotti ordinabili: {e}", exc_info=True)
             return []
+    
+    def get_aziende_trasporto(self) -> list[CompanyModel]:
+        try:
+            aziende = self.company.get_aziende_trasporto()
+            return aziende
+        except Exception as e:
+            logger.error(f"Errore nell'ottenere la lista delle aziende di trasporto: {e}", exc_info=True)
+            return []
+        
+    def invia_richiesta(self,id_az_ricevente: int, id_az_trasporto : int, id_prodotto : int, quantita : int):
+        try:
+            self.richieste.inserisci_richiesta(Session().current_user["id_azienda"],id_az_ricevente, id_az_trasporto, id_prodotto, quantita)
+        except Exception as e:
+            logger.error(f"Errore nell'invio della richiesta: {e}", exc_info=True)
+        pass
 
             
 

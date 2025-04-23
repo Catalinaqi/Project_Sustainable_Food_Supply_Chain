@@ -17,6 +17,20 @@ class CompanyRepositoryImpl(CompanyRepository, ABC):
         self.db = Database()
         self.query_builder = QueryBuilder()
 
+
+    def get_aziende_trasporto(self) -> list[CompanyModel]:
+        """
+        Get all the transport companies from the database.
+        """
+        self.query_builder.select("*").table("Azienda").where("Tipo", "=", "Trasportatore")
+        query, value = (self.query_builder.get_query())
+        result = self.db.fetch_results(query, value)
+        try:
+            return [CompanyModel(*x) for x in result]
+        except Exception as e:
+            print(e)
+            return []
+
     def get_lista_aziende(self, tipo: aziende_enum = None, 
                           nome : str = None, id : int = None ) -> list[CompanyModel]:
         
