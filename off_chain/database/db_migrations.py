@@ -115,7 +115,7 @@ class DatabaseMigrations:
             CREATE TABLE Magazzino (
                 id_azienda TEXT NOT NULL,
                 id_lotto TEXT NOT NULL,
-                quantità_disponibile REAL NOT NULL CHECK(quantità_disponibile >= 0),
+                quantita REAL NOT NULL CHECK(quantita >= 0),
                 PRIMARY KEY (id_azienda, id_lotto),
                 FOREIGN KEY (id_azienda) REFERENCES Azienda(Id_azienda),
                 FOREIGN KEY (id_lotto) REFERENCES Operazione(Id_lotto)

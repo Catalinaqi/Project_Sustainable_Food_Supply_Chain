@@ -50,10 +50,10 @@ class OperationRepositoryImpl(OperationRepository, ABC):
                     "Operazione.Id_operazione",
                     "Prodotto.Id_prodotto",
                     "Prodotto.Nome",
-                    "Prodotto.Quantita",
                     "Operazione.Data_operazione",
                     "Operazione.Consumo_CO2",
-                    "Operazione.Tipo"
+                    "Operazione.Tipo",
+                    "Operazione.quantita",
                 )
                 .table("Operazione")
                 .join("Prodotto", "Operazione.Id_prodotto", "Prodotto.Id_prodotto")
@@ -61,16 +61,6 @@ class OperationRepositoryImpl(OperationRepository, ABC):
                 .get_query()
         )
 
-        query, value = (
-            self.query_builder
-                .select(
-                    "*"
-                )
-                .table("Operazione")
-                #.join("Prodotto", "Operazione.Id_prodotto", "Prodotto.Id_prodotto")
-                #.where("Operazione.Id_azienda", "=", azienda)
-                .get_query()
-        )
 
         try:
             results = self.db.fetch_results(query, value)
@@ -79,10 +69,10 @@ class OperationRepositoryImpl(OperationRepository, ABC):
                         Id_operazione=row[0],
                         Id_prodotto=row[1],
                         Nome_prodotto=row[2],
-                        Quantita_prodotto=row[3],
-                        Data_operazione=row[4],
-                        Consumo_CO2=row[5],
-                        Nome_operazione=row[6]                  
+                        Data_operazione=row[3],
+                        Consumo_CO2=row[4],
+                        Nome_operazione=row[5],
+                        Quantita_prodotto=row[6],                 
             )
             for row in results
             ]
@@ -236,6 +226,14 @@ class OperationRepositoryImpl(OperationRepository, ABC):
                         Tipo=evento, Id_lotto= id_lotto, quantita=quantita)
                 .get_query()
             )
+            self.db.execute_query(query, value)
+
+            query, value = (
+                self.query_builder.table("Magazzino")
+                .insert(Id_azienda=azienda, id_lotto=id_lotto, quantita=quantita)
+                .get_query()
+            )
+
             self.db.execute_query(query, value)
 
 

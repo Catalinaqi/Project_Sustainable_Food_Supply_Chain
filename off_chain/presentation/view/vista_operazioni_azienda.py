@@ -51,12 +51,18 @@ class OperazioniAziendaView(QWidget):
         layout.addWidget(self.bottone_aggiungi)
 
     def filtra_operazioni(self, testo):
-        testo = testo.lower()
-        self.operazioni_filtrate = [
-            op for op in self.operazioni
-            if testo in op.Nome_operazione.lower() or testo in op.Nome_prodotto.lower()
-        ]
-        self.aggiorna_tabella()
+        try:
+            testo = testo.strip()
+        except Exception as e :
+            return
+        if isinstance(testo, str):
+
+            testo = testo.lower()
+            self.operazioni_filtrate = [
+                op for op in self.operazioni
+                if testo in op.Nome_operazione.lower() or testo in op.Nome_prodotto.lower()
+            ]
+            self.aggiorna_tabella()
 
     def aggiorna_tabella(self):
         self.tabella.setRowCount(len(self.operazioni_filtrate))

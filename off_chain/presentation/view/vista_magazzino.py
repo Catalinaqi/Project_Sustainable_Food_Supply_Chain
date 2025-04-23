@@ -2,9 +2,7 @@ from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QLabel, QLineEdit
 )
-from PyQt5.QtCore import Qt
-from model.product_model import ProductModel
-from session import Session
+from model.materia_prima_model import MateriaPrimaModel
 from presentation.controller.company_controller import ControllerAzienda
 
 
@@ -12,15 +10,10 @@ class VisualizzaMagazzinoView(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.controller = ControllerAzienda()
-        #self.id_azienda = Session().current_user["id_azienda"]
 
-        #self.prodotti_magazzino_completi = self.controller.get_prodotti_magazzino(self.id_azienda)
+        self.prodotti_magazzino_completi : list[MateriaPrimaModel] = self.controller.get_materie_prime_magazzino_azienda()
 
-        self.prodotti_magazzino_completi = [
-            ProductModel(1, "Prodotto A", []),
-            ProductModel(2, "Prodotto B", []),
-            ProductModel(3, "Prodotto C", []),
-        ]
+       
 
         self.initUI()
 
@@ -52,16 +45,16 @@ class VisualizzaMagazzinoView(QDialog):
 
     def filtra_prodotti(self):
         testo = self.input_filtro_nome.text().lower().strip()
-        prodotti_filtrati : list[ProductModel]= [
+        prodotti_filtrati : list[MateriaPrimaModel]= [
             p for p in self.prodotti_magazzino_completi
-            if testo in p.Nome_prodotto.lower()
+            if testo in p.nome.lower()
         ]
         self.mostra_prodotti(prodotti_filtrati)
 
-    def mostra_prodotti(self, prodotti : list[ProductModel]):
+    def mostra_prodotti(self, prodotti : list[MateriaPrimaModel]):
         self.tabella_magazzino.setRowCount(len(prodotti))
         for row, prodotto in enumerate(prodotti):
-            self.tabella_magazzino.setItem(row, 0, QTableWidgetItem(prodotto.Id_prodotto))
-            self.tabella_magazzino.setItem(row, 1, QTableWidgetItem(prodotto.Nome_prodotto))
-            self.tabella_magazzino.setItem(row, 2, QTableWidgetItem(str(100)))  # Placeholder per la quantità disponibile
+            self.tabella_magazzino.setItem(row, 0, QTableWidgetItem(prodotto.nome))
+            self.tabella_magazzino.setItem(row, 1, QTableWidgetItem(prodotto.id_prodotto))
+            self.tabella_magazzino.setItem(row, 2, QTableWidgetItem(str(prodotto.quantita))) # Placeholder per la quantità disponibile
             self.tabella_magazzino.setItem(row, 3, QTableWidgetItem("kg"))  # Placeholder per l'unità di misura

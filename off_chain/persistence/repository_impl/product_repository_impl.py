@@ -195,9 +195,10 @@ class ProductRepositoryImpl(ProductRepository, ABC):
     def get_materie_prime_magazzino_azienda(self, id_azienda : int) -> list[MateriaPrimaModel]:
         query, value = (
             self.query_builder
-            .select("Magazzino.quantita", "Prodotto.nome")
+            .select("Prodotto.id_prodotto","Magazzino.id_azienda","Magazzino.quantita", "Prodotto.nome")
             .table("Magazzino")
-            .join("Prodotto", "Magazzino.id_prodotto", "Prodotto.id_prodotto")
+            .join("Operazione", "Magazzino.id_lotto", "Operazione.id_lotto")
+            .join("Prodotto", "Operazione.id_prodotto", "Prodotto.id_prodotto")
             .where("Magazzino.id_azienda", "=", id_azienda)
             .where("Prodotto.stato", "=", 0)  # Stato 0 indica che è una materia prima
             .get_query()

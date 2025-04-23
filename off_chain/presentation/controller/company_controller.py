@@ -169,7 +169,7 @@ class ControllerAzienda:
         
     def get_materie_prime_magazzino_azienda(self) -> list[MateriaPrimaModel]:
         try:
-            materie_prime = self.product.get_materie_prime_magazzino_azienda(1)
+            materie_prime = self.product.get_materie_prime_magazzino_azienda(Session().current_user["id_azienda"])
             return materie_prime
         except Exception as e:
             logger.error(f"Errore nell'ottenere la lista delle materie prime: {e}", exc_info=True)
@@ -192,6 +192,8 @@ class ControllerAzienda:
             self.operation_repository.inserisci_operazione_azienda_agricola(
                 nome_prodotto, quantita, Session().current_user["id_azienda"], data, co2,
             )
+
+            
 
 
     
