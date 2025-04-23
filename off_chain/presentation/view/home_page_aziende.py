@@ -112,6 +112,7 @@ class HomePage(QMainWindow):
         self.button_token = QPushButton('Gestione token')
         self.button_token.clicked.connect(self.show_token)
         funzioni_utili.insert_button_in_grid(self.button_token, layout, 5, 2)
+        
 
         self.button_richieste = QPushButton('Richieste')
         self.button_richieste.clicked.connect(self.show_richieste)

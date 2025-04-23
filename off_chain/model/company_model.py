@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
+import datetime
+
 
 @dataclass
 class CompanyModel:
@@ -11,5 +13,7 @@ class CompanyModel:
     Tipo: str
     Nome: str
     Indirizzo: str
-    Co2_consumata: Optional[int] = None
-    Co2_compensata: Optional[int] = None
+    Co2_consumata: Optional[float] = None
+    Co2_compensata: Optional[float] = None
+    data : datetime = None
+

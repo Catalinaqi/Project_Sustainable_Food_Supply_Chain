@@ -64,11 +64,13 @@ class CredentialRepositoryImpl(CredentialRepository, ABC):
         query, value = (
             self.query_builder.select("*").table("Azienda").where("Id_azienda","=",id).get_query()
         )
+
         try:
+            result = self.db.fetch_results(query, value)
             return CompanyModel(*self.db.fetch_results(query, value)[0])
             
         except Exception as e:
-            logger.info(f"{e} ")
+            logger.info(f" Errore nel repository{e} ")
             return False
 
 

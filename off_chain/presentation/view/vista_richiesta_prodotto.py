@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
-    QLabel, QSpinBox, QPushButton, QMessageBox
+    QLabel, QSpinBox, QPushButton, QMessageBox, QComboBox
 )
 from PyQt5.QtCore import Qt
 
@@ -13,12 +13,20 @@ class RichiestaProdottoView(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.controller = ControllerAzienda()
-        #self.prodotti: list[ProductModel] = self.controller.get_prodotti_disponibili()  # o un altro metodo del controller
+        
+        # Prodotti placeholder (da controller in uso reale)
         self.prodotti = [
             ProductModel(1, "Prodotto A", []),
             ProductModel(2, "Prodotto B", []),
             ProductModel(3, "Prodotto C", []),
         ]
+        
+        # Aziende disponibili (placeholder o da controller)
+        #self.aziende_trasporto = self.controller.get_aziende_trasporto()  
+        self.aziende_trasporto= [{'id': 1, 'nome': 'Azienda X'}, 
+                                 {'id': 2, 'nome': 'Azienda Y'}, 
+                                 {'id': 3, 'nome': 'Azienda Z'}]
+
         self.initUI()
 
     def initUI(self):
@@ -43,20 +51,27 @@ class RichiestaProdottoView(QDialog):
         self.input_quantita.setMinimum(1)
         layout.addWidget(self.input_quantita)
 
+        # Azienda di trasporto
+        layout.addWidget(QLabel("Seleziona azienda di trasporto:"))
+        self.combo_azienda = QComboBox()
+        for azienda in self.aziende_trasporto:
+            self.combo_azienda.addItem(azienda["nome"], azienda["id"])  # Mostra nome, ma salva id
+        layout.addWidget(self.combo_azienda)
+
         # Bottone richiesta
         self.btn_richiesta = QPushButton("Invia richiesta")
         self.btn_richiesta.clicked.connect(self.invia_richiesta)
         layout.addWidget(self.btn_richiesta)
 
         self.setLayout(layout)
-        self.resize(500, 400)
+        self.resize(500, 450)
 
     def carica_prodotti(self):
         self.tabella.setRowCount(len(self.prodotti))
         for row, prodotto in enumerate(self.prodotti):
             self.tabella.setItem(row, 0, QTableWidgetItem(prodotto.Nome_prodotto))
-            self.tabella.setItem(row, 1, QTableWidgetItem("azienda"))  # Placeholder per l'azienda
-            self.tabella.setItem(row, 2, QTableWidgetItem(str(100)))  # Placeholder per la quantità disponibile
+            self.tabella.setItem(row, 1, QTableWidgetItem("azienda"))  # Placeholder
+            self.tabella.setItem(row, 2, QTableWidgetItem(str(100)))  # Placeholder
             self.tabella.setRowHeight(row, 30)
 
     def invia_richiesta(self):
@@ -68,18 +83,24 @@ class RichiestaProdottoView(QDialog):
         prodotto = self.prodotti[row]
         quantita = self.input_quantita.value()
 
-        if quantita > 1000:  # Placeholder per la quantità disponibile
-            QMessageBox.warning(self, "Errore", f"Quantità richiesta maggiore della disponibilità.")
+        if quantita > 1000:  # Placeholder
+            QMessageBox.warning(self, "Errore", "Quantità richiesta maggiore della disponibilità.")
             return
 
+        id_azienda_trasporto = self.combo_azienda.currentData()
+        nome_azienda = self.combo_azienda.currentText()
+
         try:
-            
             """self.controller.invia_richiesta_prodotto(
                 id_richiedente=Session().current_user["id_azienda"],
                 id_prodotto=prodotto.Id_prodotto,
-                quantita=quantita
+                quantita=quantita,
+                id_azienda_trasporto=id_azienda_trasporto
             )"""
-            QMessageBox.information(self, "Successo", "Richiesta inviata con successo.")
+            QMessageBox.information(
+                self, "Successo",
+                f"Richiesta inviata con successo.\nTrasporto affidato a: {nome_azienda}."
+            )
             self.accept()
         except Exception as e:
             QMessageBox.critical(self, "Errore", f"Errore durante l'invio della richiesta: {str(e)}")
