@@ -3,6 +3,7 @@ from configuration.database import Database
 from configuration.log_load_setting import logger
 from domain.repository.product_repository import ProductRepository
 from model.materia_prima_model import MateriaPrimaModel
+from model.info_product_for_choice_model import ProductForChoiceModel
 from persistence.query_builder import QueryBuilder
 
 
@@ -209,16 +210,52 @@ class ProductRepositoryImpl(ProductRepository, ABC):
             result = self.db.fetch_results(query, value)
         except Exception as e:
             logger.error(f"Error in get_materie_prime_magazzino_azienda: {e}")
-            return [MateriaPrimaModel(1, "Materia Prima A")]
+            return []
 
         
         if not result:
             logger.warning("The get_materie_prime_magazzino_azienda is empty or the query returned no results.")
         else:
             logger.info(f"Obtained in get_materie_prime_magazzino_azienda: {result}")
-        return [MateriaPrimaModel(*x) for x in result] if result else [MateriaPrimaModel(1,8,14,20, "Errore A"),
-                                                                       MateriaPrimaModel(2,8,20,10, "Errore B")]    
+        try:
+            return [MateriaPrimaModel(*x) for x in result] if result else [] 
+        except Exception as e:
+            logger.error(f"Error in converting result to MateriaPrimaModel: {e}")
+            return []   
      # Assicurati che il path sia corretto
+
+
+    def get_prodotti_ordinabili(self) -> list[ProductForChoiceModel]:
+        query, value = (
+            self.query_builder
+            .select("Azienda.Nome","Prodotto.nome","Magazzino.quantita","Azienda.Id_azienda","Prodotto.id_prodotto",  "Operazione.Consumo_CO2")
+            .table("Magazzino")
+            .join("Operazione", "Magazzino.id_lotto", "Operazione.id_lotto")
+            .join("Azienda", "Operazione.id_azienda", "Azienda.id_azienda")
+            .where("Azienda.Tipo", "=", "Agricola")
+            .join("Prodotto", "Operazione.id_prodotto", "Prodotto.id_prodotto")
+            .where("Magazzino.quantita", ">", 0)
+            .where("Prodotto.stato", "=", 0)  
+            .get_query()
+        )
+
+        try:
+            logger.info(f"Query in get_prodotti_ordinabili: {query} - Value: {value}")
+            result = self.db.fetch_results(query, value)
+        except Exception as e:
+            logger.error(f"Error in get_prodotti_ordinabili: {e}")
+            return []
+
+        
+        if not result:
+            logger.warning("The get_prodotti_ordinabili is empty or the query returned no results.")
+        else:
+            logger.info(f"Obtained in get_prodotti_ordinabili: {result}")
+        try:
+            return [ProductForChoiceModel(*x) for x in result] if result else []
+        except Exception as e:
+            logger.error(f"Error in converting result to ProductForChoiceModel: {e}")
+            return []
 
 
 

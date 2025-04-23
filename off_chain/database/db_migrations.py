@@ -179,7 +179,7 @@ class DatabaseMigrations:
             SEED_AZIENDE = [
                 ("aaa", "Azienda Agricola Verde", "Via Roma 1", "Agricola", 10.5, 2.0),
                 ("ttt", "Trasporti EcoExpress", "Via Milano 2", "Trasportatore", 30.0, 5.0),
-                ("trasf", "Certificazioni BioCheck", "Via Torino 3", "Certificatore", 5.0, 1.5),
+                ("trasf", "Certificazioni BioCheck", "Via Torino 3", "Trasformatore", 5.0, 1.5),
             ]
 
             for username, nome, indirizzo, tipo, co2_emessa, co2_compensata in SEED_AZIENDE:
@@ -191,13 +191,61 @@ class DatabaseMigrations:
                         INSERT OR IGNORE INTO Azienda (Id_credenziali, Tipo, Nome, Indirizzo, Co2_emessa, Co2_compensata)
                         VALUES (?, ?, ?, ?, ?, ?)
                     """, (id_cred, tipo, nome, indirizzo, co2_emessa, co2_compensata))
+                        # Seed prodotti per l'azienda con id_azienda = 1
+            SEED_PRODOTTI = [
+                ("Mele Bio", 0),
+                ("Succo di mela", 0)
+            ]
+
+            for nome, stato in SEED_PRODOTTI:
+                db.execute_query("""
+                    INSERT INTO Prodotto (Nome, Stato)
+                    VALUES (?, ?)
+                """, (nome, stato))
+
+            # Ottieni gli ID dei prodotti inseriti
+            prodotti = db.fetch_results("SELECT Id_prodotto, Nome FROM Prodotto")
+            id_azienda = 1  # come richiesto
+
+            # Operazioni di produzione per ciascun prodotto (lotti univoci)
+            SEED_OPERAZIONI = [
+                {
+                    "prodotto": "Mele Bio",
+                    "lotto": 1001,
+                    "co2": 5.0,
+                    "quantita": 100.0
+                },
+                {
+                    "prodotto": "Succo di mela",
+                    "lotto": 1002,
+                    "co2": 3.2,
+                    "quantita": 80.0
+                }
+            ]
+
+            for op in SEED_OPERAZIONI:
+                id_prodotto = next((idp for idp, nome in prodotti if nome == op["prodotto"]), None)
+                if id_prodotto:
+                    db.execute_query("""
+                        INSERT INTO Operazione (Id_azienda, Id_prodotto, Id_lotto, Consumo_CO2, quantita, Tipo)
+                        VALUES (?, ?, ?, ?, ?, 'produzione')
+                    """, (id_azienda, id_prodotto, op["lotto"], op["co2"], op["quantita"]))
+
+            # Inserimento nel Magazzino per i lotti prodotti
+            for op in SEED_OPERAZIONI:
+                db.execute_query("""
+                    INSERT INTO Magazzino (id_azienda, id_lotto, quantita)
+                    VALUES (?, ?, ?)
+                """, (id_azienda, op["lotto"], op["quantita"]))
+
+            logger.info("BackEnd: run_migrations: Seed prodotti, operazioni e magazzino completato.")
+
+            
+            
 
             logger.info("BackEnd: run_migrations: Seed dei dati iniziali completato.")
         except Exception as e:
             logger.error(f"Errore durante l'inserimento dei dati di seed: {e}")
 
 
-
-# Execute migrations when the module is imported
-# DatabaseMigrations.run_migrations()
-#logger.info("Step 3, backend: Executed migrations of tables...")
+        

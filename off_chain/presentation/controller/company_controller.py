@@ -4,6 +4,7 @@ from model.operation_model import OperationModel
 from model.threshold_model import ThresholdModel
 from model.product_model import ProductModel
 from model.materia_prima_model import MateriaPrimaModel
+from model.info_product_for_choice_model import ProductForChoiceModel
 from session import Session
 from persistence.repository_impl.company_repository_impl import CompanyRepositoryImpl
 from persistence.repository_impl.threshold_repository_impl import ThresholdRepositoryImpl
@@ -192,6 +193,14 @@ class ControllerAzienda:
             self.operation_repository.inserisci_operazione_azienda_agricola(
                 nome_prodotto, quantita, Session().current_user["id_azienda"], data, co2,
             )
+
+    def get_prodotti_ordinabili(self) -> list[ProductForChoiceModel]:
+        try:
+            prodotti = self.product.get_prodotti_ordinabili()
+            return prodotti
+        except Exception as e:
+            logger.error(f"Errore nell'ottenere la lista dei prodotti ordinabili: {e}", exc_info=True)
+            return []
 
             
 

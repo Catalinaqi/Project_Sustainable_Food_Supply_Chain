@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (
     QPushButton, QMessageBox, QLabel, QGroupBox
 )
 from PyQt5.QtCore import Qt
+from presentation.view.vista_richiesta_prodotto import RichiestaProdottoView
 from session import Session
 from presentation.controller.company_controller import ControllerAzienda
 
@@ -19,17 +20,9 @@ class VisualizzaRichiesteView(QDialog):
         #self.richieste_ricevute: list[richiesta] = self.controller.get_richieste_ricevute(self.id_azienda)
         #self.richieste_effettuate : list[richiesta] = self.controller.get_richieste_effettuate(self.id_azienda)
 
-        self.richieste_ricevute: list[richiesta] = [
-            richiesta(1, 1, 1, 10, "In attesa", "2023-10-01"),
-            richiesta(2, 1, 2, 5, "In attesa", "2023-10-02"),
-            richiesta(3, 1, 3, 20, "Accettata", "2023-10-03"),
-        ]
+        self.richieste_ricevute: list[richiesta] = []
 
-        self.richieste_effettuate: list[richiesta] = [
-            richiesta(4, 2, 1, 15, "In attesa", "2023-10-01"),
-            richiesta(5, 2, 2, 8, "In attesa", "2023-10-02"),
-            richiesta(6, 2, 3, 12, "Accettata", "2023-10-03"),
-        ]
+        self.richieste_effettuate: list[richiesta] = []
 
         self.initUI()
 
@@ -84,6 +77,10 @@ class VisualizzaRichiesteView(QDialog):
         self.carica_ricevute()
         self.carica_effettuate()
 
+        self.bottone_aggiungi = QPushButton("Invia Richiesta")
+        self.bottone_aggiungi.clicked.connect(self.apri_invia_richiesta)
+        layout.addWidget(self.bottone_aggiungi)
+
         self.setLayout(layout)
         self.resize(700, 600)
 
@@ -135,6 +132,12 @@ class VisualizzaRichiesteView(QDialog):
             self.carica_ricevute()
         except Exception as e:
             QMessageBox.critical(self, "Errore", f"Errore durante la gestione: {str(e)}")
+
+
+    def apri_invia_richiesta(self):
+        self.finestra_aggiungi = RichiestaProdottoView(self)
+        self.finestra_aggiungi.salva_richiesta.connect(self.carica_effettuate)
+        self.finestra_aggiungi.exec_()
 
 
 class richiesta():

@@ -2,24 +2,22 @@ from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QLabel, QSpinBox, QPushButton, QMessageBox, QComboBox
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 
-from model.product_model import ProductModel
+from model.info_product_for_choice_model import ProductForChoiceModel
 from session import Session
 from presentation.controller.company_controller import ControllerAzienda
 
 
 class RichiestaProdottoView(QDialog):
+    salva_richiesta = pyqtSignal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.controller = ControllerAzienda()
         
         # Prodotti placeholder (da controller in uso reale)
-        self.prodotti = [
-            ProductModel(1, "Prodotto A", []),
-            ProductModel(2, "Prodotto B", []),
-            ProductModel(3, "Prodotto C", []),
-        ]
+        self.prodotti: list[ProductForChoiceModel] = self.controller.get_prodotti_ordinabili()  # Placeholder per il caricamento dei prodotti
         
         # Aziende disponibili (placeholder o da controller)
         #self.aziende_trasporto = self.controller.get_aziende_trasporto()  
@@ -69,9 +67,9 @@ class RichiestaProdottoView(QDialog):
     def carica_prodotti(self):
         self.tabella.setRowCount(len(self.prodotti))
         for row, prodotto in enumerate(self.prodotti):
-            self.tabella.setItem(row, 0, QTableWidgetItem(prodotto.Nome_prodotto))
-            self.tabella.setItem(row, 1, QTableWidgetItem("azienda"))  # Placeholder
-            self.tabella.setItem(row, 2, QTableWidgetItem(str(100)))  # Placeholder
+            self.tabella.setItem(row, 0, QTableWidgetItem(prodotto.nome_prodotto))
+            self.tabella.setItem(row, 1, QTableWidgetItem(prodotto.nome_azienda))  # Placeholder
+            self.tabella.setItem(row, 2, QTableWidgetItem(str(prodotto.quantita)))  # Placeholder
             self.tabella.setRowHeight(row, 30)
 
     def invia_richiesta(self):
@@ -83,7 +81,7 @@ class RichiestaProdottoView(QDialog):
         prodotto = self.prodotti[row]
         quantita = self.input_quantita.value()
 
-        if quantita > 1000:  # Placeholder
+        if quantita > prodotto.quantita:  # Placeholder
             QMessageBox.warning(self, "Errore", "Quantità richiesta maggiore della disponibilità.")
             return
 
@@ -101,6 +99,10 @@ class RichiestaProdottoView(QDialog):
                 self, "Successo",
                 f"Richiesta inviata con successo.\nTrasporto affidato a: {nome_azienda}."
             )
-            self.accept()
+            
+        
         except Exception as e:
             QMessageBox.critical(self, "Errore", f"Errore durante l'invio della richiesta: {str(e)}")
+
+        self.salva_richiesta.emit()
+        self.accept()
