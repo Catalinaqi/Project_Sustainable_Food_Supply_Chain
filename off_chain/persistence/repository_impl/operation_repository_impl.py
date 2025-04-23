@@ -53,11 +53,22 @@ class OperationRepositoryImpl(OperationRepository, ABC):
                     "Prodotto.Quantita",
                     "Operazione.Data_operazione",
                     "Operazione.Consumo_CO2",
-                    "Operazione.Operazione"
+                    "Operazione.Tipo"
                 )
                 .table("Operazione")
                 .join("Prodotto", "Operazione.Id_prodotto", "Prodotto.Id_prodotto")
                 .where("Operazione.Id_azienda", "=", azienda)
+                .get_query()
+        )
+
+        query, value = (
+            self.query_builder
+                .select(
+                    "*"
+                )
+                .table("Operazione")
+                #.join("Prodotto", "Operazione.Id_prodotto", "Prodotto.Id_prodotto")
+                #.where("Operazione.Id_azienda", "=", azienda)
                 .get_query()
         )
 
@@ -78,7 +89,7 @@ class OperationRepositoryImpl(OperationRepository, ABC):
 
             return operazioni_estese   
         except Exception as e:
-            logger.error(f"Error fetching operations by company: {e}", exc_info=True)
+            logger.error(f"Error fetching operations by company qui: {e}", exc_info=True)
             return[]
     
 
@@ -197,29 +208,37 @@ class OperationRepositoryImpl(OperationRepository, ABC):
         self.db_manager_setting.execute_query(queries, multiple=True)
         logger.info(f"Operazione inserita e stato aggiornato con successo per il prodotto {prodotto}.")
 
-    def inserisci_operazione_azienda_agricola(self, nome: str, quantita: int, azienda: int, data: datetime, co2: float,
-                                              evento: str):
+
+
+
+
+    """ Funzionanti"""
+
+    def inserisci_operazione_azienda_agricola(self, nome: str, quantita: int, azienda: int, data: datetime, co2: float):
         """
         Inserts a new agricultural product and logs the operation.
         """
-        # Inserisci il prodotto
-        query_prodotto = """
-        INSERT INTO Prodotto (Nome, Quantita, Stato) VALUES (?, ?, ?);
-        """
-        params_prodotto = (nome, quantita, 0)
+        try:
 
-        # Esegui l'inserimento del prodotto per ottenere l'ID generato
-        self.db_manager_setting.execute_query(query_prodotto, params_prodotto)
-        prodotto_id = self.db_manager_setting.cursor.lastrowid  # Ottieni l'ID del prodotto appena creato
+            query = "INSERT INTO Prodotto (Nome, Stato) VALUES (?, ?)"
+            params = (nome, 0)  # Stato 0 indica che il prodotto è in magazzino
 
-        # Inserisci l'operazione
-        query_operazione = """
-        INSERT INTO Operazione (Id_azienda, Id_prodotto, Data_operazione, Consumo_CO2, Operazione) 
-        VALUES (?, ?, ?, ?, ?);
-        """
-        params_operazione = (azienda, prodotto_id, data, co2, evento)
+            self.db.cur.execute(query, params)
+            self.db.conn.commit()
+            new_prodotto_id = self.db.cur.lastrowid  # Restituisce l'ID del nuovo prodotto            
 
-        # Esegui l'inserimento dell'operazione
-        self.db_manager_setting.execute_query(query_operazione, params_operazione)
 
-        logger.info(f"Prodotto inserito con ID {prodotto_id} e operazione registrata con successo.")
+            evento = "produzione"
+            id_lotto = "PROD" + str(new_prodotto_id)  # Genera un ID lotto unico}
+            query, value = (
+                self.query_builder.table("Operazione")
+                .insert(Id_azienda=azienda, Id_prodotto=new_prodotto_id, Data_operazione=data, Consumo_CO2=co2,
+                        Tipo=evento, Id_lotto= id_lotto, quantita=quantita)
+                .get_query()
+            )
+            self.db.execute_query(query, value)
+
+
+            logger.info(f"Prodotto inserito con ID {new_prodotto_id} e operazione registrata con successo.")
+        except Exception as e:
+            logger.error(f"Errore durante l'inserimento del prodotto: {str(e)}")

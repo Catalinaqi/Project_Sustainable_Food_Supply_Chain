@@ -183,84 +183,15 @@ class ControllerAzienda:
             return None
         
 
-
-
-
-
-
-
-        
-    def aggiungi_operazione(
-            self, tipo_operazione : str,   quantità : int, tipo_azienda, azienda, prodotto, data, co2, evento,
-            quantita='', nuovo_stato=00, materie_prime=None
-    ):
-        if not self.check_utente(tipo_operazione):
-            raise PermissionError("Operazione non consentita per questo utente.")
-        
-
-        if tipo_azienda == "Agricola":
-            self.operation_repository.inserisci_operazione_azienda_agricola(
-                prodotto, quantita, azienda, data, co2, evento
-            )
-        elif tipo_azienda == "Trasportatore":
-            self.operation_repository.inserisci_operazione_azienda_trasporto(
-                azienda, prodotto, data, co2, evento, nuovo_stato
-            )
-        elif tipo_azienda == "Trasformatore":
-            self.operation_repository.inserisci_operazione_azienda_trasformazione(
-                azienda, prodotto, data, co2, evento, quantita, materie_prime
-            )
-        elif tipo_azienda == "Rivenditore":
-            self.operation_repository.inserisci_operazione_azienda_rivenditore(
-                azienda, prodotto, data, co2, evento
-            )
-
-
-
-    def salva_operazione_agricola(self,id_azienda : int, tipo : str, data : datetime,
+    def salva_operazione_agricola(self, tipo : str, data : datetime,
                                   co2 : float,nome_prodotto : str, quantita : int
                 ):
             if not self.check_utente(tipo):
                 raise PermissionError("Operazione non consentita per questo utente.")
+            
             self.operation_repository.inserisci_operazione_azienda_agricola(
-                nome_prodotto, quantita, id_azienda, data, co2,
+                nome_prodotto, quantita, Session().current_user["id_azienda"], data, co2,
             )
-
-           
-
-    def salva_operazione_trasformazione(self, 
-                    id_azienda : int,
-                    tipo : str,
-                    data = datetime,
-                    co2 = float,
-                    nome_nuovo_prodotto = str,
-                    prodotti_usati = list[ProductModel],
-                ):
-            self.operation_repository.inserisci_operazione_azienda_trasformazione(
-                azienda, prodotto, data, co2, evento, nuovo_stato
-            )
-    
-
-    def salva_operazione_trasportatore(self,
-                    id_azienda : int,
-                    tipo : str,
-                    data = datetime,
-                    co2 = float
-                ): 
-        self.operation_repository.inserisci_operazione_azienda_trasporto(
-            id_azienda, prodotto, data, co2, evento, nuovo_stato
-            )
-
-    def salva_operazione_distributore(
-                    id_azienda : int,
-                    tipo : str,
-                    data = datetime,
-                    co2 = float
-                ):
-        self.operation_repository.inserisci_operazione_azienda_rivenditore(
-            id_azienda, prodotto, data, co2, evento, nuovo_stato
-            )
-
 
 
     

@@ -1,3 +1,6 @@
+from configuration.database import Database
+
+
 class QueryBuilder:
     def __init__(self):
         self.reset()
@@ -157,3 +160,28 @@ class QueryBuilder:
             values = [val for _, _, val in self.query_where]
 
         return query, values
+    
+
+    def execute_and_return_last_id(self):
+        db = Database()
+        conn = db.conn
+        query_type = self.query_type  # Salva prima che venga resettato!
+        query, values = self.get_query()
+
+        cursor = conn.cursor()
+        cursor.execute(query, values)
+        conn.commit()
+
+        if query_type == 'insert':
+            return cursor.lastrowid
+        return None
+    
+    def execute_and_fetch_one(self):
+        db = Database()  # Singleton
+        query, values = self.get_query()
+        cursor = db.conn.cursor()
+        cursor.execute(query, values)
+        result = cursor.fetchone()
+        return result[0] if result else None
+
+

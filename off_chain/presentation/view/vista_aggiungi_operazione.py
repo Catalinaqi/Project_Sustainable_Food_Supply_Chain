@@ -135,6 +135,7 @@ class AggiungiOperazioneView(QDialog):
             co2 = self.input_valore.value()
             id_azienda = Session().current_user["id_azienda"]
 
+
             # Controlli di validità base
             if not tipo:
                 QMessageBox.warning(self, "Errore", "Tipo operazione mancante.")
@@ -144,7 +145,7 @@ class AggiungiOperazioneView(QDialog):
                 QMessageBox.warning(self, "Errore", "Inserisci un valore di CO2 positivo.")
                 return
 
-            """ # Raccolta dei dati specifici in base al ruolo
+             # Raccolta dei dati specifici in base al ruolo
             if self.role_azienda == "Agricola":
                 nome_nuovo_prodotto = self.input_testo.text().strip()
                 if not nome_nuovo_prodotto:
@@ -152,13 +153,13 @@ class AggiungiOperazioneView(QDialog):
                     return
 
                 self.controller.salva_operazione_agricola(
-                    id_azienda=id_azienda,
                     tipo=tipo,
                     data=data,
                     co2=co2,
-                    nome_prodotto=nome_nuovo_prodotto
+                    nome_prodotto=nome_nuovo_prodotto,
+                    quantita=self.input_quantita.value()
                 )
-
+            """
             elif self.role_azienda == "Trasformatore":
                 nome_nuovo_prodotto = self.input_testo.text().strip()
                 if not nome_nuovo_prodotto:

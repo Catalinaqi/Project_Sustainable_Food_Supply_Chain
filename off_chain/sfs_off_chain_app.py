@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import QApplication, QSplashScreen
 
 from configuration.log_load_setting import logger
 from database.db_migrations import DatabaseMigrations
+from configuration.database import Database
+from persistence.query_builder import QueryBuilder
 from presentation.view.vista_composizione_prodotto import VistaCreaProdottoTrasformato
 from presentation.view.vista_invia_richiesta import VistaInviaRichiesta
 from presentation.view.vista_magazzino import VisualizzaMagazzinoView
@@ -29,7 +31,7 @@ def setup_database():
 
     try:
         pass
-        #DatabaseMigrations.run_migrations()
+        DatabaseMigrations.run_migrations()
     except Exception as e:
         logger.error(f"Error initializing database: {e}")
         sys.exit(1)  # Stops the application if there is a critical error
@@ -50,6 +52,17 @@ if __name__ == "__main__":
     splash.show()
 
     time.sleep(1)
+
+    db = Database()
+    qb = QueryBuilder()
+    query,value = (
+        qb.select("*")
+        .table("Prodotto")
+        .get_query()
+    )
+
+    print( "risultato " + str(db.execute_query(query, value)))
+
     finestra = VistaAccedi()
     finestra.show()
     splash.finish(finestra)

@@ -74,7 +74,7 @@ class DatabaseMigrations:
                 Id_lotto INTEGER UNIQUE NOT NULL,
                 Data_operazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 Consumo_CO2 REAL NOT NULL,
-                quantità REAL NOT NULL CHECK(quantità > 0),
+                quantita REAL NOT NULL CHECK(quantita > 0),
                 Tipo TEXT CHECK(tipo IN ('produzione', 'trasporto', 'trasformazione', 'vendita')) NOT NULL,
                 FOREIGN KEY (Id_azienda) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE,
                 FOREIGN KEY (Id_prodotto) REFERENCES Prodotto(Id_prodotto) ON DELETE CASCADE
