@@ -20,5 +20,6 @@ class RichiestaModel:
     Stato_ricevente: str
     Stato_trasportatore: str
     Data: datetime.datetime
+    id_lotto_input: int
     
    

@@ -82,11 +82,9 @@ class DatabaseMigrations:
             ''',
             '''
             CREATE TABLE ComposizioneLotto (
-                id_lotto_output TEXT NOT NULL,
+                id_lotto_output INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_lotto_input TEXT NOT NULL,
                 quantità_utilizzata REAL NOT NULL CHECK(quantità_utilizzata > 0),
-                PRIMARY KEY (id_lotto_output, id_lotto_input),
-                FOREIGN KEY (id_lotto_output) REFERENCES Operazione(Id_lotto),
                 FOREIGN KEY (id_lotto_input) REFERENCES Operazione(Id_lotto)
             )
             ''',
@@ -303,6 +301,33 @@ class DatabaseMigrations:
                 INSERT OR IGNORE INTO Magazzino (id_azienda, id_lotto, quantita)
                 VALUES (?, ?, ?)
             """, (3, 2001, 130.0))
+
+
+
+            # Prima recuperiamo l'id del prodotto "Succo di mela"
+            id_succo = db.fetch_results("SELECT Id_prodotto FROM Prodotto WHERE Nome = ?", ("Succo di mela",))
+            if id_succo:
+                id_succo = id_succo[0][0]  # Prendiamo il primo risultato
+
+                # Inseriamo la richiesta
+                db.execute_query("""
+                    INSERT INTO Richiesta (
+                        Id_richiedente, Id_ricevente, Id_trasportatore, 
+                        Id_prodotto, Quantita, Stato_ricevente, Stato_trasportatore
+                    )
+                    VALUES ( ?, ?, ?, ?, ?, ?, ?)
+                """, (  
+                    3,  # Id_richiedente (stesso della Id_azienda, chi richiede)
+                    1,  # Id_ricevente (azienda 1)
+                    2,  # Id_trasportatore (azienda 2)
+                    2,  # Id del prodotto "Succo di mela"
+                    20.0,  # Quantità richiesta
+                    'In attesa',  # Stato_ricevente
+                    'In attesa'   # Stato_trasportatore
+                ))
+
+  
+
 
 
             logger.info("BackEnd: run_migrations: Seed prodotti, operazioni e magazzino completato.")

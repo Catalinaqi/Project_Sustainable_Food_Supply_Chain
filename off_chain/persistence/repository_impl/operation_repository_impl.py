@@ -240,3 +240,35 @@ class OperationRepositoryImpl(OperationRepository, ABC):
             logger.info(f"Prodotto inserito con ID {new_prodotto_id} e operazione registrata con successo.")
         except Exception as e:
             logger.error(f"Errore durante l'inserimento del prodotto: {str(e)}")
+
+
+    def inserisci_operazione_trasporto(self, id_azienda_trasporto: int,id_lotto_input: int, id_prodotto: int, id_azienda_richiedente: int, id_azienda_ricevente: int, quantita: int, co2_emessa: float):
+        """
+        Inserts a new transport operation and updates the product status.
+        """
+        try:
+            query = "INSERT OR IGNORE INTO ComposizioneLotto (id_lotto_input, quantità_utilizzata) VALUES ( ?, ?)"
+            params = (id_lotto_input, quantita)  # Stato 0 indica che il prodotto è in magazzino
+
+            self.db.cur.execute(query, params)
+            self.db.conn.commit()
+            lotto_output = self.db.cur.lastrowid
+
+
+
+            query = "INSERT INTO Operazione (Id_azienda,Id_prodotto,Id_lotto, Quantita, Consumo_CO2, tipo) VALUES (?, ?, ?, ?, ?, ?)"
+            params = (id_azienda_trasporto,id_prodotto, lotto_output, quantita, co2_emessa,"trasporto")
+
+            self.db.cur.execute(query, params)
+            self.db.conn.commit()
+            logger.info(f"Operazione di trasporto inserita con successo.")
+
+
+            #TODO Aggionare magazzino
+
+
+        except Exception as e:
+            logger.error(f"Errore durante l'inserimento dell'operazione di trasporto: {str(e)}")
+
+
+    

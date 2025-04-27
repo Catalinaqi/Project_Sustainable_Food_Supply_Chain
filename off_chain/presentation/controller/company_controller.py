@@ -197,6 +197,14 @@ class ControllerAzienda:
                 nome_prodotto, quantita, Session().current_user["id_azienda"], data, co2,
             )
 
+    def salva_operazione_trasporto(self, id_prodotto : int, id_azienda_ricevente: int, id_azienda_richiedente: int,\
+                                    quantita : int, co2 : float , id_lotto_input : int,
+                ):
+            
+            self.operation_repository.inserisci_operazione_trasporto(
+                Session().current_user["id_azienda"],id_lotto_input, id_prodotto,id_azienda_richiedente, id_azienda_ricevente, quantita, co2
+            )
+
     def get_prodotti_ordinabili(self) -> list[ProductForChoiceModel]:
         try:
             prodotti = self.product.get_prodotti_ordinabili()
@@ -222,7 +230,10 @@ class ControllerAzienda:
     
     def get_richieste_ricevute(self) -> list[RichiestaModel]:
         try:
-            richieste = self.richieste.get_richieste_ricevute(Session().current_user["id_azienda"])
+            if Session().current_user["role"] == "Trasportatore":
+                richieste = self.richieste.get_richieste_ricevute(Session().current_user["id_azienda"], check_trasporto=True)
+            else:
+                richieste = self.richieste.get_richieste_ricevute(Session().current_user["id_azienda"])
             return richieste
         except Exception as e:
             logger.error(f"Errore nell'ottenere la lista delle richieste ricevute: {e}", exc_info=True)
@@ -235,6 +246,13 @@ class ControllerAzienda:
         except Exception as e:
             logger.error(f"Errore nell'ottenere la lista delle richieste effettuate: {e}", exc_info=True)
             return []
+        
+    def update_richiesta(self, id_richiesta : int, nuovo_stato : str):
+        try:
+                self.richieste.update_richiesta(id_richiesta, nuovo_stato, Session().current_user["role"])
+        except Exception as e:
+            logger.error(f"Errore nell'aggiornare la richiesta: {e}", exc_info=True)
+            raise Exception(f"Errore nell'aggiornare la richiesta: {e}")
             
 
 

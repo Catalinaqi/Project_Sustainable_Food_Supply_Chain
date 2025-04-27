@@ -31,12 +31,12 @@ class RichiesteRepositoryImpl():
         except Exception as e:
             logger.error(f"Errore nell'inserimento della richiesta: {e}", exc_info=True)
 
-    def get_richieste_ricevute(self, id_azienda: int) -> list[RichiestaModel]:
+    def get_richieste_ricevute(self, id_azienda: int, check_trasporto: bool = False) -> list[RichiestaModel]:
         """
         Restituisce tutte le richieste ricevute da un'azienda.
         """
-        query, value = (
-            self.query_builder
+       
+        self.query_builder \
             .select(
                 "r.Id_richiesta",
                 "r.Id_richiedente", "rich.Nome AS Nome_richiedente",
@@ -44,20 +44,37 @@ class RichiesteRepositoryImpl():
                 "r.Id_trasportatore", "tras.Nome AS Nome_trasportatore",
                 "r.Id_prodotto", "prod.Nome AS Nome_prodotto",
                 "r.Quantita", "r.Stato_ricevente",
-                "r.Stato_trasportatore", "r.Data"
-            )
-            .table("Richiesta AS r")
-            .join("Azienda AS rich", "rich.Id_azienda", "r.Id_richiedente")
-            .join("Azienda AS rice", "rice.Id_azienda", "r.Id_ricevente")
-            .join("Azienda AS tras", "tras.Id_azienda", "r.Id_trasportatore")
-            .join("Prodotto AS prod", "prod.Id_prodotto", "r.Id_prodotto")
-            .where("r.Id_ricevente", "=", id_azienda)
-            .get_query()
-        )
-        result = self.db.fetch_results(query, value)
+                "r.Stato_trasportatore", "r.Data", "op.Id_lotto"
+            ) \
+            .table("Richiesta AS r") \
+            .join("Azienda AS rich", "rich.Id_azienda", "r.Id_richiedente") \
+            .join("Azienda AS rice", "rice.Id_azienda", "r.Id_ricevente") \
+            .join("Azienda AS tras", "tras.Id_azienda", "r.Id_trasportatore") \
+            .join("Prodotto AS prod", "prod.Id_prodotto", "r.Id_prodotto") \
+            .join("Operazione AS op", "op.Id_prodotto", "prod.Id_prodotto") \
+            .where("op.Tipo", "=", "produzione") \
+            
 
+        if not check_trasporto:
+            self.query_builder.where("r.Id_ricevente", "=", id_azienda)  
+        
+
+        if check_trasporto:
+            self.query_builder.where("r.stato_ricevente", "=", "Accettata")
+            self.query_builder.where("r.Id_trasportatore", "=", id_azienda)
+            
         try:
-            return [RichiestaModel(*x) for x in result]
+            query, value = self.query_builder.get_query()
+
+            result = self.db.fetch_results(query, value)
+
+        
+            if not result:
+                logger.info(f"Nessuna richiesta ricevuta trovata per l'azienda con ID {id_azienda}.")
+                return []
+            else:
+                logger.info(f"Richieste ricevute per l'azienda con ID {id_azienda}: {result}")
+                return [RichiestaModel(*x) for x in result]
         except Exception as e:
             logger.error(f"Errore nel recupero delle richieste ricevute: {e}", exc_info=True)
             return []
@@ -95,5 +112,29 @@ class RichiesteRepositoryImpl():
         except Exception as e:
             logger.error(f"Errore nel recupero delle richieste effettuate: {e}", exc_info=True)
             return []
+        
+    def update_richiesta(self, id_richiesta: int, nuovo_stato: str,azienda_role : str) -> None:
+        """
+        Aggiorna lo stato di una richiesta.
+        """
+        self.query_builder.table("Richiesta").where("Id_richiesta", "=", id_richiesta)
+        if azienda_role == "Trasportatore":
+            self.query_builder.update(
+                Stato_trasportatore=nuovo_stato
+            )
+        elif azienda_role == "Agricola" or azienda_role == "Trasformatore":
+            self.query_builder.update(
+                Stato_ricevente=nuovo_stato
+            )
+        else:
+            logger.error(f"Ruolo aziendale non valido: {azienda_role}.")
+            raise ValueError("Ruolo aziendale non valido.")
+
+        query, value = self.query_builder.get_query()
+        try:
+            self.db.execute_query(query, value)
+            logger.info(f"Richiesta con ID {id_richiesta} aggiornata a {nuovo_stato}.")
+        except Exception as e:
+            logger.error(f"Errore nell'aggiornamento della richiesta: {e}", exc_info=True)
 
             

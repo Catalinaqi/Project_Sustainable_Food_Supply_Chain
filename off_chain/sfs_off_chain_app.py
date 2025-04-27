@@ -33,7 +33,7 @@ def setup_database():
 
     try:
         pass
-        DatabaseMigrations.run_migrations()
+        #DatabaseMigrations.run_migrations()
     except Exception as e:
         logger.error(f"Error initializing database: {e}")
         sys.exit(1)  # Stops the application if there is a critical error
@@ -56,21 +56,22 @@ if __name__ == "__main__":
     time.sleep(1)
 
     
-    """db = Database()
+    db = Database()
     qb = QueryBuilder()
     query,value = (
         qb.select("*")
-        .table("Richiesta")
+        .table("Operazione")
+        .where("tipo", "=", "trasporto")
         .get_query()
     )
 
-    print( "risultato " + str(db.fetch_results(query, value)))"""
+    print( "risultato " + str(db.fetch_results(query, value)))
     #rep = ProductRepositoryImpl()
     #print("prodotto:" + str(rep.carica_lotto_con_composizione(2001)))
 
 
 
-    finestra = LottoTreeView(2001)
+    finestra = VistaAccedi()
     finestra.show()
     splash.finish(finestra)
     sys.exit(app.exec())
