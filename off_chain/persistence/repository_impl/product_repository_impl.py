@@ -4,6 +4,7 @@ from configuration.log_load_setting import logger
 from domain.repository.product_repository import ProductRepository
 from model.materia_prima_model import MateriaPrimaModel
 from model.info_product_for_choice_model import ProductForChoiceModel
+from model.lotto_composizione_model import Composizione, Lotto
 from persistence.query_builder import QueryBuilder
 
 
@@ -256,6 +257,73 @@ class ProductRepositoryImpl(ProductRepository, ABC):
         except Exception as e:
             logger.error(f"Error in converting result to ProductForChoiceModel: {e}")
             return []
+
+
+
+# Funzione per caricare un lotto e la sua composizione ricorsiva
+    def carica_lotto_con_composizione(self, id_lotto) -> Lotto:
+    # 1. Recupero dati dell'operazione (lotto)
+        query, value = (
+            self.query_builder
+            .select("Id_lotto", "Tipo", "quantita", "Consumo_CO2")
+            .table("Operazione")
+            .where("Id_lotto", "=", id_lotto)
+            .get_query()
+        )
+
+        try:
+            logger.info(f"Query operazione: {query} - Value: {value}")
+            rows = self.db.fetch_results(query, value)
+            logger.info(f"Result operazione: {rows}")
+            if not rows:
+                logger.warning(f"Nessuna operazione trovata per id_lotto: {id_lotto}")
+                return None
+            row = rows[0]
+            lotto = Lotto(*row)  # Istanza singola
+        except Exception as e:
+            logger.error(f"Errore nel recupero dell'operazione: {e}")
+            return None
+
+        # 2. Recupero composizioni
+        query, value = (
+            self.query_builder
+            .select("id_lotto_input", "quantità_utilizzata")
+            .table("ComposizioneLotto")
+            .where("id_lotto_output", "=", id_lotto)
+            .get_query()
+        )
+
+        try:
+            logger.info(f"Query composizione: {query} - Value: {value}")
+            rows = self.db.fetch_results(query, value)
+            logger.info(f"Result composizione: {rows}")
+            composizioni_raw: list[Composizione] = [Composizione(*x) for x in rows] if rows else []
+        except Exception as e:
+            logger.error(f"Errore nel recupero della composizione: {e}")
+            return None
+
+        # 3. Ricorsione per ogni composizione
+        for comp in composizioni_raw:
+            input_lotto = self.carica_lotto_con_composizione(comp.id_lotto_input)
+            composizione = Composizione(
+                id_lotto_input=comp.id_lotto_input,
+                quantita_utilizzata=comp.quantita_utilizzata,
+                lotto_input=input_lotto
+            )
+            lotto.composizione.append(composizione)
+
+        return lotto
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -239,6 +239,72 @@ class DatabaseMigrations:
                     VALUES (?, ?, ?)
                 """, (id_azienda, op["lotto"], op["quantita"]))
 
+
+
+
+            
+            
+
+            # Seed prodotti
+            SEED_PRODOTTI = [
+                ("Mele biologiche", 0),
+                ("Zucchero di canna", 0),
+                ("Succo di mela", 0)
+            ]
+
+            for nome, stato in SEED_PRODOTTI:
+                db.execute_query("""
+                    INSERT OR IGNORE INTO Prodotto (Nome, Stato)
+                    VALUES (?, ?)
+                """, (nome, stato))
+
+            prodotti = db.fetch_results("SELECT Id_prodotto, Nome FROM Prodotto")
+            id_mele = next(pid for pid, nome in prodotti if nome == "Mele biologiche")
+            id_zucchero = next(pid for pid, nome in prodotti if nome == "Zucchero di canna")
+            id_succo = next(pid for pid, nome in prodotti if nome == "Succo di mela")
+
+            # Operazioni di produzione delle materie prime
+            operazioni = [
+                # Produzione mele
+                (1, id_mele, 1001, 5.0, 100.0, 'produzione'),
+                # Produzione zucchero
+                (1, id_zucchero, 1002, 2.0, 50.0, 'produzione'),
+                # Trasporto mele
+                (2, id_mele, 1003, 1.0, 95.0, 'trasporto'),
+                # Trasporto zucchero
+                (2, id_zucchero, 1004, 0.5, 45.0, 'trasporto'),
+                # Trasformazione in succo
+                (3, id_succo, 2001, 7.0, 130.0, 'trasformazione')
+            ]
+
+            for op in operazioni:
+                db.execute_query("""
+                    INSERT OR IGNORE INTO Operazione (Id_azienda, Id_prodotto, Id_lotto, Consumo_CO2, quantita, Tipo)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, op)
+
+            # ComposizioneLotto: il succo di mela è fatto da mele e zucchero
+            composizioni = [
+                (1003, 1001, 95.0),  # usa 90 mele
+                (1004, 1002, 45.0),  # usa 40 zucchero
+                (2001, 1003, 90.0),  # usa 90 mele
+                (2001, 1004, 40.0)   # usa 40 di zucchero
+                
+            ]
+
+            for output_lotto, input_lotto, quantita_usata in composizioni:
+                db.execute_query("""
+                    INSERT OR IGNORE INTO ComposizioneLotto (id_lotto_output, id_lotto_input, quantità_utilizzata)
+                    VALUES (?, ?, ?)
+                """, (output_lotto, input_lotto, quantita_usata))
+
+            # Magazzino: solo il prodotto finito è nel magazzino del trasformatore
+            db.execute_query("""
+                INSERT OR IGNORE INTO Magazzino (id_azienda, id_lotto, quantita)
+                VALUES (?, ?, ?)
+            """, (3, 2001, 130.0))
+
+
             logger.info("BackEnd: run_migrations: Seed prodotti, operazioni e magazzino completato.")
 
             

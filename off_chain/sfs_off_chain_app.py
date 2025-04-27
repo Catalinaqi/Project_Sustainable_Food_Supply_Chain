@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication, QSplashScreen
 from configuration.log_load_setting import logger
 from database.db_migrations import DatabaseMigrations
 from configuration.database import Database
+from presentation.view.vista_catena_prodotto import LottoTreeView
 from persistence.query_builder import QueryBuilder
 from presentation.view.vista_composizione_prodotto import VistaCreaProdottoTrasformato
 from presentation.view.vista_invia_richiesta import VistaInviaRichiesta
@@ -25,13 +26,14 @@ from model.product_model import ProductModel, Componente
 from model.operation_model import OperationModel
 from presentation.view.vista_operazioni_azienda import OperazioniAziendaView
 from presentation.view.vista_aggiungi_operazione import AggiungiOperazioneView
+from persistence.repository_impl.product_repository_impl import ProductRepositoryImpl
 
 
 def setup_database():
 
     try:
         pass
-        #DatabaseMigrations.run_migrations()
+        DatabaseMigrations.run_migrations()
     except Exception as e:
         logger.error(f"Error initializing database: {e}")
         sys.exit(1)  # Stops the application if there is a critical error
@@ -63,11 +65,18 @@ if __name__ == "__main__":
     )
 
     print( "risultato " + str(db.fetch_results(query, value)))"""
-    
-    finestra = VistaAccedi()
+    #rep = ProductRepositoryImpl()
+    #print("prodotto:" + str(rep.carica_lotto_con_composizione(2001)))
+
+
+
+    finestra = LottoTreeView(2001)
     finestra.show()
     splash.finish(finestra)
     sys.exit(app.exec())
+
+
+    
 
     # Close the database connection when the app closes
     # app.aboutToQuit.connect(DatabaseConnectionSetting.close_connection)
