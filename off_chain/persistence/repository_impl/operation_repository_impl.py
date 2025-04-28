@@ -247,8 +247,12 @@ class OperationRepositoryImpl(OperationRepository, ABC):
         Inserts a new transport operation and updates the product status.
         """
         try:
-            query = "INSERT OR IGNORE INTO ComposizioneLotto (id_lotto_input, quantità_utilizzata) VALUES ( ?, ?)"
-            params = (id_lotto_input, quantita)  # Stato 0 indica che il prodotto è in magazzino
+            query = "SELECT IFNULL(MAX(id_lotto_output), 0) + 1 FROM ComposizioneLotto;"
+            self.db.execute_query(query)
+            result = self.db.fetchone()
+            value_output_lotto = result[0] if result else 1
+            query = "INSERT INTO ComposizioneLotto (id_lotto_output,id_lotto_input, quantità_utilizzata) VALUES (?, ?, ?)"
+            params = (value_output_lotto, id_lotto_input, quantita)  # Stato 0 indica che il prodotto è in magazzino
 
             self.db.cur.execute(query, params)
             self.db.conn.commit()

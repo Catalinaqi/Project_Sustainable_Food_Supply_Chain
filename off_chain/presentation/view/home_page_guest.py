@@ -2,11 +2,11 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGridLayout, QPushButton, QMessageBox
 
+
+from presentation.view.vista_prodotti_guest import ProdottiFinitiView
 from presentation.controller.guest_controller import ControllerGuest
 from presentation.view import funzioni_utili
 from presentation.view.vista_aziende import VistaAziende
-from presentation.view.vista_prodotti import VistaProdotti
-from presentation.view.vista_sviluppatori import VistaSviluppatori
 
 
 class HomePageGuest(QMainWindow):
@@ -17,8 +17,7 @@ class HomePageGuest(QMainWindow):
         self.controller = ControllerGuest()
 
         self.vista_prodotti = None
-        self.vista_sviluppatori = None
-        self.vista_prodotti_certificati = VistaProdotti(self.controller, filtro_certificazioni=True)
+        self.vista_prodotti_certificati = None
         self.vista_aziende = None
 
         self.menu_bar = self.menuBar()
@@ -49,7 +48,6 @@ class HomePageGuest(QMainWindow):
         self.button_prodotti = QPushButton('Ricerca prodotti')
         self.button_aziende = QPushButton('Aziende')
         self.button_certificazioni = QPushButton('Prodotti certificati')
-        self.button_sviluppatori = QPushButton('Sviluppatori')
 
         self.init_ui()
 
@@ -81,8 +79,6 @@ class HomePageGuest(QMainWindow):
         funzioni_utili.insert_button_in_grid(self.button_certificazioni, button_layout, 5, 2)
         self.button_certificazioni.clicked.connect(self.show_certificati)
 
-        funzioni_utili.insert_button_in_grid(self.button_sviluppatori, button_layout, 5, 4)
-        self.button_sviluppatori.clicked.connect(self.show_sviluppatori)
 
         funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("presentation\\resources\\logo_centro.png"))
 
@@ -120,16 +116,12 @@ class HomePageGuest(QMainWindow):
             self, 'SupplyChain', "Termini e condizioni d'uso work in progress")
 
     def lista_prodotti_clicked(self):
-        self.vista_prodotti = VistaProdotti(self.controller)
+        self.vista_prodotti = ProdottiFinitiView()
         self.vista_prodotti.show()
 
     def show_aziende(self):
         self.vista_aziende = VistaAziende()
         self.vista_aziende.show()
-
-    def show_sviluppatori(self):
-        self.vista_sviluppatori = VistaSviluppatori()
-        self.vista_sviluppatori.show()
 
     def show_certificati(self):
         self.vista_prodotti_certificati.show()

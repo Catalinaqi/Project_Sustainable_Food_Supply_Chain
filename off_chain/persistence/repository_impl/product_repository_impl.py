@@ -5,6 +5,7 @@ from domain.repository.product_repository import ProductRepository
 from model.materia_prima_model import MateriaPrimaModel
 from model.info_product_for_choice_model import ProductForChoiceModel
 from model.lotto_composizione_model import Composizione, Lotto
+from model.prodotto_finito_cliente import ProdottoFinito
 from persistence.query_builder import QueryBuilder
 
 
@@ -46,20 +47,7 @@ class ProductRepositoryImpl(ProductRepository, ABC):
             lista_con_co2.append((prodotto, totale_co2))
         return lista_con_co2
 
-    def get_lista_prodotti(self) -> list:
-        query = """
-          SELECT
-                Prodotto.Id_prodotto,
-                Prodotto.Nome,
-                Prodotto.Quantita,
-                Prodotto.Stato,
-                Azienda.Nome
-            FROM Operazione
-            JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-            JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-            WHERE Operazione.Operazione = "Messo sugli scaffali";        
-        """
-        return self.co2_consumata_prodotti(self.db_manager_setting.fetch_results(query))
+    
 
     def get_prodotti_ordinati_co2(self):
         return sorted(self.get_lista_prodotti(), key=lambda x: x[1])
@@ -313,6 +301,38 @@ class ProductRepositoryImpl(ProductRepository, ABC):
             lotto.composizione.append(composizione)
 
         return lotto
+    
+
+    def get_lista_prodotti(self):
+
+        query,value = (
+            self.query_builder.select(
+                "Prodotto.nome",
+                "Operazione.Id_lotto",
+                "Azienda.nome",
+                "Operazione.Id_prodotto",
+            )
+            .table("Operazione")
+            .join("Azienda", "Operazione.Id_azienda", "Azienda.Id_azienda")
+            .join("Prodotto", "Operazione.Id_prodotto", "Prodotto.Id_prodotto")
+            .where("Operazione.Tipo", "=", "vendita")
+            .get_query()
+        )
+        
+        try:
+            # Esegui direttamente il raw SQL (non serve builder qui)
+            results = self.db.fetch_results(query, value)
+            if results:
+                prodotti_co2 = [ProdottoFinito(*r) for r in results]
+            
+                return prodotti_co2
+            else:
+                logger.warning("Nessun risultato trovato ")
+                return []
+        except Exception as e:
+            logger.error(f"Errore in calcola_co2_totale_per_prodotti_finiti: {e}")
+            return []
+
 
 
 

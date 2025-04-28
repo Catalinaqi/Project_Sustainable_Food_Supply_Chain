@@ -8,13 +8,9 @@ from PyQt5.QtWidgets import QApplication, QSplashScreen
 from configuration.log_load_setting import logger
 from database.db_migrations import DatabaseMigrations
 from configuration.database import Database
+from presentation.view.home_page_guest import HomePageGuest
 from presentation.view.vista_catena_prodotto import LottoTreeView
 from persistence.query_builder import QueryBuilder
-from presentation.view.vista_composizione_prodotto import VistaCreaProdottoTrasformato
-from presentation.view.vista_invia_richiesta import VistaInviaRichiesta
-from presentation.view.vista_magazzino import VisualizzaMagazzinoView
-from presentation.view.vista_richieste import VisualizzaRichiesteView
-from presentation.view.vista_richiesta_prodotto import RichiestaProdottoView
 from session import Session
 from presentation.view.vista_accedi import VistaAccedi
 
@@ -33,7 +29,7 @@ def setup_database():
 
     try:
         pass
-        #DatabaseMigrations.run_migrations()
+        DatabaseMigrations.run_migrations()
     except Exception as e:
         logger.error(f"Error initializing database: {e}")
         sys.exit(1)  # Stops the application if there is a critical error
@@ -57,46 +53,18 @@ if __name__ == "__main__":
 
     
     db = Database()
-    qb = QueryBuilder()
-    query,value = (
-        qb.select("*")
-        .table("Operazione")
-        .where("tipo", "=", "trasporto")
-        .get_query()
-    )
+    query_builder = QueryBuilder()
+    query, value = (query_builder.select("id_lotto_input", "quantità_utilizzata")
+                    .table("ComposizioneLotto")
+                    .where("id_lotto_output","=",2001)
+                    .get_query())
+    
+    
 
     print( "risultato " + str(db.fetch_results(query, value)))
-    #rep = ProductRepositoryImpl()
-    #print("prodotto:" + str(rep.carica_lotto_con_composizione(2001)))
 
 
-
-    finestra = VistaAccedi()
+    finestra = HomePageGuest(None)
     finestra.show()
     splash.finish(finestra)
     sys.exit(app.exec())
-
-
-    
-
-    # Close the database connection when the app closes
-    # app.aboutToQuit.connect(DatabaseConnectionSetting.close_connection)
-
-
-# Fake data per test
-
-# Avvia l'app per test manuale
-
-"""
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-
-
-
-
-    finestra = OperazioniAziendaView()
-
-
-
-    finestra.show()
-    sys.exit(app.exec_())"""

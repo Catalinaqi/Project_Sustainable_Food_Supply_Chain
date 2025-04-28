@@ -13,6 +13,7 @@ sys.path.append(percorso_a)
 # Ora puoi importare
 from model.product_model import ProductModel
 from presentation.controller.guest_controller import ControllerGuest
+from model.prodotto_finito_cliente import ProdottoFinito
 
 
 class StoriaProdottoView(QWidget):

@@ -3,6 +3,7 @@ from model.company_model import CompanyModel
 from model.product_model import ProductModel
 from model.componente_model import Componente
 from model.operation_model import OperationModel
+from model.prodotto_finito_cliente import ProdottoFinito
 from persistence.repository_impl.company_repository_impl import CompanyRepositoryImpl
 from persistence.repository_impl.threshold_repository_impl import ThresholdRepositoryImpl
 from persistence.repository_impl.product_repository_impl import ProductRepositoryImpl
@@ -154,6 +155,14 @@ class ControllerGuest:
         
 
     """ Funzioni Mock"""
+
+    def get_prodotti(self) -> list[ProdottoFinito]:
+        try:
+            return self.product.get_lista_prodotti()
+        except Exception as e:
+            logger.error(f"Errore durante il recupero dei prodotti: {str(e)}")
+            return []
+            
 
 
     def get_fake_prodotto(self,prodotto_id : int) -> ProductModel:
