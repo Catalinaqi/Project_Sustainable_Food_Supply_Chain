@@ -67,7 +67,7 @@ if __name__ == "__main__":
     prodotto = rep.carica_lotto_con_composizione(2002)
     print("risultato" + str(prodotto.get_costo_totale_lotto_unitario()))
 
-    finestra = HomePageGuest(None)
+    finestra = VistaAccedi()
     finestra.show()
     splash.finish(finestra)
     sys.exit(app.exec())

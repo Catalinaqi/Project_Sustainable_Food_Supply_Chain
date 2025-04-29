@@ -92,13 +92,14 @@ class RichiesteRepositoryImpl():
                     "r.Id_trasportatore", "tras.Nome AS Nome_trasportatore",
                     "r.Id_prodotto", "prod.Nome AS Nome_prodotto",
                     "r.Quantita", "r.Stato_ricevente",
-                    "r.Stato_trasportatore", "r.Data"
+                    "r.Stato_trasportatore", "r.Data", "op.Id_lotto"
                 )
                 .table("Richiesta AS r")
                 .join("Azienda AS rich", "rich.Id_azienda", "r.Id_richiedente")
                 .join("Azienda AS rice", "rice.Id_azienda", "r.Id_ricevente")
                 .join("Azienda AS tras", "tras.Id_azienda", "r.Id_trasportatore")
                 .join("Prodotto AS prod", "prod.Id_prodotto", "r.Id_prodotto")
+                .join("Operazione AS op", "op.Id_prodotto", "prod.Id_prodotto")
                 .where("r.Id_richiedente", "=", id_azienda)
                 .get_query()
             )

@@ -212,6 +212,20 @@ class DatabaseMigrations:
                     VALUES (?, ?)
                 """, (nome, stato))
 
+            SEED_MAGAZZINO = [
+
+                
+                (1,1001, 100),
+                (1,1002,50),
+                (3,2001,1)
+            ]
+
+            for id_az, id_lot, qt in SEED_MAGAZZINO:
+                db.execute_query("""
+                    INSERT OR IGNORE INTO Magazzino (id_azienda, id_lotto, quantita)
+                    VALUES (?, ?,?)
+                """, (id_az, id_lot,qt))
+
 
             # Operazioni di produzione delle materie prime
             operazioni = [
