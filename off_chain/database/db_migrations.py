@@ -201,9 +201,9 @@ class DatabaseMigrations:
             # Seed dei prodotti
             SEED_PRODOTTI = [
                 
-                ("Pomodoro datterino", 0),
-                ("Basilico",0),
-                ("Salsa di pomodoro",1)
+                ("farina", 0),
+                ("zucchero",0),
+                ("impasto",1)
             ]
 
             for nome, stato in SEED_PRODOTTI:
@@ -216,19 +216,15 @@ class DatabaseMigrations:
             # Operazioni di produzione delle materie prime
             operazioni = [
     # Produzione mele
-                (1, 1, 1001, 5.0, 100.0, 'produzione'),
+                (1, 1, 1001, 50.0, 100.0, 'produzione'),
                 # Produzione zucchero
-                (1, 2, 1002, 2.0, 50.0, 'produzione'),
-                # Trasporto mele
-                (2, 1, 1003, 1.0, 95.0, 'trasporto'),
-                # Trasporto zucchero
-                (2, 2, 1004, 0.5, 45.0, 'trasporto'),
+                (1, 2, 1002, 25.0, 50.0, 'produzione'),
                 # Trasformazione in succo
-                (3, 3, 2001, 7.0, 130.0, 'trasformazione'),
+                (3, 3, 2001, 10.0, 100.0, 'trasformazione'),
 
-                (2, 3, 2002, 0.5, 45.0, 'trasporto'),
+                (3, 3, 2002, 1.0, 10.0, 'vendita'),
 
-                (3, 3, 2003, 1, 20, 'vendita')  # Manca la virgola qui
+                
             ]
 
             for op in operazioni:
@@ -239,12 +235,10 @@ class DatabaseMigrations:
 
             # ComposizioneLotto: il succo di mela in bottiglia è fatto da mele e zucchero
             composizioni = [
-                (1003, 1001, 95.0),  # usa 90 mele
-                (1004, 1002, 45.0),  # usa 40 zucchero
-                (2001, 1003, 900.0),  # usa 90 mele
-                (2001, 1004, 40.0),  # usa 40 di zucchero
-                (2002, 2001, 130.0),   # succo di mela in bottiglia è prodotto dal succo
-                (2003,2002,10)
+                  # usa 40 zucchero
+                (2001, 1001, 50.0),
+                (2001, 1002, 50.0),
+                (2002,2001,10)  # usa 40 di zucchero
             ]
 
             for output_lotto, input_lotto, quantita_usata in composizioni:

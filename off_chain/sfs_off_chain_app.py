@@ -61,8 +61,11 @@ if __name__ == "__main__":
     
     
 
-    print( "risultato " + str(db.fetch_results(query, value)))
+    #print( "risultato " + str(db.fetch_results(query, value)))
 
+    rep = ProductRepositoryImpl()
+    prodotto = rep.carica_lotto_con_composizione(2002)
+    print("risultato" + str(prodotto.get_costo_totale_lotto_unitario()))
 
     finestra = HomePageGuest(None)
     finestra.show()
