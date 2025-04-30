@@ -102,6 +102,7 @@ class HomePageCertificatore(QMainWindow):
 
         # Procede solo se l'utente clicca "Yes"
         if reply == QMessageBox.Yes:
+            Session().end_session()
             self.close()
             self.callback()
 

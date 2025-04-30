@@ -54,18 +54,28 @@ if __name__ == "__main__":
     
     db = Database()
     query_builder = QueryBuilder()
-    query, value = (query_builder.select("id_lotto_input", "quantità_utilizzata")
-                    .table("ComposizioneLotto")
-                    .where("id_lotto_output","=",2001)
-                    .get_query())
+
+    query, value = (
+                query_builder
+                            .select(
+                    "*"
+                )
+                .table("Richiesta AS r")
+                .join("Azienda AS rich", "rich.Id_azienda", "r.Id_richiedente")
+                .join("Azienda AS rice", "rice.Id_azienda", "r.Id_ricevente")
+                .join("Azienda AS tras", "tras.Id_azienda", "r.Id_trasportatore")
+                .join("Prodotto AS prod", "prod.Id_prodotto", "r.Id_prodotto")
+                .join("Operazione AS op", "op.Id_prodotto", "prod.Id_prodotto")
+                .where("r.Id_richiedente", "=", 3)
+                .where("op.Tipo", "!=","trasporto")
+                .get_query()
+            )
+    result = db.fetch_results(query, value)
     
     
 
-    #print( "risultato " + str(db.fetch_results(query, value)))
+    print( "risultato " + str(result))
 
-    rep = ProductRepositoryImpl()
-    prodotto = rep.carica_lotto_con_composizione(2002)
-    print("risultato" + str(prodotto.get_costo_totale_lotto_unitario()))
 
     finestra = VistaAccedi()
     finestra.show()

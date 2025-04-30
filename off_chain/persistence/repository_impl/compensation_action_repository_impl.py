@@ -68,5 +68,4 @@ class CompensationActionRepositoryImpl( ABC):
         INSERT INTO Azioni_compensative (Data, Id_azienda, Co2_compensata, Nome_azione)
         VALUES (?, ?, ?, ?);
         """
-        #TODO
         return self.db.execute_query(query, (data, azienda, co2_compensata, nome_azione))

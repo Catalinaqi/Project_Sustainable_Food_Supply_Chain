@@ -101,6 +101,7 @@ class RichiesteRepositoryImpl():
                 .join("Prodotto AS prod", "prod.Id_prodotto", "r.Id_prodotto")
                 .join("Operazione AS op", "op.Id_prodotto", "prod.Id_prodotto")
                 .where("r.Id_richiedente", "=", id_azienda)
+                .where("op.Tipo", "!=","trasporto")
                 .get_query()
             )
         result = self.db.fetch_results(query, value)

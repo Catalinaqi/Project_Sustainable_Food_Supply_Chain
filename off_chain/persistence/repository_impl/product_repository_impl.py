@@ -217,7 +217,8 @@ class ProductRepositoryImpl(ProductRepository, ABC):
     def get_prodotti_ordinabili(self) -> list[ProductForChoiceModel]:
         query, value = (
             self.query_builder
-            .select("Azienda.Nome","Prodotto.nome","Magazzino.quantita","Azienda.Id_azienda","Prodotto.id_prodotto",  "Operazione.Consumo_CO2")
+            .select("Azienda.Nome","Prodotto.nome","Magazzino.quantita",
+                    "Prodotto.id_prodotto","Azienda.Id_azienda",  "Operazione.Consumo_CO2")
             .table("Magazzino")
             .join("Operazione", "Magazzino.id_lotto", "Operazione.id_lotto")
             .join("Azienda", "Operazione.id_azienda", "Azienda.id_azienda")

@@ -248,27 +248,70 @@ class OperationRepositoryImpl(OperationRepository, ABC):
         """
         try:
             query = "SELECT IFNULL(MAX(id_lotto_output), 0) + 1 FROM ComposizioneLotto;"
-            self.db.execute_query(query)
-            result = self.db.fetchone()
-            value_output_lotto = result[0] if result else 1
+            result = self.db.fetch_one(query)
+            value_output_lotto = result or 1
             query = "INSERT INTO ComposizioneLotto (id_lotto_output,id_lotto_input, quantità_utilizzata) VALUES (?, ?, ?)"
             params = (value_output_lotto, id_lotto_input, quantita)  # Stato 0 indica che il prodotto è in magazzino
 
-            self.db.cur.execute(query, params)
-            self.db.conn.commit()
-            lotto_output = self.db.cur.lastrowid
+        
 
 
+            self.db.execute_query(query, params)
+            
+
+        except Exception as e:
+                    logger.error(f"composizione {e}")
+        
+        try:
 
             query = "INSERT INTO Operazione (Id_azienda,Id_prodotto,Id_lotto, Quantita, Consumo_CO2, tipo) VALUES (?, ?, ?, ?, ?, ?)"
-            params = (id_azienda_trasporto,id_prodotto, lotto_output, quantita, co2_emessa,"trasporto")
+            params = (id_azienda_trasporto,id_prodotto, value_output_lotto, quantita, co2_emessa,"trasporto")
 
-            self.db.cur.execute(query, params)
-            self.db.conn.commit()
+            self.db.execute_query(query, params)
+            #self.db.conn.commit()
             logger.info(f"Operazione di trasporto inserita con successo.")
 
+        except Exception as e:
+                    logger.error(f"composizione {e}")
+        
+        try:
 
-            #TODO Aggionare magazzino
+            query = "INSERT INTO Magazzino(id_azienda,id_lotto,quantita) VALUES(?,?,?)"
+            params = (id_azienda_richiedente,value_output_lotto,quantita)
+
+            self.db.execute_query(query, params)
+            #self.db.conn.commit()
+
+        except Exception as e:
+                    logger.error(f"composizione {e}")
+        
+        try:
+
+
+            
+
+    # Verifica quantità disponibile
+            quantita_disponibile = self.db.fetch_one("SELECT quantita FROM Magazzino WHERE id_lotto = ?", (id_lotto_input,))
+             
+
+            if quantita_disponibile is None:
+                raise Exception(f"{id_lotto_input} non trovato")
+
+           
+
+            if quantita_disponibile < quantita:
+                raise Exception( f"Quantità insufficiente: disponibile {quantita_disponibile}, richiesta {quantita}.")
+
+    # Aggiornamento
+            self.db.execute_query("""
+                UPDATE Magazzino
+                SET quantita = quantita - ?
+                WHERE id_lotto = ?;
+            """, (quantita, id_lotto_input))
+
+            #self.db.conn.commit()
+            logger.info( f"Aggiornamento riuscito: {quantita} sottratti dal lotto {id_lotto_input}.")
+
 
 
         except Exception as e:

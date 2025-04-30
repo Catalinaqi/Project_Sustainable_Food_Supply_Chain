@@ -66,8 +66,8 @@ class RichiestaProdottoView(QDialog):
         self.tabella.setRowCount(len(self.prodotti))
         for row, prodotto in enumerate(self.prodotti):
             self.tabella.setItem(row, 0, QTableWidgetItem(prodotto.nome_prodotto))
-            self.tabella.setItem(row, 1, QTableWidgetItem(prodotto.nome_azienda))  # Placeholder
-            self.tabella.setItem(row, 2, QTableWidgetItem(str(prodotto.quantita)))  # Placeholder
+            self.tabella.setItem(row, 1, QTableWidgetItem(prodotto.nome_azienda + str(prodotto.id_azienda)))  # Placeholder
+            self.tabella.setItem(row, 2, QTableWidgetItem(str(prodotto.quantita))) # Placeholder
             self.tabella.setRowHeight(row, 30)
 
     def invia_richiesta(self):
