@@ -47,8 +47,8 @@ class DatabaseMigrations:
                 Tipo TEXT CHECK(Tipo IN ('Agricola', 'Trasportatore', 'Trasformatore', 'Rivenditore', 'Certificatore')),
                 Nome TEXT NOT NULL,
                 Indirizzo TEXT NOT NULL,
-                Co2_emessa REAL NOT NULL,
-                Co2_compensata REAL NOT NULL,
+                Co2_emessa REAL NOT NULL DEFAULT 0,
+                Co2_compensata REAL NOT NULL DEFAULT 0,
                 CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (Id_credenziali) REFERENCES Credenziali(Id_credenziali) ON DELETE CASCADE
             )

@@ -266,7 +266,7 @@ class VistaAccedi(QMainWindow):
 
             # Procedi con il resto del login come prima
             if Session().current_user["role"] == 'Certificatore':
-                self.home_certificatore = HomePageCertificatore(self.reset, utente)
+                self.home_certificatore = HomePageCertificatore(self.reset)
                 self.home_certificatore.show()
             else:
                 self.home_page = HomePage(self.reset, utente)

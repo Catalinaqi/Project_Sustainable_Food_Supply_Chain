@@ -29,7 +29,7 @@ def setup_database():
 
     try:
         pass
-        DatabaseMigrations.run_migrations()
+        #DatabaseMigrations.run_migrations()
     except Exception as e:
         logger.error(f"Error initializing database: {e}")
         sys.exit(1)  # Stops the application if there is a critical error

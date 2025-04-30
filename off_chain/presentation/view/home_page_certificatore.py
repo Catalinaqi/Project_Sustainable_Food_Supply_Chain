@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGridLayout, QPushButton, QMessageBox
 
+from session import Session
 from presentation.controller.certification_controller import ControllerCertificatore
 from presentation.view import funzioni_utili
 from presentation.view.vista_stato_azienda import VistaStatoAzienda
@@ -11,16 +12,14 @@ from presentation.view.vista_sviluppatori import VistaSviluppatori
 
 
 class HomePageCertificatore(QMainWindow):
-    def __init__(self, callback, utente):
+    def __init__(self, callback):
         super().__init__()
 
         self.controller = ControllerCertificatore()
 
         self.vista_soglie = None
-        self.vista_sviluppatori = None
         self.vista_azienda = None
         self.vista_certificazioni = None
-        self.utente = utente
 
         self.menu_bar = self.menuBar()
         self.menu_bar.setStyleSheet("background-color: rgb(240, 240, 240)")
@@ -47,12 +46,12 @@ class HomePageCertificatore(QMainWindow):
 
         # Elementi di layout
         self.logo = QLabel()
-        self.welcome_label = QLabel(f"Ciao {self.utente[3]} 👋!\nBenvenuto in SupplyChain.\n"
+        self.welcome_label = QLabel(f"Ciao {Session().current_user['username']} 👋!\nBenvenuto in SupplyChain.\n"
                                     f"Prego selezionare un'opzione dal menu")
         self.button_certificazione = QPushButton('Certificazioni')
         self.button_aziende = QPushButton('Stato azienda')
         self.button_soglie = QPushButton('Soglie')
-        self.button_sviluppatori = QPushButton('Sviluppatori')
+       
 
         self.init_ui()
 
@@ -82,9 +81,6 @@ class HomePageCertificatore(QMainWindow):
 
         funzioni_utili.insert_button_in_grid(self.button_soglie, button_layout, 5, 2)
         self.button_soglie.clicked.connect(self.show_soglie)
-
-        funzioni_utili.insert_button_in_grid(self.button_sviluppatori, button_layout, 5, 4)
-        self.button_sviluppatori.clicked.connect(self.show_sviluppatori)
 
         funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("presentation\\resources\\logo_centro.png"))
 
@@ -133,13 +129,9 @@ class HomePageCertificatore(QMainWindow):
     def aggiorna_profilo(self, utente):
         self.utente = utente
         self.welcome_label.setText(
-            f"Ciao {utente[4]} 👋!\nBenvenuto in SupplyChain.\n"
+            f"Ciao {Session().current_user['username']} 👋!\nBenvenuto in SupplyChain.\n"
             f"Prego selezionare un'opzione dal menu"
         )
-
-    def show_sviluppatori(self):
-        self.vista_sviluppatori = VistaSviluppatori()
-        self.vista_sviluppatori.show()
 
     def show_soglie(self):
         self.vista_soglie = VistaSoglie(True)

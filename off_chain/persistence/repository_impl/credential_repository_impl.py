@@ -80,22 +80,24 @@ class CredentialRepositoryImpl(CredentialRepository, ABC):
             UserModel.validate_password(password)
 
             # Avvia la transazione
-            # self.db.cur.execute("BEGIN TRANSACTION;")
+            #self.db.cur.execute("BEGIN TRANSACTION;")
 
             # Inserimento delle credenziali
             query_credenziali = """
-                    INSERT INTO Credenziali (Username, Password, totp_secret)
+                    INSERT INTO Credenziali (Username, Password, topt_secret)
                     VALUES (?, ?, ?);
                     """
             try:
                 self.db.execute_query(query_credenziali, (username, password, secret_key))
             except sqlite3.IntegrityError:
                 raise UniqueConstraintError("Errore: Username già esistente.")
-
-            # Recupero dell'ID delle credenziali appena inserite
-            id_credenziali = self.db.fetch_one("SELECT last_insert_rowid();")[0]
-            if id_credenziali is None:
+            
+            try:
+                id_credenziali : int = self.db.cur.lastrowid
+            except Exception as e:
+                logger.error(f"Errore nel'ottenimento dell'id delle credenziali inserite")
                 raise Exception("Errore nel recupero dell'ID delle credenziali.")
+
 
             # Inserimento dell'azienda con l'ID delle credenziali
             query_azienda = """
@@ -105,7 +107,7 @@ class CredentialRepositoryImpl(CredentialRepository, ABC):
             self.db.execute_query(query_azienda, (id_credenziali, tipo, username, indirizzo,))
 
             # Commit della transazione
-            # self.conn.commit()
+            #self.conn.commit()
 
             return id_credenziali  # Può essere utile restituire l'ID
 
