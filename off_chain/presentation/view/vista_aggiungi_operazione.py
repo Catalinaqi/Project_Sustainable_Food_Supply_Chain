@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import pyqtSignal, Qt
 
 from model.operation_model import OperationModel
-from model.product_model import ProductModel
+from model.prodotto_finito_model import ProdottoFinitoModel
 from session import Session
 from presentation.controller.company_controller import PERMESSI_OPERAZIONI, ControllerAzienda
 from PyQt5.QtWidgets import QComboBox , QMessageBox, QDoubleSpinBox , QListWidget, QListWidgetItem, QLabel, QVBoxLayout
@@ -71,7 +71,7 @@ class AggiungiOperazioneView(QDialog):
 
             layout.addWidget(QLabel("Seleziona il prodotto:"))
 
-            if self.role_azienda in ["Distributore", "Trasportatore"]:  
+            if self.role_azienda in ["Rivenditore"]:  
                 self.abilita_selezione_singola()
 
 
@@ -81,9 +81,7 @@ class AggiungiOperazioneView(QDialog):
             
             layout.addWidget(self.lista_prodotti)
 
-            self.prodotti_completi: list[ProductModel] = self.controller.get_prodotti_to_composizione(
-                id_azienda=Session().current_user["id_azienda"]
-            )
+            self.prodotti_completi: list[ProdottoFinitoModel] = self.controller.get_prodotti_to_composizione()
 
             self.popola_lista_prodotti(self.prodotti_completi)
 
@@ -133,7 +131,7 @@ class AggiungiOperazioneView(QDialog):
             tipo = self.input_tipo.currentText()
             data = self.input_data.date().toPyDate()
             co2 = self.input_valore.value()
-            id_azienda = Session().current_user["id_azienda"]
+            quantita = self.input_quantita.value()
 
 
             # Controlli di validità base
@@ -157,54 +155,46 @@ class AggiungiOperazioneView(QDialog):
                     data=data,
                     co2=co2,
                     nome_prodotto=nome_nuovo_prodotto,
-                    quantita=self.input_quantita.value()
+                    quantita= quantita
                 )
-            """
-            elif self.role_azienda == "Trasformatore":
-                nome_nuovo_prodotto = self.input_testo.text().strip()
-                if not nome_nuovo_prodotto:
-                    QMessageBox.warning(self, "Errore", "Devi inserire il nome del nuovo prodotto.")
-                    return
+            
 
+            elif self.role_azienda == "Rivenditore":
                 prodotti_selezionati = self.get_prodotti_selezionati()
+
                 if not prodotti_selezionati:
-                    QMessageBox.warning(self, "Errore", "Devi selezionare almeno un prodotto.")
+                    QMessageBox.warning(self, "Errore", "Seleziona un prodotto.")
+                    return
+                if len(prodotti_selezionati) > 1:
+                    QMessageBox.warning(self, "Errore", "Puoi selezionare solo un prodotto.")
                     return
 
-                self.controller.salva_operazione_trasformatore(
-                    id_azienda=id_azienda,
-                    tipo=tipo,
-                    data=data,
-                    co2=co2,
-                    nome_nuovo_prodotto=nome_nuovo_prodotto,
-                    prodotti_usati=prodotti_selezionati
-                )
+                prodotto = prodotti_selezionati[0]
 
-            elif self.role_azienda == "Trasportatore":
-                prodotti_selezionati = self.get_prodotti_selezionati()
-                if not prodotti_selezionati:
-                    QMessageBox.warning(self, "Errore", "Devi selezionare almeno un prodotto.")
+                if quantita <= 0:
+                    QMessageBox.warning(self, "Errore", "Inserisci una quantità positiva.")
                     return
 
-                self.controller.salva_operazione_trasportatore(
-                    id_azienda=id_azienda,
-                    tipo=tipo,
-                    data=data,
-                    co2=co2,
-                    prodotti_trasportati=prodotti_selezionati
-                )
+                if quantita > prodotto.quantita:
+                    QMessageBox.warning(self, "Errore", f"La quantità inserita ({quantita}) supera quella disponibile ({prodotto.quantita}).")
+                    return
 
-            elif self.role_azienda == "Distributore":
+                id_prodotto = prodotto.id_prodotto
+                numero_lotto = prodotto.id_lotto  # Assicurati che questo attributo esista
+
                 self.controller.salva_operazione_distributore(
-                    id_azienda=id_azienda,
-                    tipo=tipo,
                     data=data,
-                    co2=co2
+                    co2=co2,
+                    id_prodotto=id_prodotto,
+                    id_lotto_input=numero_lotto,
+                    quantita=quantita
                 )
+
+
 
             else:
                 QMessageBox.critical(self, "Errore", f"Ruolo azienda non gestito: {self.role_azienda}")
-                return"""
+                return
 
             # Successo
             self.operazione_aggiunta.emit()
@@ -225,10 +215,10 @@ class AggiungiOperazioneView(QDialog):
 
 
 
-    def popola_lista_prodotti(self, prodotti: list[ProductModel]):
+    def popola_lista_prodotti(self, prodotti: list[ProdottoFinitoModel]):
         self.lista_prodotti.clear()
         for prodotto in prodotti:
-            item = QListWidgetItem(f"{prodotto.Nome_prodotto} (ID: {prodotto.Id_prodotto})")
+            item = QListWidgetItem(f"{prodotto.nome} (ID_lotto: {prodotto.id_prodotto}) Quantità{prodotto.quantita}")
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Unchecked)
             item.setData(Qt.UserRole, prodotto)
@@ -238,7 +228,7 @@ class AggiungiOperazioneView(QDialog):
         testo = testo.lower().strip()
         prodotti_filtrati = [
             p for p in self.prodotti_completi
-            if testo in p.Nome_prodotto.lower() or testo in str(p.Id_prodotto)
+            if testo in p.nome.lower() or testo in str(p.id_lotto)
         ]
         self.popola_lista_prodotti(prodotti_filtrati)
 
@@ -257,7 +247,7 @@ class AggiungiOperazioneView(QDialog):
                 if item != item_selezionato and item.checkState() == Qt.Checked:
                     item.setCheckState(Qt.Unchecked)
 
-    def get_prodotti_selezionati(self) -> list[ProductModel]:
+    def get_prodotti_selezionati(self) -> list[ProdottoFinitoModel]:
         prodotti = []
         for i in range(self.lista_prodotti.count()):
             item = self.lista_prodotti.item(i)

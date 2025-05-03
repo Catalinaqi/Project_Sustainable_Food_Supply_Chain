@@ -71,7 +71,7 @@ class VistaCreaProdottoTrasformato(QDialog):
                         max= materia.quantita,  # Placeholder per la quantità disponibile
                     )
                     if ok:
-                        self.quantita_usata_per_materia[materia.id] = (materia, q)
+                        self.quantita_usata_per_materia[materia.id_prodotto] = (materia, q)
 
     def crea_prodotto(self):
         nome = self.input_nome.text().strip()
@@ -84,22 +84,32 @@ class VistaCreaProdottoTrasformato(QDialog):
         if not self.quantita_usata_per_materia:
             QMessageBox.warning(self, "Errore", "Specifica le quantità delle materie prime selezionate.")
             return
-        
+
         for _, (materia , q) in self.quantita_usata_per_materia.items():
             if isinstance(materia, MateriaPrimaModel):
                 if q <= 0:
                     QMessageBox.warning(self, "Errore", f"La quantità usata deve essere maggiore di zero per {materia.nome}.")
                     return
-            if q > materia.quantita:
-                QMessageBox.warning(self, "Errore", f"La quantità usata supera la disponibilità di {materia.nome}.")
-                return
+                if q > materia.quantita:
+                    QMessageBox.warning(self, "Errore", f"La quantità usata supera la disponibilità di {materia.nome}.")
+                    return
 
-        # Chiamata a un callback esterno (se presente)
-        
-        self.controller.crea_prodotto_trasformato(nome, quantita, self.quantita_usata_per_materia)
+        co2, ok = QInputDialog.getInt(
+            self,
+            "Consumo CO₂",
+            "Inserisci il consumo di CO₂ (in kg):",
+            decimals=0,
+            min=0
+        )
+        if not ok:
+            QMessageBox.information(self, "Annullato", "Creazione del prodotto annullata.")
+            return
+
+        self.controller.crea_prodotto_trasformato(nome, quantita, self.quantita_usata_per_materia, co2)
 
         QMessageBox.information(self, "Salvato", "Prodotto trasformato creato con successo!")
         self.operazione_aggiunta.emit()
         self.accept()
+
 
 

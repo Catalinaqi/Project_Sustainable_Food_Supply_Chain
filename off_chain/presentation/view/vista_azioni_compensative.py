@@ -9,12 +9,11 @@ from presentation.view.inserisci_azione import VistaInserisciAzione
 
 
 class VistaAzioniCompensative(QMainWindow):
-    def __init__(self, azienda):
+    def __init__(self):
         super().__init__()
 
         # self.callback = callback
         self.inserisci_azione = None
-        self.azienda = azienda
 
         self.controller = ControllerAzienda()
 

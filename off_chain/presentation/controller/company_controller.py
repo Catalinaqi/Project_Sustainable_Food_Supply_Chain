@@ -17,6 +17,7 @@ from model.company_model import CompanyModel
 from model.operation_estesa_model import OperazioneEstesaModel
 from model.compensation_action_model import CompensationActionModel
 from persistence.repository_impl.richieste_repository_impl import RichiesteRepositoryImpl
+from model.prodotto_finito_model import ProdottoFinitoModel
 from model.richiesta_model import RichiestaModel
 
 
@@ -120,15 +121,11 @@ class ControllerAzienda:
             return self.product.get_prodotti_to_rivenditore()
 
     # Restituisce le opzioni per la combo box del dialog per la composizione
-    def get_prodotti_to_composizione(self, id_azienda):
-        # repo = CompositionRepositoryImpl()
-        #TODO: AGGIUSTARE QUERY
-        #lista = self.product.get_prodotti_to_composizione(id_azienda)
-        return  [
-            ProductModel(1, "Prodotto A", []),
-            ProductModel(2, "Prodotto B", []),
-            ProductModel(3, "Prodotto C", [])
-        ]
+    def get_prodotti_to_composizione(self)-> list[ProdottoFinitoModel]:
+        try:
+            return self.product.get_prodotti_finiti_magazzino_azienda(Session().current_user["id_azienda"])
+        except Exception as e:
+           logger.error(f"Errore {e}")
 
     # Restituisce lo scarto dalla soglia di riferimento
     def scarto_soglia(self, co2, operazione, prodotto):
@@ -179,9 +176,19 @@ class ControllerAzienda:
             logger.error(f"Errore nell'ottenere la lista delle materie prime: {e}", exc_info=True)
             return  []
         
-    def crea_prodotto_trasformato(self,nome : str, quantita :int,quantita_usata_per_materia : dict[MateriaPrimaModel, int]):
+
+    
+    def get_prodotti_finiti_magazzino_azienda(self)-> list[ProdottoFinitoModel]:
         try:
-            self.product.inserisci_prodotto_trasformato(nome, quantita, quantita_usata_per_materia, id_azienda=Session().current_user["id_azienda"])
+            prodotti_finiti = self.product.get_prodotti_finiti_magazzino_azienda(Session().current_user["id_azienda"])
+            return prodotti_finiti
+        except Exception as e:
+            logger.error(f"Errore nell'ottenere la lista delle materie prime: {e}", exc_info=True)
+            return  []
+        
+    def crea_prodotto_trasformato(self,nome : str, quantita :int,quantita_usata_per_materia : dict[MateriaPrimaModel, int], co2 : int):
+        try:
+            self.operation_repository.inserisci_prodotto_trasformato(nome, quantita, quantita_usata_per_materia, id_azienda=Session().current_user["id_azienda"], co2_consumata= co2)
         except Exception as e:
             logger.error(f"Errore nella creazione del prodotto trasformato: {e}", exc_info=True)
             return None
@@ -197,6 +204,13 @@ class ControllerAzienda:
                 nome_prodotto, quantita, Session().current_user["id_azienda"], data, co2,
             )
 
+    def salva_operazione_distributore(self,data: datetime, co2: float, id_prodotto, id_lotto_input: int, quantita : int):
+        try:
+            self.operation_repository.inserisci_operazione_azienda_rivenditore(Session().current_user["id_azienda"],
+                                                                               id_prodotto,data,co2,"vendita",id_lotto_input,quantita)
+        except Exception as e:
+            logger.error(f"Errore {e}")
+
     def salva_operazione_trasporto(self, id_prodotto : int, id_azienda_ricevente: int, id_azienda_richiedente: int,\
                                     quantita : int, co2 : float , id_lotto_input : int,
                 ):
@@ -207,7 +221,10 @@ class ControllerAzienda:
 
     def get_prodotti_ordinabili(self) -> list[ProductForChoiceModel]:
         try:
-            prodotti = self.product.get_prodotti_ordinabili()
+            if Session().current_user["role"] == "Rivenditore":
+                prodotti = self.product.get_prodotti_ordinabili(1)
+            else:
+                prodotti = self.product.get_prodotti_ordinabili()
             return prodotti
         except Exception as e:
             logger.error(f"Errore nell'ottenere la lista dei prodotti ordinabili: {e}", exc_info=True)
@@ -260,4 +277,13 @@ class ControllerAzienda:
         
     def check_utente(self, tipo_operazione : str) -> bool:
         return tipo_operazione in PERMESSI_OPERAZIONI.get(Session().current_user["role"], [])
+    
+
+    def aggiungi_azione_compensativa(self,descrizione, co2, data):
+        try:
+            self.compensation_action.inserisci_azione(data=data,azienda=Session().current_user["id_azienda"],
+                                                      co2_compensata=co2, nome_azione= descrizione)
+        except Exception as e:
+            logger.error(f"Errore {e}")
+     
         

@@ -17,10 +17,10 @@ class RichiestaProdottoView(QDialog):
         super().__init__(parent)
         self.controller = ControllerAzienda()
         
-        # Prodotti placeholder (da controller in uso reale)
-        self.prodotti: list[ProductForChoiceModel] = self.controller.get_prodotti_ordinabili()  # Placeholder per il caricamento dei prodotti
+       
+        self.prodotti: list[ProductForChoiceModel] = self.controller.get_prodotti_ordinabili()  
         
-        # Aziende disponibili (placeholder o da controller)
+        
         self.aziende_trasporto : list[CompanyModel] = self.controller.get_aziende_trasporto()
 
         self.initUI()

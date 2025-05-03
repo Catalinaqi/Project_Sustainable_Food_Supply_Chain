@@ -7,7 +7,7 @@ from datetime import datetime
 
 from model.compensation_action_model import CompensationActionModel 
 from presentation.controller.company_controller import ControllerAzienda
-from presentation.view.vista_aggiungi_operazione import AggiungiOperazioneView
+from presentation.view.vista_aggiungi_az_compensativa import VistaAggiungiAzioneCompensativa
 from session import Session
 
 
@@ -104,8 +104,8 @@ class AzioniAziendaView(QWidget):
             self.tabella.setItem(row, 2, QTableWidgetItem(str(op.Data_azione)))
 
     def apri_aggiungi_operazione(self):
-        self.finestra_aggiungi = AggiungiOperazioneView(self.id_azienda, self)
-        self.finestra_aggiungi.operazione_aggiunta.connect(self.ricarica_operazioni)
+        self.finestra_aggiungi = VistaAggiungiAzioneCompensativa(self)
+        #self.finestra_aggiungi.operazione_aggiunta.connect(self.ricarica_operazioni)
         self.finestra_aggiungi.exec_()
 
     def ricarica_operazioni(self):

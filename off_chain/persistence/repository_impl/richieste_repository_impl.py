@@ -31,89 +31,115 @@ class RichiesteRepositoryImpl():
         except Exception as e:
             logger.error(f"Errore nell'inserimento della richiesta: {e}", exc_info=True)
 
-    def get_richieste_ricevute(self, id_azienda: int, check_trasporto: bool = False) -> list[RichiestaModel]:
-        """
-        Restituisce tutte le richieste ricevute da un'azienda.
-        """
-       
-        self.query_builder \
-            .select(
-                "r.Id_richiesta",
-                "r.Id_richiedente", "rich.Nome AS Nome_richiedente",
-                "r.Id_ricevente", "rice.Nome AS Nome_ricevente",
-                "r.Id_trasportatore", "tras.Nome AS Nome_trasportatore",
-                "r.Id_prodotto", "prod.Nome AS Nome_prodotto",
-                "r.Quantita", "r.Stato_ricevente",
-                "r.Stato_trasportatore", "r.Data", "op.Id_lotto"
-            ) \
-            .table("Richiesta AS r") \
-            .join("Azienda AS rich", "rich.Id_azienda", "r.Id_richiedente") \
-            .join("Azienda AS rice", "rice.Id_azienda", "r.Id_ricevente") \
-            .join("Azienda AS tras", "tras.Id_azienda", "r.Id_trasportatore") \
-            .join("Prodotto AS prod", "prod.Id_prodotto", "r.Id_prodotto") \
-            .join("Operazione AS op", "op.Id_prodotto", "prod.Id_prodotto") \
-            .where("op.Tipo", "=", "produzione") \
-            
-
-        if not check_trasporto:
-            self.query_builder.where("r.Id_ricevente", "=", id_azienda)  
-        
-
-        if check_trasporto:
-            self.query_builder.where("r.stato_ricevente", "=", "Accettata")
-            self.query_builder.where("r.Id_trasportatore", "=", id_azienda)
-            
+    def get_richieste_ricevute(self, id_azienda: int, check_trasporto: bool = False) -> list:
         try:
-            query, value = self.query_builder.get_query()
-
-            result = self.db.fetch_results(query, value)
-
-        
-            if not result:
-                logger.info(f"Nessuna richiesta ricevuta trovata per l'azienda con ID {id_azienda}.")
-                return []
-            else:
-                logger.info(f"Richieste ricevute per l'azienda con ID {id_azienda}: {result}")
-                return [RichiestaModel(*x) for x in result]
-        except Exception as e:
-            logger.error(f"Errore nel recupero delle richieste ricevute: {e}", exc_info=True)
-            return []
-        
-    def get_richieste_effettuate(self, id_azienda: int) -> list[RichiestaModel]:
-        """
-        Restituisce tutte le richieste effettuate da un'azienda.
-        """
-        query, value = (
-                self.query_builder
-                            .select(
+            
+            self.query_builder \
+                .select(
                     "r.Id_richiesta",
                     "r.Id_richiedente", "rich.Nome AS Nome_richiedente",
                     "r.Id_ricevente", "rice.Nome AS Nome_ricevente",
                     "r.Id_trasportatore", "tras.Nome AS Nome_trasportatore",
                     "r.Id_prodotto", "prod.Nome AS Nome_prodotto",
                     "r.Quantita", "r.Stato_ricevente",
-                    "r.Stato_trasportatore", "r.Data", "op.Id_lotto"
-                )
-                .table("Richiesta AS r")
-                .join("Azienda AS rich", "rich.Id_azienda", "r.Id_richiedente")
-                .join("Azienda AS rice", "rice.Id_azienda", "r.Id_ricevente")
-                .join("Azienda AS tras", "tras.Id_azienda", "r.Id_trasportatore")
+                    "r.Stato_trasportatore", "r.Data"
+                ) \
+                .table("Richiesta AS r") \
+                .join("Azienda AS rich", "rich.Id_azienda", "r.Id_richiedente") \
+                .join("Azienda AS rice", "rice.Id_azienda", "r.Id_ricevente") \
+                .join("Azienda AS tras", "tras.Id_azienda", "r.Id_trasportatore") \
                 .join("Prodotto AS prod", "prod.Id_prodotto", "r.Id_prodotto")
-                .join("Operazione AS op", "op.Id_prodotto", "prod.Id_prodotto")
-                .where("r.Id_richiedente", "=", id_azienda)
-                .where("op.Tipo", "!=","trasporto")
-                .get_query()
-            )
-        result = self.db.fetch_results(query, value)
 
+            # Filtro condizionato
+            if not check_trasporto:
+                self.query_builder.where("r.Id_ricevente", "=", id_azienda)  
+            else:
+                self.query_builder.where("r.Stato_ricevente", "=", "Accettata")
+                self.query_builder.where("r.Id_trasportatore", "=", id_azienda)
+
+            query, value = self.query_builder.get_query()
+            risultati_raw = self.db.fetch_results(query, value)
+
+            if not risultati_raw:
+                logger.info(f"Nessuna richiesta ricevuta trovata per l'azienda con ID {id_azienda}.")
+                return []
+
+            risultati = []
+            for r in risultati_raw:
+                id_prodotto = r[7]  # Posizione di Id_prodotto nella tupla
+
+                # Recupera Id_lotto SOLO se op.Tipo è produzione o trasformazione
+                query_lotto = """
+                    SELECT Id_lotto 
+                    FROM Operazione 
+                    WHERE Id_prodotto = ? 
+                    AND (Tipo = 'produzione' OR Tipo = 'trasformazione')
+                    ORDER BY Id_operazione DESC LIMIT 1;
+                """
+                res_lotto = self.db.fetch_one(query_lotto, (id_prodotto,))
+                id_lotto = res_lotto if res_lotto is not None else None
+
+                risultati.append(RichiestaModel(*r, id_lotto))
+
+            logger.info(f"Richieste ricevute per l'azienda con ID {id_azienda}: {risultati}")
+            return risultati
+
+        except Exception as e:
+            logger.error(f"Errore nel recupero delle richieste ricevute: {e}", exc_info=True)
+            return []
+
+        
+    def get_richieste_effettuate(self, id_azienda: int) -> list[RichiestaModel]:
+        """
+        Restituisce tutte le richieste effettuate da un'azienda.
+        """
         try:
-            if not result:
+            # 1. Recupera le richieste
+            query, value = (
+                self.query_builder
+                    .select(
+                        "r.Id_richiesta",
+                        "r.Id_richiedente", "rich.Nome AS Nome_richiedente",
+                        "r.Id_ricevente", "rice.Nome AS Nome_ricevente",
+                        "r.Id_trasportatore", "tras.Nome AS Nome_trasportatore",
+                        "r.Id_prodotto", "prod.Nome AS Nome_prodotto",
+                        "r.Quantita", "r.Stato_ricevente",
+                        "r.Stato_trasportatore", "r.Data"
+                    )
+                    .table("Richiesta AS r")
+                    .join("Azienda AS rich", "rich.Id_azienda", "r.Id_richiedente")
+                    .join("Azienda AS rice", "rice.Id_azienda", "r.Id_ricevente")
+                    .join("Azienda AS tras", "tras.Id_azienda", "r.Id_trasportatore")
+                    .join("Prodotto AS prod", "prod.Id_prodotto", "r.Id_prodotto")
+                    .where("r.Id_richiedente", "=", id_azienda)
+                    .get_query()
+            )
+            richieste = self.db.fetch_results(query, value)
+
+            if not richieste:
                 logger.info(f"Nessuna richiesta effettuata trovata per l'azienda con ID {id_azienda}.")
                 return []
-            return [RichiestaModel(*x) for x in result]
+
+            risultati = []
+            for r in richieste:
+                id_prodotto = r[7]  # posizione di Id_prodotto nella tupla
+                query_lotto = """
+                    SELECT Id_lotto 
+                    FROM Operazione 
+                    WHERE Id_prodotto = ? AND Tipo != 'trasporto'
+                    ORDER BY Id_operazione DESC LIMIT 1;
+                """
+                res_lotto = self.db.fetch_one(query_lotto, (id_prodotto,))
+                id_lotto = res_lotto if res_lotto is not None else None
+
+                risultati.append(RichiestaModel(*r, id_lotto))
+
+            return risultati
+
         except Exception as e:
             logger.error(f"Errore nel recupero delle richieste effettuate: {e}", exc_info=True)
             return []
+
         
     def update_richiesta(self, id_richiesta: int, nuovo_stato: str,azienda_role : str) -> None:
         """

@@ -30,25 +30,24 @@ class VisualizzaRichiesteView(QDialog):
         layout = QVBoxLayout()
 
         # --- SEZIONE RICEVUTE ---
-        group_ricevute = QGroupBox("Richieste Ricevute")
-        layout_ricevute = QVBoxLayout()
+        if  Session().current_user["role"] != "Rivendiore":
+            group_ricevute = QGroupBox("Richieste Ricevute")
+            layout_ricevute = QVBoxLayout()
 
-        self.tabella_ricevute = QTableWidget()
-        self.tabella_ricevute.setColumnCount(6)  # 6 colonne!
-        self.tabella_ricevute.setHorizontalHeaderLabels([
-            "Azienda Destinataria", "Prodotto", "Quantità", "Stato Ricevente", "Stato Trasportatore", "Data"
-        ])
-        self.tabella_ricevute.setSelectionBehavior(QTableWidget.SelectRows)
-        self.tabella_ricevute.setSelectionMode(QTableWidget.SingleSelection)
-        self.tabella_ricevute.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.tabella_ricevute.horizontalHeader().setStretchLastSection(True)  # Fa allungare l'ultima colonna
-        self.tabella_ricevute.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-          # Auto resize
+            self.tabella_ricevute = QTableWidget()
+            self.tabella_ricevute.setColumnCount(6)  # 6 colonne!
+            self.tabella_ricevute.setHorizontalHeaderLabels([
+                "Azienda Destinataria", "Prodotto", "Quantità", "Stato Ricevente", "Stato Trasportatore", "Data"
+            ])
+            self.tabella_ricevute.setSelectionBehavior(QTableWidget.SelectRows)
+            self.tabella_ricevute.setSelectionMode(QTableWidget.SingleSelection)
+            self.tabella_ricevute.setEditTriggers(QTableWidget.NoEditTriggers)
+            self.tabella_ricevute.horizontalHeader().setStretchLastSection(True)  # Fa allungare l'ultima colonna
+            self.tabella_ricevute.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+            # Auto resize
 
-        layout_ricevute.addWidget(self.tabella_ricevute)
+            layout_ricevute.addWidget(self.tabella_ricevute)
 
-
-        if Session().current_user["role"] != "Trasformatore" and Session().current_user["role"] != "Rivendiore":
             btn_layout = QHBoxLayout()
             self.btn_accetta = QPushButton("Accetta")
             self.btn_rifiuta = QPushButton("Rifiuta")
@@ -61,7 +60,7 @@ class VisualizzaRichiesteView(QDialog):
             group_ricevute.setLayout(layout_ricevute)
             layout.addWidget(group_ricevute)
 
-        if Session().current_user["role"] == "Trasformatore" or Session().current_user["role"] == "Rivendiore":
+        if Session().current_user["role"] == "Trasformatore" or Session().current_user["role"] == "Rivenditore":
             
             group_effettuate = QGroupBox("Richieste Effettuate")
             layout_effettuate = QVBoxLayout()

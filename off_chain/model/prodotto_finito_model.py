@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class MateriaPrimaModel:
+class ProdottoFinitoModel:
     id_prodotto : int
     id_azienda : int
     quantita : int

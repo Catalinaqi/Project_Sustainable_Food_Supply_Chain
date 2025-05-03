@@ -171,6 +171,7 @@ class DatabaseMigrations:
                 ("aaa", "12345Aa@", "secret1"),
                 ("ttt", "12345Aa@", "secret2"),
                 ("trasf", "12345Aa@", "secret3"),
+                ("riv","12345Aa@","secret3")
             ]
 
             for username, password, topt in SEED_CREDENZIALI:
@@ -187,6 +188,7 @@ class DatabaseMigrations:
                 ("aaa", "Azienda Agricola Verde", "Via Roma 1", "Agricola", 10.5, 2.0),
                 ("ttt", "Trasporti EcoExpress", "Via Milano 2", "Trasportatore", 30.0, 5.0),
                 ("trasf", "Certificazioni BioCheck", "Via Torino 3", "Trasformatore", 5.0, 1.5),
+                ("riv", "riv BioCheck", "Via Torino 3", "Rivenditore", 5.0, 1.5),
             ]
 
             for username, nome, indirizzo, tipo, co2_emessa, co2_compensata in SEED_AZIENDE:
