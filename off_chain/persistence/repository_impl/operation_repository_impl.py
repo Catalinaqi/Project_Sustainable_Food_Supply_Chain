@@ -129,7 +129,7 @@ class OperationRepositoryImpl(ABC):
             self.db.execute_query(query, value)
 
             logger.info(f"Operazione registrata con successo.")
-            print(f"la soglia del prod farina è {str(self.recupera_soglia(tipo_evento,id_tipo_prodotto))}")
+            #print(f"la soglia del prod farina è {str(self.recupera_soglia(tipo_evento,id_tipo_prodotto))}")
         except Exception as e:
             logger.error(f"Errore durante l'inserimento del prodotto: {str(e)}")
 
@@ -230,6 +230,7 @@ class OperationRepositoryImpl(ABC):
                 composizioni.append((materia.id_prodotto, quantita_usata))
 
 
+
             # 3 Creo la composizione del lotto 
             value_output_lotto = self.get_next_id_lotto_output()
 
@@ -240,7 +241,10 @@ class OperationRepositoryImpl(ABC):
 
                     queries.append((query_comp, params))
 
-
+            # Aggiungo nuovo lotto al magazzino
+            query_magazzino = " INSERT OR IGNORE INTO Magazzino (id_azienda, id_lotto, quantita) VALUES (?, ?,?)"
+            value = (id_azienda,value_output_lotto,quantita_prodotta)
+            queries.append((query_magazzino, value))
 
             # 3. Esegui la transazione iniziale (prodotti + materie prime)
             self.db.execute_transaction(queries)
@@ -262,7 +266,7 @@ class OperationRepositoryImpl(ABC):
                 
             self.db.execute_query(query_operazione, value)
 
-            return self.recupera_soglia(tipo_evento ,id_tipo_prodotto)
+            #return self.recupera_soglia(tipo_evento ,id_tipo_prodotto)
 
         except sqlite3.IntegrityError as e:
                 print("IntegrityError:", e)

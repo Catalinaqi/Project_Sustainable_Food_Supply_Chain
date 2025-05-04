@@ -207,38 +207,21 @@ class DatabaseMigrations:
                 
                 ("farina", 0),
                 ("zucchero",0),
-                ("impasto",1)
+                ("impasto",1),
+                ("legumi",0),
+                ("pomodori",1),
+                ("salsa",1),
+                ("pesto",1),
+               
             ]
 
             for nome, stato in SEED_PRODOTTI:
                 db.execute_query("""
                     INSERT OR IGNORE INTO Prodotto (Nome, Stato)
                     VALUES (?, ?)
-                """, (nome, stato))
-
-            """SEED_Soglie = [
-                ("aaa", "12345Aa@", "secret1"),
-                ("ttt", "12345Aa@", "secret2"),
-                ("trasf", "12345Aa@", "secret3"),
-                ("riv","12345Aa@","secret3"),
-                ("cert","12345Aa@","secret3")
-            ]"""
+                """, (nome, stato))            
 
             
-
-            SEED_MAGAZZINO = [
-
-                
-                (1,1001, 100),
-                (1,1002,50),
-                (3,2001,1)
-            ]
-
-            for id_az, id_lot, qt in SEED_MAGAZZINO:
-                db.execute_query("""
-                    INSERT OR IGNORE INTO Magazzino (id_azienda, id_lotto, quantita)
-                    VALUES (?, ?,?)
-                """, (id_az, id_lot,qt))
 
 
             # Operazioni di produzione delle materie prime
@@ -248,9 +231,15 @@ class DatabaseMigrations:
                 # Produzione zucchero
                 (1, 2, 1002, 25.0, 50.0, 'produzione'),
                 # Trasformazione in succo
-                (3, 3, 2001, 10.0, 100.0, 'trasformazione'),
+                (2, 1, 1010, 25.0, 50.0, 'trasporto'),
 
-                (3, 3, 2002, 1.0, 10.0, 'vendita'),
+                (2, 2, 1020, 25.0, 50.0, 'trasporto'),
+
+                (3, 3, 1100, 10.0, 100.0, 'trasformazione'),
+
+                (2, 3, 1011, 25.0, 50.0, 'trasporto'),
+
+                (4, 3, 2000, 1.0, 10.0, 'vendita'),
 
                 
             ]
@@ -261,12 +250,30 @@ class DatabaseMigrations:
                     VALUES (?, ?, ?, ?, ?, ?)
                 """, op)
 
+            SEED_MAGAZZINO = [
+
+                
+                (1,1001, 100),
+                (1,1002,50),
+                (3,1010,200),
+                (3,1020,100)
+            ]
+
+            for id_az, id_lot, qt in SEED_MAGAZZINO:
+                db.execute_query("""
+                    INSERT OR IGNORE INTO Magazzino (id_azienda, id_lotto, quantita)
+                    VALUES (?, ?,?)
+                """, (id_az, id_lot,qt))
+
             # ComposizioneLotto: il succo di mela in bottiglia è fatto da mele e zucchero
             composizioni = [
                   # usa 40 zucchero
-                (2001, 1001, 50.0),
-                (2001, 1002, 50.0),
-                (2002,2001,10)  # usa 40 di zucchero
+                (1010, 1001, 50.0),
+                (1020, 1002, 50.0),
+                (1100,1010,20),
+                (1100,1020,20),
+                (1011,1100,10),
+                (2000,1011,5)
             ]
 
             for output_lotto, input_lotto, quantita_usata in composizioni:
@@ -274,12 +281,7 @@ class DatabaseMigrations:
                     INSERT OR IGNORE INTO ComposizioneLotto (id_lotto_output, id_lotto_input, quantità_utilizzata)
                     VALUES (?, ?, ?)
                 """, (output_lotto, input_lotto, quantita_usata))
-
-            # Magazzino: solo il prodotto finito (succo di mela in bottiglia) è nel magazzino del trasformatore
-            db.execute_query("""
-                INSERT OR IGNORE INTO Magazzino (id_azienda, id_lotto, quantita)
-                VALUES (?, ?, ?)
-            """, (3, 2002, 130.0))  # solo il prodotto finito
+           
 
             # Richiesta di prodotto da parte di un rivenditore (vendita)
             db.execute_query("""

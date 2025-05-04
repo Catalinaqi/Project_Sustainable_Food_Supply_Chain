@@ -61,7 +61,7 @@ if __name__ == "__main__":
     query_builder = QueryBuilder()
     query,value = (
         query_builder.select("*")
-            .table("Richiesta")
+            .table("Operazione")
             .get_query()
     )
     result = db.fetch_results(query,value)

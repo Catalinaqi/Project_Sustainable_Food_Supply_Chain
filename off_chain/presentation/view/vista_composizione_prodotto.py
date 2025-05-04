@@ -113,7 +113,6 @@ class VistaCreaProdottoTrasformato(QDialog):
             self,
             "Consumo CO₂",
             "Inserisci il consumo di CO₂ (in kg):",
-            decimals=0,
             min=0
         )
         if not ok:
