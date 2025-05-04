@@ -1,10 +1,11 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QSpinBox, QListWidget, QListWidgetItem,
-    QPushButton, QInputDialog, QMessageBox, QDialog
+        QComboBox,  QPushButton, QInputDialog, QMessageBox, QDialog, 
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 
 from model.product_model import ProductModel  
+from model.product_standard_model import ProductStandardModel
 from presentation.controller.company_controller import ControllerAzienda
 from model.materia_prima_model import MateriaPrimaModel 
 
@@ -27,9 +28,20 @@ class VistaCreaProdottoTrasformato(QDialog):
     def init_ui(self):
         layout = QVBoxLayout()
 
-        layout.addWidget(QLabel("Nome prodotto:"))
-        self.input_nome = QLineEdit()
-        layout.addWidget(self.input_nome)
+        layout.addWidget(QLabel("Tipo di prodotto trasformato:"))
+        self.combo_tipo_prodotto = QComboBox()
+        self.tipologie_trasformati: list[ProductStandardModel] = self.controller.get_prodotti_standard()
+        if self.tipologie_trasformati:
+            for tipo in self.tipologie_trasformati:
+                self.combo_tipo_prodotto.addItem(tipo.Nome_prodotto, tipo.Id_prodotto)
+        layout.addWidget(self.combo_tipo_prodotto)
+
+        layout.addWidget(QLabel("Descrizione aggiuntiva (opzionale):"))
+        self.input_descrizione = QLineEdit()
+        self.input_descrizione.setPlaceholderText("es. 'di pomodoro biologica'")
+        self.input_descrizione.setMaxLength(50)
+        layout.addWidget(self.input_descrizione)
+
 
         layout.addWidget(QLabel("Quantità prodotta:"))
         self.input_quantita = QSpinBox()
@@ -74,12 +86,15 @@ class VistaCreaProdottoTrasformato(QDialog):
                         self.quantita_usata_per_materia[materia.id_prodotto] = (materia, q)
 
     def crea_prodotto(self):
-        nome = self.input_nome.text().strip()
+        id_tipologia = self.combo_tipo_prodotto.currentData()
+        descrizione = self.input_descrizione.text().strip()
+
+        if not id_tipologia:
+            QMessageBox.warning(self, "Errore", "Seleziona una tipologia di prodotto trasformato.")
+            return
+
         quantita = self.input_quantita.value()
 
-        if not nome:
-            QMessageBox.warning(self, "Errore", "Inserisci il nome del nuovo prodotto.")
-            return
 
         if not self.quantita_usata_per_materia:
             QMessageBox.warning(self, "Errore", "Specifica le quantità delle materie prime selezionate.")
@@ -105,7 +120,8 @@ class VistaCreaProdottoTrasformato(QDialog):
             QMessageBox.information(self, "Annullato", "Creazione del prodotto annullata.")
             return
 
-        self.controller.crea_prodotto_trasformato(nome, quantita, self.quantita_usata_per_materia, co2)
+        self.controller.crea_prodotto_trasformato(id_tipologia, descrizione, quantita, self.quantita_usata_per_materia, co2)
+
 
         QMessageBox.information(self, "Salvato", "Prodotto trasformato creato con successo!")
         self.operazione_aggiunta.emit()

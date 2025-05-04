@@ -23,13 +23,14 @@ from model.operation_model import OperationModel
 from presentation.view.vista_operazioni_azienda import OperazioniAziendaView
 from presentation.view.vista_aggiungi_operazione import AggiungiOperazioneView
 from persistence.repository_impl.product_repository_impl import ProductRepositoryImpl
+from persistence.repository_impl.operation_repository_impl import OperationRepositoryImpl
 
 
 def setup_database():
 
     try:
         pass
-        #DatabaseMigrations.run_migrations()
+        DatabaseMigrations.run_migrations()
     except Exception as e:
         logger.error(f"Error initializing database: {e}")
         sys.exit(1)  # Stops the application if there is a critical error
@@ -51,7 +52,11 @@ if __name__ == "__main__":
 
     time.sleep(1)
 
+    rep = OperationRepositoryImpl()
     
+
+
+
     db = Database()
     query_builder = QueryBuilder()
     query,value = (
@@ -62,8 +67,6 @@ if __name__ == "__main__":
     result = db.fetch_results(query,value)
 
     
-    
-    #5, 3, 'Trasformazione', 2006, 0, 1]
 
     print( "risultato " + str(result))
 

@@ -5,6 +5,7 @@ from model.threshold_model import ThresholdModel
 from model.product_model import ProductModel
 from model.materia_prima_model import MateriaPrimaModel
 from model.info_product_for_choice_model import ProductForChoiceModel
+from model.product_standard_model import ProductStandardModel
 from session import Session
 from persistence.repository_impl.company_repository_impl import CompanyRepositoryImpl
 from persistence.repository_impl.threshold_repository_impl import ThresholdRepositoryImpl
@@ -58,67 +59,7 @@ class ControllerAzienda:
         # Restituisce il dettaglio della soglia selezionata dato l'indice n    def get_dettaglio_soglia(self, n):
         pass
 
-    # Restituisce il dettaglio della co2/il numero di certificati della sua azienda
-    def get_dettaglio_azienda(self, id_azienda):
-        # repo = CompanyRepositoryImpl()
-        return self.company.get_azienda_by_id(id_azienda)
-
-    # Modifica i dati dell sua azienda
-    def modifica_dati_azienda(self, azienda):
-        pass
-
-
-    # Restituisce la lista delle sue azioni compensative filtrate per data
-    def lista_azioni_per_data(self, azienda, d1, d2):
-        # repo = CompensationActionRepositoryImpl()
-        lista_azioni_per_data = self.company.get_lista_azioni_per_data(azienda, d1, d2)
-        return lista_azioni_per_data
-
-    # Restituisce la lista di tutte le azioni compensative della sua azienda
-    def lista_azioni_compensative_ordinata(self, azienda):
-        # repo = CompensationActionRepositoryImpl()
-        lista_azioni_compensative = self.company.get_lista_azioni_ordinata(azienda)
-        return lista_azioni_compensative
-
-    # Restituisce il dettaglio dell'azione compensativa selezionata
-    # dato l'indice n e la lista (filtrata o meno)
-    def get_dettaglio_azione(self, n, lista):
-        pass
-
-    # Aggiunge un'azione compensativa
-    def aggiungi_azione(self, data, azienda, co2_compensata, nome_azione):
-
-
-        # repo = CompensationActionRepositoryImpl()
-        self.company.inserisci_azione(data, azienda, co2_compensata, nome_azione)
-
-
-    # Restituisce la lista delle sue operazioni filtrate per data
-    def lista_operazioni_per_data(self, azienda, d1, d2):
-        # repo = OperationRepositoryImpl()
-        lista_operazioni = self.company.get_operazioni_by_data(azienda, d1, d2)
-        return lista_operazioni
-
-    def lista_operazioni_ordinata_co2(self, azienda):
-        # repo = OperationRepositoryImpl()
-        lista_operazioni = self.company.get_operazioni_ordinate_co2(azienda)
-        return lista_operazioni
-
-    # Restituisce il dettaglio dell'operazione selezionata dato l'indice n e la lista (filtrata o meno)
-    def get_dettaglio_operazione(self, n, lista):
-        pass
-
     # Restituisce gli elementi da visualizzare nella combo box
-
-    def elementi_combo_box(self, azienda, operazione, destinatario=''):
-        if azienda == "Agricola":
-            return self.threshold.get_prodotti_to_azienda_agricola()
-        elif azienda == "Trasportatore":
-            return self.product.get_prodotti_to_azienda_trasporto(destinatario)
-        elif azienda == "Trasformatore":
-            return self.product.get_prodotti_to_azienda_trasformazione(operazione)
-        elif azienda == "Rivenditore":
-            return self.product.get_prodotti_to_rivenditore()
 
     # Restituisce le opzioni per la combo box del dialog per la composizione
     def get_prodotti_to_composizione(self)-> list[ProdottoFinitoModel]:
@@ -133,12 +74,6 @@ class ControllerAzienda:
         soglia = self.threshold.get_soglia_by_operazione_and_prodotto(operazione, prodotto)
         return soglia - float(co2)
 
-    def get_emissions(self, company_id: int):
-        return self.company.get_company_emission(company_id)
-
-    def newCompany(self, name, address, emissions):
-        company = CompanyModel(1, name, address, emissions)
-        company.save()
 
 
 
@@ -186,22 +121,24 @@ class ControllerAzienda:
             logger.error(f"Errore nell'ottenere la lista delle materie prime: {e}", exc_info=True)
             return  []
         
-    def crea_prodotto_trasformato(self,nome : str, quantita :int,quantita_usata_per_materia : dict[MateriaPrimaModel, int], co2 : int):
+    def crea_prodotto_trasformato(self,id_tipo: int,descrizione : str, quantita :int,quantita_usata_per_materia : dict[MateriaPrimaModel, int], co2 : int):
         try:
-            self.operation_repository.inserisci_prodotto_trasformato(nome, quantita, quantita_usata_per_materia, id_azienda=Session().current_user["id_azienda"], co2_consumata= co2)
+            id_azienda = Session().current_user["id_azienda"]
+            self.operation_repository.inserisci_prodotto_trasformato(id_tipo,descrizione, quantita, quantita_usata_per_materia, id_azienda, co2_consumata= co2)
         except Exception as e:
             logger.error(f"Errore nella creazione del prodotto trasformato: {e}", exc_info=True)
             return None
         
+        
 
     def salva_operazione_agricola(self, tipo : str, data : datetime,
-                                  co2 : float,nome_prodotto : str, quantita : int
+                                  co2 : float,id_tipo_prodotto: int,descrizione : str, quantita : int
                 ):
             if not self.check_utente(tipo):
                 raise PermissionError("Operazione non consentita per questo utente.")
             
             self.operation_repository.inserisci_operazione_azienda_agricola(
-                nome_prodotto, quantita, Session().current_user["id_azienda"], data, co2,
+                id_tipo_prodotto, descrizione, quantita, Session().current_user["id_azienda"], data, co2,
             )
 
     def salva_operazione_distributore(self,data: datetime, co2: float, id_prodotto, id_lotto_input: int, quantita : int):
@@ -271,9 +208,6 @@ class ControllerAzienda:
             logger.error(f"Errore nell'aggiornare la richiesta: {e}", exc_info=True)
             raise Exception(f"Errore nell'aggiornare la richiesta: {e}")
             
-
-
-    
         
     def check_utente(self, tipo_operazione : str) -> bool:
         return tipo_operazione in PERMESSI_OPERAZIONI.get(Session().current_user["role"], [])
@@ -285,5 +219,18 @@ class ControllerAzienda:
                                                       co2_compensata=co2, nome_azione= descrizione)
         except Exception as e:
             logger.error(f"Errore {e}")
+
+
+    def get_prodotti_standard(self) -> list[ProductStandardModel]:
+        try:
+            if Session().current_user["role"] == "Agricola":
+                return self.product.get_prodotti_standard_agricoli()
+            elif Session().current_user["role"] == "Trasformatore":
+                return self.product.get_prodotti_standard_trasformazione()
+            else:
+                raise TypeError("Utente non autorizzato")
+        except Exception as e:
+            logger.error(f"Errore nel ottenimento dei prodotti standard {e}")
+
      
         

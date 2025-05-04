@@ -8,7 +8,7 @@ from model.prodotto_finito_model import ProdottoFinitoModel
 from session import Session
 from presentation.controller.company_controller import PERMESSI_OPERAZIONI, ControllerAzienda
 from PyQt5.QtWidgets import QComboBox , QMessageBox, QDoubleSpinBox , QListWidget, QListWidgetItem, QLabel, QVBoxLayout
-
+from model.product_standard_model import ProductStandardModel
 
 
 class AggiungiOperazioneView(QDialog):
@@ -44,19 +44,30 @@ class AggiungiOperazioneView(QDialog):
         self.lista_prodotti.setSelectionMode(QListWidget.NoSelection)  
 
         if self.role_azienda == "Agricola" :
-            
-            # Se il ruolo è Trasformatore o Agricola, mostra il campo di testo per il nome del nuovo prodotto
-            self.input_testo.setPlaceholderText("Nome nuovo prodotto")
-            layout.addWidget(QLabel("Nome nuovo prodotto:"))
-            layout.addWidget(self.input_testo)
+        
+            layout.addWidget(QLabel("Seleziona il tipo di prodotto:"))
+
+            self.input_combo_prodotto = QComboBox()
+            self.prodotti_agricoli : list[ProductStandardModel] = self.controller.get_prodotti_standard()
+            for prodotto in self.prodotti_agricoli:
+                self.input_combo_prodotto.addItem(prodotto.Nome_prodotto, prodotto.Id_prodotto)  # nome visibile, ID come userData
+            layout.addWidget(self.input_combo_prodotto)
+
+            self.input_descrizione = QLineEdit()
+            self.input_descrizione.setPlaceholderText("Descrizione aggiuntiva (es. 'biologiche')")
+            self.input_descrizione.setMaxLength(50)
+            layout.addWidget(QLabel("Descrizione prodotto:"))
+            layout.addWidget(self.input_descrizione)
+
 
             self.input_quantita = QDoubleSpinBox()
-            self.input_quantita.setMinimum(0.0)            
-            self.input_quantita.setMaximum(10000.0)       
-            self.input_quantita.setDecimals(0)          
-            self.input_quantita.setSingleStep(1)                    
+            self.input_quantita.setMinimum(0.0)
+            self.input_quantita.setMaximum(10000.0)
+            self.input_quantita.setDecimals(0)
+            self.input_quantita.setSingleStep(1)
             layout.addWidget(QLabel("Inserisci quantità prodotta:"))
             layout.addWidget(self.input_quantita)
+
 
 
 
@@ -145,18 +156,27 @@ class AggiungiOperazioneView(QDialog):
 
              # Raccolta dei dati specifici in base al ruolo
             if self.role_azienda == "Agricola":
-                nome_nuovo_prodotto = self.input_testo.text().strip()
+                nome_nuovo_prodotto = self.input_combo_prodotto.currentText()
                 if not nome_nuovo_prodotto:
-                    QMessageBox.warning(self, "Errore", "Devi inserire il nome del nuovo prodotto.")
+                    QMessageBox.warning(self, "Errore", "Seleziona una tipologia di prodotto.")
+                    return
+                
+                id_prodotto_base = self.input_combo_prodotto.currentData()
+                descrizione = self.input_descrizione.text().strip()
+
+                if not id_prodotto_base:
+                    QMessageBox.warning(self, "Errore", "Seleziona una tipologia di prodotto.")
                     return
 
                 self.controller.salva_operazione_agricola(
                     tipo=tipo,
                     data=data,
                     co2=co2,
-                    nome_prodotto=nome_nuovo_prodotto,
-                    quantita= quantita
+                    id_tipo_prodotto=id_prodotto_base,
+                    descrizione=descrizione,
+                    quantita=quantita
                 )
+
             
 
             elif self.role_azienda == "Rivenditore":

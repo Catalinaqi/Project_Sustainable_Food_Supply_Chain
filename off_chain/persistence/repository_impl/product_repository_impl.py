@@ -7,11 +7,12 @@ from model.materia_prima_model import MateriaPrimaModel
 from model.info_product_for_choice_model import ProductForChoiceModel
 from model.lotto_composizione_model import Composizione, Lotto
 from model.prodotto_finito_cliente import ProdottoFinito
+from model.product_standard_model import ProductStandardModel
 from persistence.query_builder import QueryBuilder
 from model.prodotto_finito_model import ProdottoFinitoModel
 
 
-class ProductRepositoryImpl(ProductRepository, ABC):
+class ProductRepositoryImpl( ABC):
     """
      Implementing the prodotto repository.
      """
@@ -19,26 +20,6 @@ class ProductRepositoryImpl(ProductRepository, ABC):
         super().__init__()
         self.db = Database()
         self.query_builder = QueryBuilder()
-
-    def get_storico_prodotto(self, prodotto: int) -> list:
-        query = """
-        SELECT
-            Operazione.Id_operazione,
-            Azienda.Nome,
-            Prodotto.Nome,
-            Operazione.Data_operazione,
-            Operazione.Consumo_CO2,
-            Operazione.Operazione
-        FROM Operazione
-        JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-        JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-        WHERE Operazione.Id_prodotto IN (
-            SELECT Materia_prima
-            FROM Composizione
-            WHERE Prodotto = ?
-        );
-            """
-        return self.db_manager_setting.fetch_results(query, (prodotto,))
 
     def co2_consumata_prodotti(self, prodotti: [int]) -> list:
         lista_con_co2 = []
@@ -49,135 +30,25 @@ class ProductRepositoryImpl(ProductRepository, ABC):
             lista_con_co2.append((prodotto, totale_co2))
         return lista_con_co2
 
-    
 
-    def get_prodotti_ordinati_co2(self):
-        return sorted(self.get_lista_prodotti(), key=lambda x: x[1])
+    def get_prodotti_standard_agricoli(self) ->list[ProductStandardModel]:
+        try:
+            result = self.db.fetch_results("SELECT Id_prodotto, Nome  FROM Prodotto WHERE  Stato = 0")
+            print(result)
+            return [ProductStandardModel(*x) for x in result] if result else []
+        except Exception as e:
+            logger.warning("Nessun prodotto trovato")
+            return[]
+         
 
-    def get_prodotti_by_nome(self, nome: str) -> list:
-        query = """
-                SELECT
-                    Prodotto.Id_prodotto,
-                    Prodotto.Nome,
-                    Prodotto.Quantita,
-                    Prodotto.Stato,
-                    Azienda.Nome
-                FROM Operazione
-                JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-                JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-                WHERE Operazione.Operazione = "Messo sugli scaffali"
-                AND Prodotto.Nome = ?;
-        """
-        return self.db_manager_setting.fetch_results(query, (nome,))
-
-    def get_lista_prodotti_by_rivenditore(self, rivenditore: int) -> list:
-        query = """
-        SELECT
-            Prodotto.Id_prodotto,
-            Prodotto.Nome,
-            Prodotto.Quantita,
-            Prodotto.Stato,
-            Azienda.Nome
-        FROM Operazione
-        JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-        JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-        WHERE Operazione.Operazione = "Messo sugli scaffali"
-        AND Operazione.Id_azienda = ?;
-        """
-        return self.db_manager_setting.fetch_results(query, (rivenditore,))
-
-    def get_prodotti_certificati(self) -> list:
-        query = """
-        SELECT
-            Prodotto.Id_prodotto,
-            Prodotto.Nome,
-            Prodotto.Quantita,
-            Prodotto.Stato,
-            Azienda.Nome
-        FROM Operazione
-        JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-        JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-        WHERE Operazione.Operazione = "Messo sugli scaffali"
-        AND Operazione.Id_prodotto IN (
-            SELECT Id_prodotto FROM Certificato
-        );
-        """
-        #prodotti = self.db_manager_setting.fetch_results(query)
-        #logger.info(f"get_prodotti_certificati - prodotti: {prodotti}")
-        #if not prodotti:
-        #    return []
-        #return ProductRepositoryImpl.co2_consumata_prodotti(prodotti)
-
-        result = self.db_manager_setting.fetch_results(query)
-        if not result:
-            logger.warning("The get_lista_credenziali is empty or the query returned no results.")
-        else:
-            logger.info(f"Obtained in get_lista_credenziali: {result}")
-
-        #return result
-        return self.co2_consumata_prodotti(result)
-
-    def get_prodotti_certificati_by_rivenditore(self, id_rivenditore: int) -> list:
-        query = """
-        SELECT
-            Prodotto.Id_prodotto,
-            Prodotto.Nome,
-            Prodotto.Quantita,
-            Prodotto.Stato,
-            Azienda.Nome
-        FROM Operazione
-        JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-        JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-        WHERE Operazione.Operazione = "Messo sugli scaffali"
-        AND Operazione.Id_prodotto IN (
-            SELECT Id_prodotto FROM Certificato
-        )
-        AND Operazione.Id_azienda = ?;
-        """
-        return self.co2_consumata_prodotti(
-            self.db_manager_setting.fetch_results(query, (id_rivenditore,)))
-
-    def get_prodotti_certificati_ordinati_co2(self):
-        return sorted(self.get_prodotti_certificati(), key=lambda x: x[1])
-
-    def get_prodotti_certificati_by_nome(self, nome: str) -> list:
-        query = """
-        SELECT
-            Prodotto.Id_prodotto,
-            Prodotto.Nome,
-            Prodotto.Quantita,
-            Prodotto.Stato,
-            Azienda.Nome
-        FROM Operazione
-        JOIN Azienda ON Operazione.Id_azienda = Azienda.Id_azienda
-        JOIN Prodotto ON Operazione.Id_prodotto = Prodotto.Id_prodotto
-        WHERE Operazione.Operazione = "Messo sugli scaffali"
-        AND Operazione.Id_prodotto IN (
-            SELECT Id_prodotto FROM Certificato
-        )
-        AND Prodotto.Nome = ?;
-        """
-        return self.co2_consumata_prodotti(
-            self.db_manager_setting.fetch_results(query, (nome,)))
-
-    def get_prodotti_to_rivenditore(self) -> list:
-        query = """
-        SELECT Id_prodotto, Nome, Quantita FROM Prodotto WHERE Stato = 11;
-        """
-        return self.db_manager_setting.fetch_results(query)
-
-    def get_materie_prime(self, azienda: int) -> list:
-        query = """
-        SELECT Prodotto.Id_prodotto, Prodotto.Nome, Prodotto.Quantita
-        FROM Prodotto
-        JOIN Operazione
-        ON Prodotto.Id_prodotto = Operazione.Id_prodotto
-        WHERE Operazione.Operazione = "Trasformazione"
-        AND Operazione.Id_azienda = ?
-        ORDER BY Operazione.Data_operazione DESC;
-        """
-        return self.db_manager_setting.fetch_results(query, (azienda,))
-    
+    def get_prodotti_standard_trasformazione(self)  -> list[ProductStandardModel]:
+        try:
+            result = self.db.fetch_results("SELECT Id_prodotto, Nome  FROM Prodotto WHERE  Stato = 1")
+            print(f"risultao----{result}")
+            return [ProductStandardModel(*x) for x in result] if result else []
+        except Exception as e:
+            logger.warning("Nessun prodotto trovato")
+            return[]
 
 
 
