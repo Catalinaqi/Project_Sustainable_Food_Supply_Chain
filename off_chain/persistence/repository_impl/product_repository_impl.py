@@ -174,9 +174,8 @@ class ProductRepositoryImpl( ABC):
         )
 
         try:
-            logger.info(f"Query operazione: {query} - Value: {value}")
             rows = self.db.fetch_results(query, value)
-            logger.info(f"Result operazione: {rows}")
+           
             if not rows:
                 logger.warning(f"Nessuna operazione trovata per id_lotto: {id_lotto}")
                 return None
@@ -196,9 +195,7 @@ class ProductRepositoryImpl( ABC):
         )
 
         try:
-            logger.info(f"Query composizione: {query} - Value: {value}")
             rows = self.db.fetch_results(query, value)
-            logger.info(f"Result composizione: {rows}")
             composizioni_raw: list[Composizione] = [Composizione(*x) for x in rows] if rows else []
         except Exception as e:
             logger.error(f"Errore nel recupero della composizione: {e}")

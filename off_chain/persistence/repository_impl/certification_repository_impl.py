@@ -3,6 +3,7 @@ from abc import ABC
 #from configuration.log_load_setting import logger
 from domain.repository.certification_repository import CertificationRepository
 from configuration.database import Database
+from model.certification_model import CertificationModel
 from persistence.query_builder import QueryBuilder
 
 
@@ -101,3 +102,38 @@ class CertificationRepositoryImpl(CertificationRepository, ABC):
                     )
 
         return self.db.fetch_results(query, values)
+    
+
+    
+    def get_certificati_catena(self, id_lotto: int) -> list[CertificationModel]:
+        try:
+            certificati: list[CertificationModel] = []
+
+            query, value = (
+                self.query_builder
+                .select("Id_certificato", "Id_lotto", "Descrizione", "az.Nome", "Data")
+                .table("Certificato")
+                .join("Azienda AS az", "Id_azienda_certificatore", "az.Id_azienda")
+                .where("Id_lotto", "=", id_lotto)
+                .get_query()
+            )
+
+            result = self.db.fetch_results(query, value)
+            certificati.extend([CertificationModel(*r) for r in result])
+
+            lotti_input = self.db.fetch_results("""
+                SELECT id_lotto_input FROM ComposizioneLotto WHERE id_lotto_output = ?
+            """, (id_lotto,))
+
+            for (id_lotto_input,) in lotti_input:
+                certificati.extend(self.get_certificati_catena(id_lotto_input))
+
+            return certificati
+
+        except Exception as e:
+            print(f"Errore durante la conversione dei certificati: {e}")
+            return []
+
+
+
+

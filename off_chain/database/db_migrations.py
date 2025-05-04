@@ -87,12 +87,11 @@ class DatabaseMigrations:
             '''
             CREATE TABLE  Certificato (
                 Id_certificato INTEGER PRIMARY KEY AUTOINCREMENT,
-                Id_prodotto INTEGER NOT NULL,
+                Id_lotto INTEGER NOT NULL,
                 Descrizione TEXT,
                 Id_azienda_certificatore INTEGER NOT NULL,
                 Data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (Id_azienda_certificatore) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE,
-                FOREIGN KEY (Id_prodotto) REFERENCES Prodotto(Id_prodotto) ON DELETE CASCADE
+                FOREIGN KEY (Id_azienda_certificatore) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
             )
             ''',
             '''
@@ -281,6 +280,23 @@ class DatabaseMigrations:
                     INSERT OR IGNORE INTO ComposizioneLotto (id_lotto_output, id_lotto_input, quantità_utilizzata)
                     VALUES (?, ?, ?)
                 """, (output_lotto, input_lotto, quantita_usata))
+
+            certificati = [
+                (1001,"desc1",5),
+                (1100,"des2c",5),
+                (2000,"desc3",5)
+
+            ]
+
+            for id_lotto, desc, id_az in certificati:
+                db.execute_query("""
+                    INSERT OR IGNORE INTO Certificato (Id_lotto, Descrizione, Id_azienda_certificatore)
+                    VALUES (?, ?, ?)
+                """, (id_lotto, desc, id_az))
+
+            
+                
+                
            
 
             # Richiesta di prodotto da parte di un rivenditore (vendita)
