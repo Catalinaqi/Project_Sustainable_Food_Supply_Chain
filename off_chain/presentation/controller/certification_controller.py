@@ -1,5 +1,7 @@
 from configuration.log_load_setting import logger
 from model.lotto_for_cetification_model import LottoForCertificaion
+from model.certification_for_lotto import CertificationForLotto
+from session import Session
 from persistence.repository_impl.company_repository_impl import CompanyRepositoryImpl
 from persistence.repository_impl.threshold_repository_impl import ThresholdRepositoryImpl
 from persistence.repository_impl.product_repository_impl import ProductRepositoryImpl
@@ -57,4 +59,17 @@ class ControllerCertificatore:
             return self.certification.get_lotti_certificabili()
         except Exception as e:
             logger.error(f"Errore nel recupero dei lotti: {e}")
+
+    def get_certificati_lotto(self, id_lotto: int) -> list[CertificationForLotto]:
+        try:
+            return self.certification.get_certificati_lotto(id_lotto)
+        except Exception as e:
+            logger.error(f"Errore nel recupero dei certificati: {e}")
+
+    def aggiungi_certificazione(self , id_lotto, descrizione):
+        try:
+            self.certification.aggiungi_certificazione(id_lotto, descrizione, Session().current_user["id_azienda"])
+        except Exception as e:
+            logger.error(f"Errore nel aggiunta dei certificati: {e}")
+
 

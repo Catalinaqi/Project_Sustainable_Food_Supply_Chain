@@ -4,11 +4,12 @@ from domain.repository.certification_repository import CertificationRepository
 from configuration.database import Database
 from model.certification_model import CertificationModel
 from model.lotto_for_cetification_model import LottoForCertificaion
+from model.certification_for_lotto import CertificationForLotto
 from persistence.query_builder import QueryBuilder
 from configuration.log_load_setting import logger
 
 
-class CertificationRepositoryImpl(CertificationRepository, ABC):
+class CertificationRepositoryImpl(ABC):
     """
      Implementing the certificato repository.
      """    
@@ -72,12 +73,6 @@ class CertificationRepositoryImpl(CertificationRepository, ABC):
             return False
         return True
 
-    def inserisci_certificato(self, prodotto: int, tipo: str, azienda: int, data: datetime):
-        query = """
-        INSERT INTO Certificato (Id_prodotto, Descrizione, Id_azienda_certificatore, Data)
-        VALUES (?, ?, ?, ?);
-        """
-        self.db.execute_query(query, (prodotto, tipo, azienda, data))
 
     # Restituisce la certificazione del prodotto selezionato
     def get_certificazione_by_prodotto(self, prodotto):
@@ -116,6 +111,7 @@ class CertificationRepositoryImpl(CertificationRepository, ABC):
             result = self.db.fetch_results(query, value)
             certificati.extend([CertificationModel(*r) for r in result])
 
+
             lotti_input = self.db.fetch_results("""
                 SELECT id_lotto_input FROM ComposizioneLotto WHERE id_lotto_output = ?
             """, (id_lotto,))
@@ -150,6 +146,39 @@ class CertificationRepositoryImpl(CertificationRepository, ABC):
         except Exception as e:
             logger.error(f"Errore nel recupero dei lotti: {e}")
 
+
+    def get_certificati_lotto(self,id_lotto : int) ->list[CertificationForLotto]:
+        try:
+
+            query, value = (
+                self.query_builder
+                .select("Descrizione", "az.Nome", "Data")
+                .table("Certificato")
+                .join("Azienda AS az", "Id_azienda_certificatore", "az.Id_azienda")
+                .where("Id_lotto", "=", id_lotto)
+                .get_query()
+            )
+
+            result = self.db.fetch_results(query, value)
+            if not result:
+                logger.warning("Ritorno lista vuota")
+            return [CertificationForLotto(*r) for r in result] or []
+        except Exception as e:
+            logger.error(f"Errore nel recupero dei certificati {e}")
+
+    def aggiungi_certificazione(self,id_lotto, descrizione, id_azienda):
+        try:
+            query = """INSERT INTO Certificato(Id_lotto,Descrizione,Id_azienda_certificatore) VALUES (?, ?, ?)"""
+            value =(id_lotto,descrizione,id_azienda)
+            self.db.execute_query(query,value)
+        except Exception as e:
+            logger.error(f"Errore nel aggiunta del certificato {e}")
+
+            
+
+
+
+           
 
 
 

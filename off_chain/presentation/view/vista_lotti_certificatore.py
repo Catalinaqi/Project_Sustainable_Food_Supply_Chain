@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 from model.lotto_for_cetification_model import LottoForCertificaion
+from presentation.view.vista_aggiungi_certificazione import VistaCertificazioniLotto
 from presentation.controller.certification_controller import ControllerCertificatore  # Sostituisci col tuo controller
 
 class VistaRicercaLotti(QWidget):
@@ -14,6 +15,7 @@ class VistaRicercaLotti(QWidget):
         self.controller = ControllerCertificatore()  # Sostituisci con il tuo controller reale
         self.lotti: list[LottoForCertificaion] = self.controller.get_lotti_certificabili()  # Lista iniziale completa
         self.init_ui()
+        self.finestre_aperte = []
 
     def init_ui(self):
         layout = QVBoxLayout()
@@ -40,8 +42,12 @@ class VistaRicercaLotti(QWidget):
                 item.setData(Qt.UserRole, lotto.id_lotto)
                 self.lista_risultati.addItem(item)
 
+    
+
     def apri_dettagli_lotto(self, item):
         id_lotto = item.data(Qt.UserRole)
-        self.lotto_selezionato.emit(id_lotto)  
-        print(f"Lotto selezionato: {id_lotto}")  
+        finestra = VistaCertificazioniLotto(id_lotto)
+        finestra.show()
+        self.finestre_aperte.append(finestra)  
+
 
