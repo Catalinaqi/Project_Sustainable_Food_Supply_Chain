@@ -232,5 +232,6 @@ class ControllerAzienda:
         except Exception as e:
             logger.error(f"Errore nel ottenimento dei prodotti standard {e}")
 
+
      
         

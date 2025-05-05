@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     
 
-    print( "risultato " + str(result))
+    #print( "risultato " + str(result))
 
 
     finestra = VistaAccedi()

@@ -1,10 +1,11 @@
 import datetime
 from abc import ABC
-#from configuration.log_load_setting import logger
 from domain.repository.certification_repository import CertificationRepository
 from configuration.database import Database
 from model.certification_model import CertificationModel
+from model.lotto_for_cetification_model import LottoForCertificaion
 from persistence.query_builder import QueryBuilder
+from configuration.log_load_setting import logger
 
 
 class CertificationRepositoryImpl(CertificationRepository, ABC):
@@ -72,18 +73,12 @@ class CertificationRepositoryImpl(CertificationRepository, ABC):
         return True
 
     def inserisci_certificato(self, prodotto: int, tipo: str, azienda: int, data: datetime):
-        #TODO
-        query, values = (
-                self.query_builder
-                .table("Certificato")
-                .insert(Id_prodotto="?", Descrizione="?", Id_azienda_certificatore="?", Data="?")
-                .get_query()
-        )
         query = """
         INSERT INTO Certificato (Id_prodotto, Descrizione, Id_azienda_certificatore, Data)
         VALUES (?, ?, ?, ?);
         """
         self.db.execute_query(query, (prodotto, tipo, azienda, data))
+
     # Restituisce la certificazione del prodotto selezionato
     def get_certificazione_by_prodotto(self, prodotto):
         query, values = (
@@ -133,6 +128,27 @@ class CertificationRepositoryImpl(CertificationRepository, ABC):
         except Exception as e:
             print(f"Errore durante la conversione dei certificati: {e}")
             return []
+        
+
+    def get_lotti_certificabili(self) -> list[LottoForCertificaion]:
+        try:
+            query,value =(
+                self.query_builder
+                    .select("o.Id_lotto","o.Tipo","o.Data_operazione","o.Consumo_CO2","a.Nome","p.Nome")
+                    .table("Operazione AS o")
+                    .where("o.Tipo","!=","trasporto")
+                    .where("o.Tipo","!=","vendita")
+                    .join("Prodotto AS p","o.Id_prodotto","p.Id_prodotto")
+                    .join("Azienda AS a","o.Id_azienda","a.Id_azienda")
+                    .get_query()
+            )
+
+            result = self.db.fetch_results(query,value)
+            logger.warning(f"lista {result}")
+            return [LottoForCertificaion(*r) for r in result]
+
+        except Exception as e:
+            logger.error(f"Errore nel recupero dei lotti: {e}")
 
 
 

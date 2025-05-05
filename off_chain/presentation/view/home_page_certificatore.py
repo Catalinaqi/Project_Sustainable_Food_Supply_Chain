@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGridLayout, QPushButton, QMessageBox
 
+from presentation.view.vista_lotti_certificatore import VistaRicercaLotti
 from session import Session
 from presentation.controller.certification_controller import ControllerCertificatore
 from presentation.view import funzioni_utili
@@ -119,16 +120,12 @@ class HomePageCertificatore(QMainWindow):
             self, 'SupplyChain', 'TCU work in progress')
 
     def show_certificazioni(self):
-        self.vista_certificazioni = VistaProdotti(self.controller, self.utente)
+        self.vista_certificazioni = VistaRicercaLotti()
         self.vista_certificazioni.show()
 
-    def show_azienda(self):
-        self.vista_azienda = VistaStatoAzienda(self.aggiorna_profilo, self.utente,
-                                               self.controller, True)
-        self.vista_azienda.show()
+    
 
     def aggiorna_profilo(self, utente):
-        self.utente = utente
         self.welcome_label.setText(
             f"Ciao {Session().current_user['username']} 👋!\nBenvenuto in SupplyChain.\n"
             f"Prego selezionare un'opzione dal menu"
@@ -137,3 +134,7 @@ class HomePageCertificatore(QMainWindow):
     def show_soglie(self):
         self.vista_soglie = VistaSoglie(True)
         self.vista_soglie.show()
+
+    def show_azienda(self):
+        self.vista_azienda = VistaStatoAzienda(self.aggiorna_profilo, self.utente,self.controller, True)
+        self.vista_azienda.show()
