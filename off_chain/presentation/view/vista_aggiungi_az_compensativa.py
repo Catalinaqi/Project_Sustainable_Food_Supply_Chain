@@ -2,11 +2,12 @@ from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QLineEdit, QDoubleSpinBox,
     QDateEdit, QPushButton, QMessageBox
 )
-from PyQt5.QtCore import QDate
+from PyQt5.QtCore import QDate, pyqtSignal
 from presentation.controller.company_controller import ControllerAzienda
 
 
 class VistaAggiungiAzioneCompensativa(QDialog):
+    azione_aggiunta = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -57,6 +58,7 @@ class VistaAggiungiAzioneCompensativa(QDialog):
         try:
             self.controller.aggiungi_azione_compensativa(descrizione, co2, data)  
             QMessageBox.information(self, "Salvato", "Azione compensativa salvata con successo!")
+            self.azione_aggiunta.emit()
             self.accept()
         except Exception as e:
             QMessageBox.critical(self, "Errore", f"Errore durante il salvataggio: {e}")

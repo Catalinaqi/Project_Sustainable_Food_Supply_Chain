@@ -25,7 +25,7 @@ class AzioniAziendaView(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
 
-        layout.addWidget(QLabel(f"<b>Azioni compensative dell'azienda:</b> {self.id_azienda}"))
+        layout.addWidget(QLabel(f"<b>ID azienda:</b> {self.id_azienda}"))
 
         self.filtro_input = QLineEdit()
         self.filtro_input.setPlaceholderText("Filtra azioni...")
@@ -105,7 +105,7 @@ class AzioniAziendaView(QWidget):
 
     def apri_aggiungi_operazione(self):
         self.finestra_aggiungi = VistaAggiungiAzioneCompensativa(self)
-        #self.finestra_aggiungi.operazione_aggiunta.connect(self.ricarica_operazioni)
+        self.finestra_aggiungi.azione_aggiunta.connect(self.ricarica_operazioni)
         self.finestra_aggiungi.exec_()
 
     def ricarica_operazioni(self):

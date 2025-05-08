@@ -17,7 +17,7 @@ class SoglieAziendaView(QWidget):
         self.controller = ControllerAzienda()
         
 
-        self.soglie : list[ThresholdModel]= self.controller.lista_soglie(self.tipo_azienda) # Mock data
+        self.soglie : list[ThresholdModel]= self.controller.lista_soglie() # Mock data
         self.soglie_filtrate = self.soglie.copy()
 
         self.initUI()

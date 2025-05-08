@@ -27,7 +27,7 @@ class OperazioniAziendaView(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
 
-        layout.addWidget(QLabel(f"<b>Operazioni dell'azienda:</b> {self.id_azienda}"))
+        layout.addWidget(QLabel(f"<b>ID azienda:</b> {self.id_azienda}"))
 
         self.filtro_input = QLineEdit()
         self.filtro_input.setPlaceholderText("Filtra operazioni...")
