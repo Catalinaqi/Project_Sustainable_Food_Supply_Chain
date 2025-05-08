@@ -106,7 +106,7 @@ class OperationRepositoryImpl(ABC):
             self.db.execute_query(query,params)
 
             
-            value_update= (co2,azienda)
+            value_update= (co2,0,azienda)
             queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
 
             self.db.execute_transaction(queries)
@@ -147,7 +147,7 @@ class OperationRepositoryImpl(ABC):
             queries.append((query,value))
 
             
-            value_update= (co2,azienda)
+            value_update= (co2,0,azienda,)
             queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
 
             self.db.execute_transaction(queries)
@@ -208,7 +208,7 @@ class OperationRepositoryImpl(ABC):
             queries.append((query_mag, value_mag))
 
             
-            value_update= (co2_emessa,id_azienda_trasporto)
+            value_update= (co2_emessa,0,id_azienda_trasporto)
             queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
 
 
@@ -292,7 +292,7 @@ class OperationRepositoryImpl(ABC):
 
             token = self.token_opeazione(co2_consumata,tipo_evento,id_tipo_prodotto)
 
-            value_update= (co2_consumata,token ,id_azienda)
+            value_update= (co2_consumata,token ,0,id_azienda)
             queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
 
             
