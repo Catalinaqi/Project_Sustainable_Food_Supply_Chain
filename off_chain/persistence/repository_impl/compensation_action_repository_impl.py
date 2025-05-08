@@ -45,12 +45,6 @@ class CompensationActionRepositoryImpl( ABC):
         return lista_op
     
 
-
-
-
-
-
-
     def get_co2_compensata(self, id_azienda: int) -> float:
         query,value = (
             self.query_builder
@@ -64,8 +58,20 @@ class CompensationActionRepositoryImpl( ABC):
             raise ValueError
 
     def inserisci_azione(self, data: datetime, azienda: int, co2_compensata: str, nome_azione: str):
-        query = """
+
+        queries = []
+        query_azione = """
         INSERT INTO Azioni_compensative (Data, Id_azienda, Co2_compensata, Nome_azione)
         VALUES (?, ?, ?, ?);
         """
-        return self.db.execute_query(query, (data, azienda, co2_compensata, nome_azione))
+        value_azione =(data,azienda,co2_compensata, nome_azione)
+        queries.append((query_azione, value_azione))
+
+        query_update_azienda=""" UPDATE Azienda  SET Co2_compensata = Co2_compensata + ? 
+        WHERE Id_azienda = ?;"""
+        value_update= (co2_compensata,azienda)
+        queries.append((query_update_azienda, value_update))
+
+
+        return self.db.execute_transaction(queries)
+

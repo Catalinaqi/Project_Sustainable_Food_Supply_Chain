@@ -3,44 +3,35 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, QFormLayout, QLineEdit,
                              QHBoxLayout, QPushButton, QMessageBox)
 
+from session import Session
 from presentation.view import funzioni_utili
 
 
 class VistaStatoAzienda(QMainWindow):
-    def __init__(self, callback, azienda, controller, is_certificatore=False):
+    def __init__(self, callback):
         super().__init__()
 
         self.callback = callback
-        self.azienda = azienda
-        self.controller = controller
-        self.is_certificatore = is_certificatore
-
-        self.dettaglio = self.controller.get_dettaglio_azienda(self.azienda[0])[0]
+        
 
         # Elementi di layout
         self.id_azienda_label = QLabel("ID")
-        self.id_azienda_input = QLineEdit(str(self.azienda[0]))
+        self.id_azienda_input = QLineEdit(str(Session().current_user["id_azienda"]))
 
         self.nome_label = QLabel("Nome")
-        self.nome_input = QLineEdit(str(self.azienda[3]))
+        self.nome_input = QLineEdit(str(Session().current_user["username"]))
 
         self.tipo_label = QLabel("Tipo")
-        self.tipo_input = QLineEdit(str(self.azienda[2]))
-
-        self.indirizzo_label = QLabel("Indirizzo")
-        self.indirizzo_input = QLineEdit(str(self.azienda[4]))
+        self.tipo_input = QLineEdit(str(Session().current_user["role"]))
 
         self.co2_consumata_totale_label = QLabel("CO2 consumata totale")
-        self.co2_consumata_totale_input = QLineEdit("100")  # Da modificare con la query corretta
+        self.co2_consumata_totale_input = QLineEdit(str((Session().current_user["co2_consumata"])))
 
         self.co2_risparmiata_totale_label = QLabel("CO2 risparmiata totale")
-        self.co2_risparmiata_totale_input = QLineEdit("50")  # Da modificare con la query corretta
+        self.co2_risparmiata_totale_input = QLineEdit(str((Session().current_user["co2_compensata"]))) 
 
-        self.saldo_totale_label = QLabel("Saldo CO2 complessivo")
-        self.saldo_totale_input = QLineEdit("(100)")  # Da modificare con la query corretta
-
-        self.certificazioni_label = QLabel("Certificazioni effettuate")
-        self.certificazioni_input = QLineEdit("3")  # Da modificare con la query corretta
+        self.token_label = QLabel("Token accumulati")
+        self.token_label_input = QLineEdit(str((Session().current_user["Token"]))) 
 
         self.conferma_button = QPushButton('Conferma modifiche')
 
@@ -81,33 +72,21 @@ class VistaStatoAzienda(QMainWindow):
         self.tipo_input.setReadOnly(True)
         funzioni_utili.add_field_to_form(self.tipo_label, self.tipo_input, form_layout)
 
-        self.indirizzo_input.setReadOnly(True)
-        # self.indirizzo_input.setValidator(QRegExpValidator(QRegExp("[A-Za-z0-9, ]+")))  # Lettere, numeri e virgole
-        funzioni_utili.add_field_to_form(self.indirizzo_label, self.indirizzo_input, form_layout)
 
-        if not self.is_certificatore:
-            self.co2_consumata_totale_input.setText(str(self.dettaglio[1]))
+        if Session().current_user["role"] != "Certificatore":
             self.co2_consumata_totale_input.setReadOnly(True)
             funzioni_utili.add_field_to_form(self.co2_consumata_totale_label, self.co2_consumata_totale_input,
                                              form_layout)
 
-            self.co2_risparmiata_totale_input.setText(str(self.dettaglio[2]))
             self.co2_risparmiata_totale_input.setReadOnly(True)
             funzioni_utili.add_field_to_form(self.co2_risparmiata_totale_label, self.co2_risparmiata_totale_input,
                                              form_layout)
-
-            saldo = self.dettaglio[2] - self.dettaglio[1]
-            if saldo < 0:
-                saldo = f"({-saldo})"
-            self.saldo_totale_input.setText(str(saldo))
-            self.saldo_totale_input.setReadOnly(True)
-            funzioni_utili.add_field_to_form(self.saldo_totale_label, self.saldo_totale_input, form_layout)
-
-        else:
-            self.certificazioni_input.setText(str(self.dettaglio))
-            self.certificazioni_input.setReadOnly(True)
-            funzioni_utili.add_field_to_form(self.certificazioni_label, self.certificazioni_input,
+            
+            self.token_label_input.setReadOnly(True)
+            funzioni_utili.add_field_to_form(self.token_label, self.token_label_input,
                                              form_layout)
+            
+
 
         main_layout.addLayout(form_container)
 
@@ -115,8 +94,6 @@ class VistaStatoAzienda(QMainWindow):
         button_layout.setSpacing(10)
         button_layout.setAlignment(Qt.AlignCenter)
 
-        # funzioni_utili.insert_button(self.conferma_button, button_layout)
-        # self.conferma_button.clicked.connect(self.on_conferma_button_clicked)
 
         main_layout.addLayout(button_layout)
 
@@ -128,9 +105,8 @@ class VistaStatoAzienda(QMainWindow):
         id_azienda = self.id_azienda_input.text()
         nome = self.nome_input.text()
         tipo = self.tipo_input.text()
-        indirizzo = self.indirizzo_input.text()
 
-        self.aggiungi(id_azienda, nome, tipo, indirizzo)
+        #self.aggiungi(id_azienda, nome, tipo, indirizzo)
 
     def aggiungi(self, id_azienda, nome, tipo, indirizzo):
         QMessageBox.information(self, "SupplyChain",

@@ -10,6 +10,7 @@ from model.prodotto_finito_cliente import ProdottoFinito
 from model.product_standard_model import ProductStandardModel
 from persistence.query_builder import QueryBuilder
 from model.prodotto_finito_model import ProdottoFinitoModel
+from persistence.repository_impl import db_default_string
 
 
 class ProductRepositoryImpl( ABC):
@@ -131,10 +132,10 @@ class ProductRepositoryImpl( ABC):
             
         if tipo_prodoto == 0:
             self.query_builder.where("Prodotto.stato", "=", 0)\
-                             .where("Azienda.Tipo", "=", "Agricola")
+                             .where("Azienda.Tipo", "=", db_default_string.TIPO_AZIENDA_AGRICOLA)
         elif tipo_prodoto == 1:
             self.query_builder.where("Prodotto.stato", "=", 1) \
-                            .where("Azienda.Tipo", "=", "Trasformatore")
+                            .where("Azienda.Tipo", "=", db_default_string.TIPO_AZIENDA_TRASPORTATORE)
         else:
             raise ValueError("Tipo di prodotto non identificato")
 
@@ -226,7 +227,7 @@ class ProductRepositoryImpl( ABC):
             .table("Operazione")
             .join("Azienda", "Operazione.Id_azienda", "Azienda.Id_azienda")
             .join("Prodotto", "Operazione.Id_prodotto", "Prodotto.Id_prodotto")
-            .where("Operazione.Tipo", "=", "vendita")
+            .where("Operazione.Tipo", "=", db_default_string.TIPO_OP_VENDITA)
             .get_query()
         )
         

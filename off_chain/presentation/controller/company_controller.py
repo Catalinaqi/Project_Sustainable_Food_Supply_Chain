@@ -20,6 +20,7 @@ from model.compensation_action_model import CompensationActionModel
 from persistence.repository_impl.richieste_repository_impl import RichiesteRepositoryImpl
 from model.prodotto_finito_model import ProdottoFinitoModel
 from model.richiesta_model import RichiestaModel
+from persistence.repository_impl import db_default_string
 
 
 PERMESSI_OPERAZIONI = {
@@ -67,12 +68,6 @@ class ControllerAzienda:
             return self.product.get_prodotti_finiti_magazzino_azienda(Session().current_user["id_azienda"])
         except Exception as e:
            logger.error(f"Errore {e}")
-
-    # Restituisce lo scarto dalla soglia di riferimento
-    def scarto_soglia(self, co2, operazione, prodotto):
-        # repo = ThresholdRepositoryImpl()
-        soglia = self.threshold.get_soglia_by_operazione_and_prodotto(operazione, prodotto)
-        return soglia - float(co2)
 
 
 

@@ -9,10 +9,17 @@ from model.operation_estesa_model import OperazioneEstesaModel
 from model.materia_prima_model import MateriaPrimaModel
 from persistence.query_builder import QueryBuilder
 from persistence.repository_impl.integrity_utils import firma_dati, verifica_firma
+from typing import Final
 
 
 class OperationRepositoryImpl(ABC):
     # Class variable that stores the single instance
+
+    QUERY_UPDATE_AZIENDA : Final = """
+                            UPDATE Azienda  
+                            SET Co2_emessa = Co2_emessa + ?, Token = Token + ?  
+                            WHERE Id_azienda = ?;
+                        """
     
 
     def __init__(self):
@@ -72,14 +79,15 @@ class OperationRepositoryImpl(ABC):
         Inserts a new operation for a retailer and updates the product status in a single transaction.
         """
         try:
-        
+            
+            queries=[]
 
             
             value_output_lotto = self.get_next_id_lotto_output()
             query = "INSERT INTO ComposizioneLotto (id_lotto_output,id_lotto_input, quantità_utilizzata) VALUES (?, ?, ?)"
             params = (value_output_lotto,id_lotto_input,quantita)
 
-            self.db.execute_query(query,params)
+            queries.append((query, params))
             
             query = """
                 INSERT INTO Operazione (Id_azienda, Id_prodotto,Id_lotto, Data_operazione, Consumo_CO2, Tipo,quantita)
@@ -87,7 +95,7 @@ class OperationRepositoryImpl(ABC):
             """
             params = (azienda, prodotto,value_output_lotto, data, co2, evento,quantita)
 
-            self.db.execute_query(query,params)
+            queries.append((query, params))
 
             
 
@@ -96,6 +104,12 @@ class OperationRepositoryImpl(ABC):
             params = (quantita,azienda,id_lotto_input)
 
             self.db.execute_query(query,params)
+
+            
+            value_update= (co2,azienda)
+            queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
+
+            self.db.execute_transaction(queries)
 
         
         except Exception as e:
@@ -110,15 +124,19 @@ class OperationRepositoryImpl(ABC):
         """
         try:
 
+            queries = []
+
             tipo_evento = "produzione"
-            id_lotto = self.get_next_id_lotto_output
+            id_lotto = self.get_next_id_lotto_output()
             query, value = (
                 self.query_builder.table("Operazione")
                 .insert(Id_azienda=azienda, Id_prodotto=id_tipo_prodotto, Data_operazione=data, Consumo_CO2=co2,
                         Tipo=tipo_evento, Id_lotto= id_lotto, quantita=quantita)
                 .get_query()
             )
-            self.db.execute_query(query, value)
+
+            queries.append((query,value))
+            
 
             query, value = (
                 self.query_builder.table("Magazzino")
@@ -126,7 +144,13 @@ class OperationRepositoryImpl(ABC):
                 .get_query()
             )
 
-            self.db.execute_query(query, value)
+            queries.append((query,value))
+
+            
+            value_update= (co2,azienda)
+            queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
+
+            self.db.execute_transaction(queries)
 
             logger.info(f"Operazione registrata con successo.")
             #print(f"la soglia del prod farina è {str(self.recupera_soglia(tipo_evento,id_tipo_prodotto))}")
@@ -139,57 +163,59 @@ class OperationRepositoryImpl(ABC):
         Inserts a new transport operation and updates the product status.
         """
         try:
-            
-            value_output_lotto = self.get_next_id_lotto_output()
 
-            query = "INSERT INTO ComposizioneLotto (id_lotto_output,id_lotto_input, quantità_utilizzata) VALUES (?, ?, ?)"
-            params = (value_output_lotto, id_lotto_input, quantita)  
+            queries = []
 
-            self.db.execute_query(query, params)
-            
-        except Exception as e:
-                    logger.error(f"composizione {e}")
-        try:
 
-            query = "INSERT INTO Operazione (Id_azienda,Id_prodotto,Id_lotto, Quantita, Consumo_CO2, tipo) VALUES (?, ?, ?, ?, ?, ?)"
-            params = (id_azienda_trasporto,id_prodotto, value_output_lotto, quantita, co2_emessa,"trasporto")
+            query = "SELECT quantita FROM Magazzino WHERE id_lotto = ?"
+            params = (id_lotto_input)
 
-            self.db.execute_query(query, params)
-            #self.db.conn.commit()
-            logger.info(f"Operazione di trasporto inserita con successo.")
-
-        except Exception as e:
-                    logger.error(f"composizione {e}")
-        
-        try:
-
-            query = "INSERT INTO Magazzino(id_azienda,id_lotto,quantita) VALUES(?,?,?)"
-            params = (id_azienda_richiedente,value_output_lotto,quantita)
-
-            self.db.execute_query(query, params)
-            #self.db.conn.commit()
-
-        except Exception as e:
-                    logger.error(f"composizione {e}")
-        
-        try:
-            # Verifica quantità disponibile
-            quantita_disponibile = self.db.fetch_one("SELECT quantita FROM Magazzino WHERE id_lotto = ?", (id_lotto_input,))       
+            quantita_disponibile = self.db.fetch_one(query,params)
 
             if quantita_disponibile is None:
                 raise Exception(f"{id_lotto_input} non trovato") 
 
             if quantita_disponibile < quantita:
                 raise Exception( f"Quantità insufficiente: disponibile {quantita_disponibile}, richiesta {quantita}.")
+            
+            
+            value_output_lotto = self.get_next_id_lotto_output()
 
-    # Aggiornamento
-            self.db.execute_query("""
-                UPDATE Magazzino
-                SET quantita = quantita - ?
-                WHERE id_lotto = ?;
-            """, (quantita, id_lotto_input))
+            query = "INSERT INTO ComposizioneLotto (id_lotto_output,id_lotto_input, quantità_utilizzata) VALUES (?, ?, ?)"
+            params = (value_output_lotto, id_lotto_input, quantita)  
 
-            #self.db.conn.commit()
+            queries.append((query,params))
+            
+       
+
+            query = "INSERT INTO Operazione (Id_azienda,Id_prodotto,Id_lotto, Quantita, Consumo_CO2, tipo) VALUES (?, ?, ?, ?, ?, ?)"
+            params = (id_azienda_trasporto,id_prodotto, value_output_lotto, quantita, co2_emessa,"trasporto")
+
+            queries.append((query,params))
+
+            logger.info(f"Operazione di trasporto inserita con successo.")
+
+        
+
+            query = "INSERT INTO Magazzino(id_azienda,id_lotto,quantita) VALUES(?,?,?)"
+            params = (id_azienda_richiedente,value_output_lotto,quantita)
+
+            queries.append((query,params))
+
+            # Aggiornamento
+            query_mag = """UPDATE Magazzino SET quantita = quantita - ? WHERE id_lotto = ?;""" 
+            value_mag = (quantita, id_lotto_input)
+            queries.append((query_mag, value_mag))
+
+            
+            value_update= (co2_emessa,id_azienda_trasporto)
+            queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
+
+
+
+            self.db.execute_transaction(queries)
+
+
             logger.info( f"Aggiornamento riuscito: {quantita} sottratti dal lotto {id_lotto_input}.")
 
         except Exception as e:
@@ -246,12 +272,11 @@ class OperationRepositoryImpl(ABC):
             value = (id_azienda,value_output_lotto,quantita_prodotta)
             queries.append((query_magazzino, value))
 
-            # 3. Esegui la transazione iniziale (prodotti + materie prime)
-            self.db.execute_transaction(queries)
+           
             
 
             # 6. Inserisci operazione di trasformazione
-            query_operazione, value = (
+            query_operazione, value_op = (
                 self.query_builder.
                 table("Operazione")
                 .insert(id_prodotto=id_tipo_prodotto,
@@ -262,11 +287,21 @@ class OperationRepositoryImpl(ABC):
                         quantita = quantita_prodotta)
                 .get_query()
             )
+
+            queries.append((query_operazione, value_op))
+
+            token = self.token_opeazione(co2_consumata,tipo_evento,id_tipo_prodotto)
+
+            value_update= (co2_consumata,token ,id_azienda)
+            queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
+
+            
     
                 
-            self.db.execute_query(query_operazione, value)
+            # 3. Esegui la transazione iniziale (prodotti + materie prime)
+            self.db.execute_transaction(queries)
 
-            #return self.recupera_soglia(tipo_evento ,id_tipo_prodotto)
+            return self.recupera_soglia(tipo_evento ,id_tipo_prodotto)
 
         except sqlite3.IntegrityError as e:
                 print("IntegrityError:", e)
@@ -306,7 +341,6 @@ class OperationRepositoryImpl(ABC):
 
 
 
-
     def recupera_soglia(self, tipo_operazione: str, id_prodotto: int):
         result = self.db.fetch_results("""
             SELECT Operazione, Prodotto, Soglia_Massima, firma FROM Soglie WHERE Operazione = ? AND Prodotto = ?
@@ -328,6 +362,14 @@ class OperationRepositoryImpl(ABC):
             raise ValueError("Dati soglia corrotti o manomessi!")
 
         return soglia_massima
+    
+
+    def token_opeazione(self,co2_consumata :int,tipo_operazione: str, id_prodotto: int) -> float:
+        try:
+             return co2_consumata - self.recupera_soglia(tipo_operazione, id_prodotto)
+        except Exception as e:
+            logger.error(f"Errore nel calcolo dei token {e}")
+            return 0
 
     
             

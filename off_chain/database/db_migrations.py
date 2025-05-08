@@ -49,6 +49,7 @@ class DatabaseMigrations:
                 Indirizzo TEXT NOT NULL,
                 Co2_emessa REAL NOT NULL DEFAULT 0,
                 Co2_compensata REAL NOT NULL DEFAULT 0,
+                Token INTEGER NOT NULL DEFAULT 100,
                 CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (Id_credenziali) REFERENCES Credenziali(Id_credenziali) ON DELETE CASCADE
             )
@@ -204,13 +205,26 @@ class DatabaseMigrations:
             # Seed dei prodotti
             SEED_PRODOTTI = [
                 
-                ("farina", 0),
-                ("zucchero",0),
-                ("impasto",1),
-                ("legumi",0),
-                ("pomodori",1),
-                ("salsa",1),
-                ("pesto",1),
+                ("grano", 0),
+                ("mais", 0),
+                ("soia", 0),
+                ("riso", 0),
+                ("pomodoro", 0),
+                ("latte", 0),
+                ("uova", 0),
+                ("patate", 0),
+                ("mele", 0),
+                ("olive", 0),
+                ("pane", 1),
+                ("farina di grano", 1),
+                ("olio di oliva", 1),
+                ("passata di pomodoro", 1),
+                ("formaggio", 1),
+                ("yogurt", 1),
+                ("conserve di frutta", 1),
+                ("patatine fritte", 1),
+                ("pasta", 1),
+                ("salsa di soia", 1)
                
             ]
 

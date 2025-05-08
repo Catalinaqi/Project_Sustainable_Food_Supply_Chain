@@ -49,7 +49,11 @@ class Session:
                 "id": self._current_user.Id_azienda,
                 "username": self._current_user.Nome,
                 "role": self._current_user.Tipo,
-                "id_azienda" : self._current_user.Id_azienda
+                "id_azienda" : self._current_user.Id_azienda,
+                "co2_consumata" : self._current_user.Co2_consumata,
+                "co2_compensata" : self._current_user.Co2_compensata,
+                "Token": self._current_user.Token
+
                  # Solo info essenziali
             }
         return None

@@ -2,6 +2,7 @@ from configuration.database import Database
 from model.richiesta_model import RichiestaModel
 from persistence.query_builder import QueryBuilder
 from configuration.log_load_setting import logger
+from persistence.repository_impl import db_default_string
 
 
 class RichiesteRepositoryImpl():
@@ -54,7 +55,7 @@ class RichiesteRepositoryImpl():
             if not check_trasporto:
                 self.query_builder.where("r.Id_ricevente", "=", id_azienda)  
             else:
-                self.query_builder.where("r.Stato_ricevente", "=", "Accettata")
+                self.query_builder.where("r.Stato_ricevente", "=", db_default_string.STATO_ACCETTATA)
                 self.query_builder.where("r.Id_trasportatore", "=", id_azienda)
 
             query, value = self.query_builder.get_query()
@@ -73,10 +74,11 @@ class RichiesteRepositoryImpl():
                     SELECT Id_lotto 
                     FROM Operazione 
                     WHERE Id_prodotto = ? 
-                    AND (Tipo = 'produzione' OR Tipo = 'trasformazione')
+                    AND (Tipo = ? OR Tipo = ?)
                     ORDER BY Id_operazione DESC LIMIT 1;
                 """
-                res_lotto = self.db.fetch_one(query_lotto, (id_prodotto,))
+                res_lotto = self.db.fetch_one(query_lotto, (id_prodotto,db_default_string.TIPO_OP_PRODUZIONE,
+                                                            db_default_string.TIPO_OP_TRASFORMAZIONE))
                 id_lotto = res_lotto if res_lotto is not None else None
 
                 risultati.append(RichiestaModel(*r, id_lotto))
@@ -126,10 +128,10 @@ class RichiesteRepositoryImpl():
                 query_lotto = """
                     SELECT Id_lotto 
                     FROM Operazione 
-                    WHERE Id_prodotto = ? AND Tipo != 'trasporto'
+                    WHERE Id_prodotto = ? AND Tipo != ?
                     ORDER BY Id_operazione DESC LIMIT 1;
                 """
-                res_lotto = self.db.fetch_one(query_lotto, (id_prodotto,))
+                res_lotto = self.db.fetch_one(query_lotto, (id_prodotto,db_default_string.TIPO_OP_TRASPORTO))
                 id_lotto = res_lotto if res_lotto is not None else None
 
                 risultati.append(RichiestaModel(*r, id_lotto))
@@ -146,11 +148,11 @@ class RichiesteRepositoryImpl():
         Aggiorna lo stato di una richiesta.
         """
         self.query_builder.table("Richiesta").where("Id_richiesta", "=", id_richiesta)
-        if azienda_role == "Trasportatore":
+        if azienda_role == db_default_string.TIPO_AZIENDA_TRASPORTATORE:
             self.query_builder.update(
                 Stato_trasportatore=nuovo_stato
             )
-        elif azienda_role == "Agricola" or azienda_role == "Trasformatore":
+        elif azienda_role == db_default_string.TIPO_AZIENDA_AGRICOLA or azienda_role == db_default_string.TIPO_AZIENDA_TRASFORMATORE:
             self.query_builder.update(
                 Stato_ricevente=nuovo_stato
             )

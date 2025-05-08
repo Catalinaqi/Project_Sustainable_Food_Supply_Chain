@@ -11,7 +11,7 @@ class Database:
         if cls._instance is None:
             cls._instance = super(Database, cls).__new__(cls)
             try:
-                conn = sqlite3.connect(DATABASE_PATH)  # Connessione al database
+                conn = sqlite3.connect(DATABASE_PATH, timeout= 10)  # Connessione al database
                 cls._instance.conn = conn  # Memorizza la connessione nell'istanza
                 cls._instance.cur = conn.cursor()  # Cursore
                 logger.info(f"BackEnd: get_connection: Name database is: {os.path.basename(DATABASE_PATH)}")
@@ -40,7 +40,10 @@ class Database:
         except sqlite3.IntegrityError:
             print("Errore: Violazione di vincolo di unicità.")
         except sqlite3.OperationalError as e:
-            print(f"Errore SQL: {e}")
+            if "locked" in str(e).lower():
+                logger.error(f"Database bloccato (timeout raggiunto?): {e}")
+            else:
+                print(f"Errore SQL: {e}")
         except sqlite3.Error as e:
             print(f"Errore generico nel database: {e}")
 
@@ -52,6 +55,12 @@ class Database:
         try:
             cls._instance.cur.execute(query, params)
             return cls._instance.cur.fetchall()
+        
+        except sqlite3.OperationalError as e:
+            if "locked" in str(e).lower():
+                logger.error(f"Database bloccato (timeout raggiunto?): {e}")
+            else:
+                print(f"Errore SQL: {e}")
         except sqlite3.Error as e:
             print(f"Errore nella query: {e}")
             return None
@@ -64,6 +73,11 @@ class Database:
             self.cur.execute(query, params)
             result = self.cur.fetchone()
             return result[0] if result else None  # Restituisce il valore o None se non ci sono risultati
+        except sqlite3.OperationalError as e:
+            if "locked" in str(e).lower():
+                logger.error(f"Database bloccato (timeout raggiunto?): {e}")
+            else:
+                print(f"Errore SQL: {e}")
         except sqlite3.Error as e:
             print(f"Errore nella query: {e}")
             return None
@@ -87,6 +101,13 @@ class Database:
                 self.cur.execute(query, params)
 
             self.conn.commit()  # Commit di tutte le modifiche
+        except sqlite3.OperationalError as e:
+            if "locked" in str(e).lower():
+                logger.error(f"Database bloccato (timeout raggiunto?): {e}")
+                self.conn.rollback()  # Rollback in caso di errore
+                raise Exception(f"Transaction error: {e}")
+            else:
+                print(f"Errore SQL: {e}")
         except Exception as e:
             self.conn.rollback()  # Rollback in caso di errore
             raise Exception(f"Transaction error: {e}")

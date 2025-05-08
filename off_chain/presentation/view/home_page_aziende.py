@@ -150,7 +150,7 @@ class HomePage(QMainWindow):
         self.vista_magazzino.show()
 
     def show_stato(self):
-        self.vista_stato = VistaStatoAzienda(self.aggiorna_profilo, self.utente, self.controller)
+        self.vista_stato = VistaStatoAzienda(self.aggiorna_profilo)
         self.vista_stato.show()
 
     def show_richieste(self):

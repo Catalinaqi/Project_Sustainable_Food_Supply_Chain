@@ -15,5 +15,7 @@ class CompanyModel:
     Indirizzo: str
     Co2_consumata: Optional[float] = None
     Co2_compensata: Optional[float] = None
+    Token : int = 0
     data : datetime = None
+
 

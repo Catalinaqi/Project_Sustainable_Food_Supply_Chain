@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, QFormLay
 
 from presentation.controller.company_controller import ControllerAzienda
 from presentation.view import funzioni_utili
+from persistence.repository_impl import db_default_string
 
 
 def operazioni(tipo):

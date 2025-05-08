@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QListView
 
 from presentation.controller.guest_controller import ControllerGuest
 from presentation.view import funzioni_utili
+from persistence.repository_impl import db_default_string
 
 
 class VistaAziende(QMainWindow):
