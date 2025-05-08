@@ -276,7 +276,7 @@ class VistaAccedi(QMainWindow):
                 self.setVisible(False)  # Nascondi la finestra di login
         except ToManyTryLogEXcepition as e : 
             QMessageBox.warning(self,"SupplyChain",f"{e}")
-        except LoginFailExetion:
+        except LoginFailExetion as e:
             QMessageBox.warning(self, "SupplyChain", f"{e}")
         except Exception as e:
             pass
