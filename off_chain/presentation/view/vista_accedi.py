@@ -38,7 +38,7 @@ class VistaAccedi(QMainWindow):
         self.register_label = QLabel("Registrati")
         self.stacked_widget = QStackedWidget()
 
-        self.username_label = QLabel('Nome Azienda:')
+        self.username_label = QLabel('Nome Utente:')
         self.username_input = QLineEdit()
         self.password_label = QLabel('Password:')
         self.password_input = QLineEdit()
