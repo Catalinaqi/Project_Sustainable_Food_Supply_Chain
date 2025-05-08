@@ -16,6 +16,7 @@ class Session:
         self.session_start_time = None
         self.session_timeout = 3600
         self.session_token = None
+        self.tentativi = 0
 
     def start_session(self, user_data: CompanyModel):
         """Avvia una nuova sessione"""
@@ -31,6 +32,14 @@ class Session:
         self.logged_in = False
         self.session_start_time = None
         self.session_token = None
+
+    def add_try(self):
+        self.tentativi += 1
+        
+    def can_log(self)->bool:
+       if self.tentativi <= 5:
+           return True
+       return False
 
     def is_authenticated(self):
         """Verifica se la sessione è ancora valida"""

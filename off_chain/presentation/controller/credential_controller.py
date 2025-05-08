@@ -2,6 +2,7 @@ import pyotp
 from configuration.log_load_setting import logger
 from domain.exception.authentication_exceptions import PasswordTooShortError, PasswordWeakError
 from domain.exception.database_exceptions import UniqueConstraintError, DatabaseError
+from domain.exception.login_exceptions import ToManyTryLogEXcepition , LoginFailExetion
 from persistence.repository_impl.credential_repository_impl import CredentialRepositoryImpl
 from session import Session
 from model.company_model import CompanyModel
@@ -12,6 +13,7 @@ class ControllerAutenticazione:
     def __init__(self):
         self.credential = CredentialRepositoryImpl()
         logger.info("BackEnd: Successful initialization of 'class instances' for repository implements")
+        self.sessione = Session()
 
     # Effettua la registrazione
     def registrazione(self, username, password, tipo, indirizzo):
@@ -38,26 +40,22 @@ class ControllerAutenticazione:
     # Effettua il login
     def login(self, username, password, otp_code=None):
         try:
-            # repo = CredentialRepositoryImpl()
+
+            if not self.sessione.can_log():
+                raise ToManyTryLogEXcepition()
+
+
             credenziali = self.credential.get_user(username)
             logger.info(f"Username inserito: {username}, Password inserita: {password}")
-            logger.info(f"Credenziali recuperate: {credenziali}")
         except Exception as e:
             logger.warning(f"Errore durante il recupero delle credenziali: {str(e)}")
             return
 
         if credenziali is not None :
             if credenziali.Password == password :
-                """# Verifica il codice OTP (se presente)
-                    if otp_code:
-                        totp = pyotp.TOTP(secret_key)
-                        if not totp.verify(otp_code):  # Verifica se l'OTP è corretto
-                            print('errore')
-                            return None  # Se l'OTP non è valido, ritorna None"""
                 try:
                     azienda = self.credential.get_azienda_by_id(credenziali.Id_credential)
-                    sessione = Session()
-                    sessione.start_session(azienda)
+                    self.sessione.start_session(azienda)
                     logger.info(f"Username {username} ha eseguito l'accesso")
 
                 except Exception as e:
@@ -68,7 +66,8 @@ class ControllerAutenticazione:
                 return True
             
         else:
+            self.sessione.add_try()
             logger.info(f"Tentativo di login fallito")
-            return False
+            raise LoginFailExetion()
 
             

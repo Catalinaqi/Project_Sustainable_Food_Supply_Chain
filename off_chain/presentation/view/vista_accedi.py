@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtWidgets import QWidget, QFormLayout, QHBoxLayout, QMainWindow, QAction, QCheckBox, QStackedWidget, \
     QComboBox
+from domain.exception.login_exceptions import LoginFailExetion, ToManyTryLogEXcepition
 from presentation.controller.credential_controller import ControllerAutenticazione
 from presentation.view import funzioni_utili
 from presentation.view.home_page_aziende import HomePage
@@ -256,12 +257,17 @@ class VistaAccedi(QMainWindow):
         password = self.password_input.text()
         otp_code = self.otp_input.text()
 
+        try:
         # Verifica le credenziali dell'utente
-        utente = self.controller.login(username, password, otp_code)
-
-        if not utente:
+            utente = self.controller.login(username, password, otp_code)
+        except ToManyTryLogEXcepition : 
+            pass
+        except LoginFailExetion:
             QMessageBox.warning(self, "SupplyChain", "Credenziali o codice OTP errati!")
-        else:
+        except Exception as e:
+            pass
+
+        if  utente:
             QMessageBox.information(self, "SupplyChain", "Accesso effettuato correttamente!")
 
             # Procedi con il resto del login come prima
