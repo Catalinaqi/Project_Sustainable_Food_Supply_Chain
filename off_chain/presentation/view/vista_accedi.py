@@ -260,26 +260,26 @@ class VistaAccedi(QMainWindow):
         try:
         # Verifica le credenziali dell'utente
             utente = self.controller.login(username, password, otp_code)
-        except ToManyTryLogEXcepition : 
-            pass
+        
+
+            if  utente:
+                QMessageBox.information(self, "SupplyChain", "Accesso effettuato correttamente!")
+
+                # Procedi con il resto del login come prima
+                if Session().current_user["role"] == 'Certificatore':
+                    self.home_certificatore = HomePageCertificatore(self.reset)
+                    self.home_certificatore.show()
+                else:
+                    self.home_page = HomePage(self.reset, utente)
+                    self.home_page.show()
+
+                self.setVisible(False)  # Nascondi la finestra di login
+        except ToManyTryLogEXcepition as e : 
+            QMessageBox.warning(self,"SupplyChain",f"{e}")
         except LoginFailExetion:
-            QMessageBox.warning(self, "SupplyChain", "Credenziali o codice OTP errati!")
+            QMessageBox.warning(self, "SupplyChain", f"{e}")
         except Exception as e:
             pass
-
-        if  utente:
-            QMessageBox.information(self, "SupplyChain", "Accesso effettuato correttamente!")
-
-            # Procedi con il resto del login come prima
-            if Session().current_user["role"] == 'Certificatore':
-                self.home_certificatore = HomePageCertificatore(self.reset)
-                self.home_certificatore.show()
-            else:
-                self.home_page = HomePage(self.reset, utente)
-                self.home_page.show()
-
-            self.setVisible(False)  # Nascondi la finestra di login
-
     '''
     Allow the user to enter as a guest
     '''
