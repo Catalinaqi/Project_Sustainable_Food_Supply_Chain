@@ -17,20 +17,10 @@ class ThresholdRepositoryImpl(ABC):
         self.query_builder = QueryBuilder()
    
 
-    def get_lista_soglie(self, tipo_azienda : str) -> list[ThresholdModel]:
-            self.query_builder.select("*").table("Soglie")
-
-
-            #TODO aggiungere stringhe giuste
-            if tipo_azienda == db_default_string.TIPO_AZIENDA_AGRICOLA:
-                self.query_builder.where("Operazione", "=", db_default_string.TIPO_OP_PRODUZIONE)
-                self.query_builder.where("Tipo", "=", "materia prima")
-            elif tipo_azienda == db_default_string.TIPO_AZIENDA_TRASFORMATORE:
-                self.query_builder.where("Tipo", "=", "prodotto finale")
-            elif tipo_azienda == db_default_string.TIPO_AZIENDA_TRASPORTATORE:
-                self.query_builder.where("Tipo", "=", "trasporto")
-            else:
-                logger.error("Tipo di azienda non valido") 
+    def get_lista_soglie(self) -> list[ThresholdModel]:
+            self.query_builder.select("P.Nome","Soglia_Massima","Operazione").table("Soglie") \
+                            .join("Prodotto AS P","P.Id_prodotto", "Prodotto")
+      
                 
             query, value = (self.query_builder.get_query() )
 

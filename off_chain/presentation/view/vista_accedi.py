@@ -320,21 +320,7 @@ class VistaAccedi(QMainWindow):
                 )
                 if success:
                     QMessageBox.information(self, "Successo", message)
-
-                    # Mostra il dialogo per inserire il codice OTP
-                    while True:  # Ciclo che ripete il dialogo finché il codice OTP non è corretto
-                        dialog = SecretKeyDialog(secret_key)
-                        dialog.exec_()
-
-                        # Se l'OTP è corretto
-                        if dialog.result() == QDialog.Accepted:
-                            self.reset()
-                            self.switch_section(Qt.Unchecked)
-                            self.section_switcher.setChecked(False)
-                            break  # Esci dal ciclo, registrazione completata
-                        else:
-                            # Se il codice OTP è errato, mostra un messaggio di errore
-                            QMessageBox.warning(self, "Errore", "OTP errato, riprova.")
+                    self.reset()
                 else:
                     QMessageBox.warning(self, "Errore", message)
 
@@ -401,14 +387,6 @@ class SecretKeyDialog(QDialog):
 
         # Convalida del codice OTP mentre viene inserito
         self.otp_input.textChanged.connect(self.check_otp)
-
-    def check_otp(self):
-        """Verifica che l'OTP inserito sia corretto e abilita il pulsante di conferma"""
-        otp_code = self.otp_input.text()
-        if self.totp.verify(otp_code):
-            self.confirm_button.setEnabled(True)  # Abilita il pulsante se il codice è valido
-        else:
-            self.confirm_button.setEnabled(False)  # Mantieni il pulsante disabilitato se il codice non è valido
 
     def confirm_secret_key(self):
         """Procedi con la registrazione se il codice OTP è corretto"""

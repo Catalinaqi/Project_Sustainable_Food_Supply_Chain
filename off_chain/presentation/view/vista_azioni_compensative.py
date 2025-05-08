@@ -7,7 +7,7 @@ from presentation.controller.company_controller import ControllerAzienda
 from presentation.view import funzioni_utili
 from presentation.view.inserisci_azione import VistaInserisciAzione
 
-
+"eliminabile"
 class VistaAzioniCompensative(QMainWindow):
     def __init__(self):
         super().__init__()

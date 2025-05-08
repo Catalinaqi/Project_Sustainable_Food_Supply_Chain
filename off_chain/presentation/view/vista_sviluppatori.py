@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGridLayo
 
 from presentation.view import funzioni_utili
 
-
+"eliminabile"
 class VistaSviluppatori(QMainWindow):
     def __init__(self):
         super().__init__()

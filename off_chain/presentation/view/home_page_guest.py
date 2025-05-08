@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QGridLayo
 from presentation.view.vista_prodotti_guest import ProdottiFinitiView
 from presentation.controller.guest_controller import ControllerGuest
 from presentation.view import funzioni_utili
-from presentation.view.vista_aziende import VistaAziende
 
 
 class HomePageGuest(QMainWindow):
@@ -46,8 +45,7 @@ class HomePageGuest(QMainWindow):
         # Elementi di layout
         self.logo = QLabel()
         self.button_prodotti = QPushButton('Ricerca prodotti')
-        self.button_aziende = QPushButton('Aziende')
-        self.button_certificazioni = QPushButton('Prodotti certificati')
+    
 
         self.init_ui()
 
@@ -70,14 +68,8 @@ class HomePageGuest(QMainWindow):
         button_layout = QGridLayout()
         button_layout.setSpacing(1)
 
-        funzioni_utili.insert_button_in_grid(self.button_prodotti, button_layout, 1, 2)
+        funzioni_utili.insert_button_in_grid(self.button_prodotti, button_layout, 2, 2)
         self.button_prodotti.clicked.connect(self.lista_prodotti_clicked)
-
-        funzioni_utili.insert_button_in_grid(self.button_aziende, button_layout, 1, 4)
-        self.button_aziende.clicked.connect(self.show_aziende)
-
-        funzioni_utili.insert_button_in_grid(self.button_certificazioni, button_layout, 5, 2)
-        self.button_certificazioni.clicked.connect(self.show_certificati)
 
 
         funzioni_utili.insert_logo(self.logo, button_layout, QPixmap("presentation\\resources\\logo_centro.png"))
@@ -118,10 +110,3 @@ class HomePageGuest(QMainWindow):
     def lista_prodotti_clicked(self):
         self.vista_prodotti = ProdottiFinitiView()
         self.vista_prodotti.show()
-
-    def show_aziende(self):
-        self.vista_aziende = VistaAziende()
-        self.vista_aziende.show()
-
-    def show_certificati(self):
-        self.vista_prodotti_certificati.show()

@@ -136,5 +136,5 @@ class HomePageCertificatore(QMainWindow):
         self.vista_soglie.show()
 
     def show_azienda(self):
-        self.vista_azienda = VistaStatoAzienda(self.aggiorna_profilo, self.utente,self.controller, True)
+        self.vista_azienda = VistaStatoAzienda(self.aggiorna_profilo)
         self.vista_azienda.show()

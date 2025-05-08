@@ -10,11 +10,8 @@ from presentation.view.vista_magazzino import VisualizzaMagazzinoView
 from presentation.controller.company_controller import ControllerAzienda
 from presentation.view import funzioni_utili
 from presentation.view.vista_stato_azienda import VistaStatoAzienda
-from presentation.view.vista_azioni_compensative import VistaAzioniCompensative
 from presentation.view.vista_operazioni_azienda import OperazioniAziendaView
 from presentation.view.vista_azioni_compensative_azienda import AzioniAziendaView
-from presentation.view.vista_soglie import VistaSoglie
-from presentation.view.vista_sviluppatori import VistaSviluppatori
 from session import Session
 from presentation.view.vista_soglie_azienda import SoglieAziendaView
 

@@ -52,9 +52,9 @@ class ControllerAzienda:
 
     # Restituisce tutte le soglie
 
-    def lista_soglie(self, tipo_azienda: str) -> list[ThresholdModel]:
+    def lista_soglie(self) -> list[ThresholdModel]:
         # repo = ThresholdRepositoryImpl()
-        lista_soglie = self.threshold.get_lista_soglie(tipo_azienda=tipo_azienda)
+        lista_soglie = self.threshold.get_lista_soglie()
         return lista_soglie
 
         # Restituisce il dettaglio della soglia selezionata dato l'indice n    def get_dettaglio_soglia(self, n):

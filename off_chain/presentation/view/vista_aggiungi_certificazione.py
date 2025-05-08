@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QListWidget, QListWidgetItem,
     QLineEdit, QPushButton, QMessageBox
 )
-from PyQt5.QtCore import Qt
 from presentation.controller.certification_controller import ControllerCertificatore
 
 
