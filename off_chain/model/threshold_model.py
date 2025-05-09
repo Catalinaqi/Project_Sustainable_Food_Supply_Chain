@@ -9,3 +9,4 @@ class ThresholdModel:
     Prodotto: str
     Soglia_Massima: float
     Tipo: str
+    

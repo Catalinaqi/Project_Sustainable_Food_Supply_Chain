@@ -69,5 +69,13 @@ class ControllerAutenticazione:
             self.sessione.add_try()
             logger.info(f"Tentativo di login fallito")
             raise LoginFailExetion()
+        
+
+    def get_user(self) -> CompanyModel:
+        try:
+             return self.credential.get_azienda_by_id(Session().current_user["id_azienda"])
+        except Exception as e:
+            logger.error(f"Errore nel'ottenimento del utente {e}")
+            raise Exception(f"{e}")
 
             

@@ -8,9 +8,24 @@ from model.operation_model import OperationModel
 from model.operation_estesa_model import OperazioneEstesaModel
 from model.materia_prima_model import MateriaPrimaModel
 from persistence.query_builder import QueryBuilder
-from persistence.repository_impl.integrity_utils import firma_dati, verifica_firma
 from typing import Final
+from pydantic import BaseModel
+import hmac
+import hashlib
+import os
+from persistence.repository_impl import db_default_string
 
+
+class FirmaRequest(BaseModel):
+    tipo_operazione: str
+    id_prodotto: int
+    soglia_massima: int
+
+class VerificaRequest(FirmaRequest):
+    signature: str
+
+
+SECRET_KEY = os.getenv("_KEY", "default_dev_key")
 
 class OperationRepositoryImpl(ABC):
     # Class variable that stores the single instance
@@ -105,8 +120,9 @@ class OperationRepositoryImpl(ABC):
 
             self.db.execute_query(query,params)
 
-            
-            value_update= (co2,0,azienda)
+            token_assegnati = self.token_opeazione(co2,evento,prodotto)
+
+            value_update= (co2,token_assegnati,azienda)
             queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
 
             self.db.execute_transaction(queries)
@@ -126,7 +142,7 @@ class OperationRepositoryImpl(ABC):
 
             queries = []
 
-            tipo_evento = "produzione"
+            tipo_evento = db_default_string.TIPO_OP_PRODUZIONE
             id_lotto = self.get_next_id_lotto_output()
             query, value = (
                 self.query_builder.table("Operazione")
@@ -146,8 +162,9 @@ class OperationRepositoryImpl(ABC):
 
             queries.append((query,value))
 
+            token_assegnati = self.token_opeazione(co2,tipo_evento,id_tipo_prodotto)
             
-            value_update= (co2,0,azienda,)
+            value_update= (co2,token_assegnati,azienda,)
             queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
 
             self.db.execute_transaction(queries)
@@ -163,6 +180,8 @@ class OperationRepositoryImpl(ABC):
         Inserts a new transport operation and updates the product status.
         """
         try:
+
+            evento = db_default_string.TIPO_OP_TRASPORTO
 
             queries = []
 
@@ -189,7 +208,7 @@ class OperationRepositoryImpl(ABC):
        
 
             query = "INSERT INTO Operazione (Id_azienda,Id_prodotto,Id_lotto, Quantita, Consumo_CO2, tipo) VALUES (?, ?, ?, ?, ?, ?)"
-            params = (id_azienda_trasporto,id_prodotto, value_output_lotto, quantita, co2_emessa,"trasporto")
+            params = (id_azienda_trasporto,id_prodotto, value_output_lotto, quantita, co2_emessa,evento)
 
             queries.append((query,params))
 
@@ -208,7 +227,9 @@ class OperationRepositoryImpl(ABC):
             queries.append((query_mag, value_mag))
 
             
-            value_update= (co2_emessa,0,id_azienda_trasporto)
+            token_assegnati = self.token_opeazione(co2_emessa,evento,id_prodotto)
+
+            value_update= (co2_emessa,token_assegnati,id_azienda_trasporto)
             queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
 
 
@@ -292,7 +313,7 @@ class OperationRepositoryImpl(ABC):
 
             token = self.token_opeazione(co2_consumata,tipo_evento,id_tipo_prodotto)
 
-            value_update= (co2_consumata,token ,0,id_azienda)
+            value_update= (co2_consumata,token ,token,id_azienda)
             queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
 
             
@@ -324,52 +345,51 @@ class OperationRepositoryImpl(ABC):
 
     
 
-    def salva_soglia(self,tipo_operazione: str, id_prodotto: int, soglia_massima: int):
-        payload = {
-            "tipo_operazione": tipo_operazione,
-            "id_prodotto": id_prodotto,
-            "soglia_massima": soglia_massima,
-            
-        }
+    def token_opeazione(self,co2_consumata :int,tipo_operazione: str, id_prodotto: int) -> int:
+        try:
+             return  self.recupera_soglia(tipo_operazione, id_prodotto) - co2_consumata
+        except Exception as e:
+            logger.error(f"Errore nel calcolo dei token {e}")
+            return 0
+        
 
-        firma = firma_dati(payload)
-
-        # Salva su DB insieme alla firma
-        self.db.execute_query("""
-            INSERT INTO Soglie (Operazione,Prodotto, Soglia_Massima, firma) VALUES (?, ?, ?, ?)
-        """, (tipo_operazione, id_prodotto, soglia_massima, firma))
-
-
-
-    def recupera_soglia(self, tipo_operazione: str, id_prodotto: int):
+    def recupera_soglia(self, tipo_operazione: str, id_prodotto: int) ->int:
         result = self.db.fetch_results("""
             SELECT Operazione, Prodotto, Soglia_Massima, firma FROM Soglie WHERE Operazione = ? AND Prodotto = ?
         """, (tipo_operazione, id_prodotto))
 
         if not result:
             raise ValueError("Soglia non trovata.")
+        
 
         tipo_operazione, id_prodotto, soglia_massima, firma = result[0]
         
         # Assicurati che i tipi siano coerenti con quelli usati nella firma originale
-        payload = {
+        payload : dict = {
             "tipo_operazione": tipo_operazione,
             "id_prodotto": id_prodotto,
             "soglia_massima": soglia_massima,
+    
         }
 
-        if not verifica_firma(payload, signature=firma):
+        logger.info(f"{firma}")
+
+        if not self.verifica_dati(payload,firma):
             raise ValueError("Dati soglia corrotti o manomessi!")
 
         return soglia_massima
+        
+
+    def verifica_dati(self,payload : dict,signature : str):
+        raw_string = f"{payload['tipo_operazione']}|{payload['id_prodotto']}|{payload['soglia_massima']}"
+        expected_signature = hmac.new(SECRET_KEY.encode(), raw_string.encode(), hashlib.sha256).hexdigest()
+
+        if not hmac.compare_digest(expected_signature, signature):
+            return False
+        
+        return True
     
 
-    def token_opeazione(self,co2_consumata :int,tipo_operazione: str, id_prodotto: int) -> float:
-        try:
-             return co2_consumata - self.recupera_soglia(tipo_operazione, id_prodotto)
-        except Exception as e:
-            logger.error(f"Errore nel calcolo dei token {e}")
-            return 0
 
     
             

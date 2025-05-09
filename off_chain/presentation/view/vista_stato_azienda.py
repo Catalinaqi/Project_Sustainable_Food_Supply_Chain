@@ -3,8 +3,10 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, QFormLayout, QLineEdit,
                              QHBoxLayout, QPushButton, QMessageBox)
 
+from model.company_model import CompanyModel
 from session import Session
 from presentation.view import funzioni_utili
+from presentation.controller.credential_controller import ControllerAutenticazione
 
 
 class VistaStatoAzienda(QMainWindow):
@@ -12,26 +14,28 @@ class VistaStatoAzienda(QMainWindow):
         super().__init__()
 
         self.callback = callback
+        self.controller = ControllerAutenticazione()
+        azienda : CompanyModel = self.controller.get_user()
         
 
         # Elementi di layout
         self.id_azienda_label = QLabel("ID")
-        self.id_azienda_input = QLineEdit(str(Session().current_user["id_azienda"]))
+        self.id_azienda_input = QLineEdit(str(azienda.Id_azienda))
 
         self.nome_label = QLabel("Nome")
-        self.nome_input = QLineEdit(str(Session().current_user["username"]))
+        self.nome_input = QLineEdit(str(azienda.Nome))
 
         self.tipo_label = QLabel("Tipo")
-        self.tipo_input = QLineEdit(str(Session().current_user["role"]))
+        self.tipo_input = QLineEdit(str(azienda.Tipo))
 
         self.co2_consumata_totale_label = QLabel("CO2 consumata totale")
-        self.co2_consumata_totale_input = QLineEdit(str((Session().current_user["co2_consumata"])))
+        self.co2_consumata_totale_input = QLineEdit(str(azienda.Co2_consumata))
 
         self.co2_risparmiata_totale_label = QLabel("CO2 risparmiata totale")
-        self.co2_risparmiata_totale_input = QLineEdit(str((Session().current_user["co2_compensata"]))) 
+        self.co2_risparmiata_totale_input = QLineEdit(str(azienda.Co2_compensata)) 
 
         self.token_label = QLabel("Token accumulati")
-        self.token_label_input = QLineEdit(str((Session().current_user["Token"]))) 
+        self.token_label_input = QLineEdit(str(azienda.Token)) 
 
         self.conferma_button = QPushButton('Conferma modifiche')
 
