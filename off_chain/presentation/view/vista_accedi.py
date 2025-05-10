@@ -42,7 +42,6 @@ class VistaAccedi(QMainWindow):
         self.username_input = QLineEdit()
         self.password_label = QLabel('Password:')
         self.password_input = QLineEdit()
-        self.otp_label = QLabel("Codice OTP")
         self.otp_input = QLineEdit()
         self.login_button = QPushButton('Accedi')
         self.guest_button = QPushButton('Entra come guest')
@@ -152,9 +151,6 @@ class VistaAccedi(QMainWindow):
         funzioni_utili.add_field_to_form(
             self.password_label, self.password_input, form_layout)
 
-        funzioni_utili.add_field_to_form(
-            self.otp_label, self.otp_input, form_layout
-        )
 
         main_layout.addLayout(form_container)
 
@@ -255,11 +251,10 @@ class VistaAccedi(QMainWindow):
     def accedi(self):
         username = self.username_input.text()
         password = self.password_input.text()
-        otp_code = self.otp_input.text()
 
         try:
         # Verifica le credenziali dell'utente
-            utente = self.controller.login(username, password, otp_code)
+            utente = self.controller.login(username, password)
         
 
             if  utente:
