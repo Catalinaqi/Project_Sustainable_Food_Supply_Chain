@@ -2,7 +2,6 @@ import datetime
 from abc import ABC
 from configuration.database import Database
 from configuration.log_load_setting import logger
-from domain.repository.compensation_action_repository import CompensationActionRepository
 from persistence.query_builder import QueryBuilder
 from model.compensation_action_model import CompensationActionModel
 
@@ -18,31 +17,36 @@ class CompensationActionRepositoryImpl( ABC):
 
 
     def get_lista_azioni(self, id_azienda: int,  data_start: datetime = None, data_end: datetime = None, ordinamento: str = None) -> list[CompensationActionModel]:
+        try:
 
-        self.query_builder.select("Id_azione","Id_azienda","Data","Co2_compensata","Nome_azione").table("Azioni_compensative").where("Id_azienda", "=", id_azienda)
 
-        if data_start and data_end:
-            self.query_builder.where("Data", ">", data_start).where("Data", "<", data_end)
-            
-        if ordinamento:
-            self.query_builder.order_by("Co2_compensata", "DESC")
+            self.query_builder.select("Id_azione","Id_azienda","Data","Co2_compensata","Nome_azione").table("Azioni_compensative").where("Id_azienda", "=", id_azienda)
 
-        query,value = (
-            self.query_builder.get_query()
-        )
-        results = self.db.fetch_results(query, value)
-        lista_op= [
-                CompensationActionModel(
-                    Id_azione=row[0],
-                    Id_azienda=row[1],
-                    Data_azione=row[2],
-                    Co2_compensata=row[3],
-                    Nome_azione=row[4],               
+            if data_start and data_end:
+                self.query_builder.where("Data", ">", data_start).where("Data", "<", data_end)
+                
+            if ordinamento:
+                self.query_builder.order_by("Co2_compensata", "DESC")
+
+            query,value = (
+                self.query_builder.get_query()
             )
-            for row in results
-            ]
+            results = self.db.fetch_results(query, value)
+            lista_op= [
+                    CompensationActionModel(
+                        Id_azione=row[0],
+                        Id_azienda=row[1],
+                        Data_azione=row[2],
+                        Co2_compensata=row[3],
+                        Nome_azione=row[4],               
+                )
+                for row in results
+                ]
 
-        return lista_op
+            return lista_op
+        except Exception as e:
+            logger.error(f"Errore nel recuero delle azioni compensative: {e}")
+            return []
     
 
     def get_co2_compensata(self, id_azienda: int) -> float:
@@ -58,20 +62,26 @@ class CompensationActionRepositoryImpl( ABC):
             raise ValueError
 
     def inserisci_azione(self, data: datetime, azienda: int, co2_compensata: str, nome_azione: str):
+        try:
 
-        queries = []
-        query_azione = """
-        INSERT INTO Azioni_compensative (Data, Id_azienda, Co2_compensata, Nome_azione)
-        VALUES (?, ?, ?, ?);
-        """
-        value_azione =(data,azienda,co2_compensata, nome_azione)
-        queries.append((query_azione, value_azione))
+            queries = []
+            query_azione = """
+            INSERT INTO Azioni_compensative (Data, Id_azienda, Co2_compensata, Nome_azione)
+            VALUES (?, ?, ?, ?);
+            """
+            value_azione =(data,azienda,co2_compensata, nome_azione)
+            queries.append((query_azione, value_azione))
 
-        query_update_azienda=""" UPDATE Azienda  SET Co2_compensata = Co2_compensata + ? 
-        WHERE Id_azienda = ?;"""
-        value_update= (co2_compensata,azienda)
-        queries.append((query_update_azienda, value_update))
+            query_update_azienda=""" UPDATE Azienda  SET Co2_compensata = Co2_compensata + ? 
+            WHERE Id_azienda = ?;"""
+            value_update= (co2_compensata,azienda)
+            queries.append((query_update_azienda, value_update))
 
 
-        return self.db.execute_transaction(queries)
+            self.db.execute_transaction(queries)
+            logger.info("Azione compensativa aggiunta con successo")
+
+        except Exception as e:
+            logger.error(f"Errore nel inserimento di una azione compensativa {e}")
+            raise Exception(f"{e}")
 

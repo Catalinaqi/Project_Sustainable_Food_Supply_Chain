@@ -1,8 +1,6 @@
 import datetime
 from configuration.log_load_setting import logger
-from model.operation_model import OperationModel
 from model.threshold_model import ThresholdModel
-from model.product_model import ProductModel
 from model.materia_prima_model import MateriaPrimaModel
 from model.info_product_for_choice_model import ProductForChoiceModel
 from model.product_standard_model import ProductStandardModel
@@ -13,7 +11,6 @@ from persistence.repository_impl.compensation_action_repository_impl import Comp
 from persistence.repository_impl.operation_repository_impl import OperationRepositoryImpl
 from persistence.repository_impl.product_repository_impl import ProductRepositoryImpl
 from configuration.log_load_setting import logger
-from persistence.repository_impl.composition_repository_impl import CompositionRepositoryImpl
 from model.company_model import CompanyModel
 from model.operation_estesa_model import OperazioneEstesaModel
 from model.compensation_action_model import CompensationActionModel

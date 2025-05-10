@@ -14,6 +14,7 @@ from presentation.view.vista_operazioni_azienda import OperazioniAziendaView
 from presentation.view.vista_azioni_compensative_azienda import AzioniAziendaView
 from session import Session
 from presentation.view.vista_soglie_azienda import SoglieAziendaView
+from persistence.repository_impl import db_default_string 
 
 
 class HomePage(QMainWindow):
@@ -86,9 +87,10 @@ class HomePage(QMainWindow):
         funzioni_utili.center(self)
 
     def setup_buttons(self, layout):
-        self.button_operazioni = QPushButton('Operazioni')
-        self.button_operazioni.clicked.connect(self.show_operazioni)
-        funzioni_utili.insert_button_in_grid(self.button_operazioni, layout, 1, 2)
+        if Session().current_user["role"] != db_default_string.TIPO_AZIENDA_CERTIFICATORE:
+            self.button_operazioni = QPushButton('Operazioni')
+            self.button_operazioni.clicked.connect(self.show_operazioni)
+            funzioni_utili.insert_button_in_grid(self.button_operazioni, layout, 1, 2)
 
         self.button_azioni_compensative = QPushButton('Azioni compensative')
         self.button_azioni_compensative.clicked.connect(self.show_azioni)

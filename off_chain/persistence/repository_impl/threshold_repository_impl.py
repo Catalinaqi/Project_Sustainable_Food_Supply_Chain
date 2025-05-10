@@ -2,7 +2,6 @@ from abc import ABC
 
 from configuration.database import Database
 from configuration.log_load_setting import logger
-from domain.repository.threshold_repository import ThresholdRepository
 from model.threshold_model import ThresholdModel
 from persistence.query_builder import QueryBuilder
 from persistence.repository_impl import db_default_string

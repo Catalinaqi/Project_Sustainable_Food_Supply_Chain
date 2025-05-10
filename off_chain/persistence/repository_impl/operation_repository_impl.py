@@ -3,7 +3,6 @@ from abc import ABC
 import sqlite3
 from configuration.database import Database
 from configuration.log_load_setting import logger
-from domain.repository.operation_repository import OperationRepository
 from model.operation_model import OperationModel
 from model.operation_estesa_model import OperazioneEstesaModel
 from model.materia_prima_model import MateriaPrimaModel
@@ -170,9 +169,9 @@ class OperationRepositoryImpl(ABC):
             self.db.execute_transaction(queries)
 
             logger.info(f"Operazione registrata con successo.")
-            #print(f"la soglia del prod farina è {str(self.recupera_soglia(tipo_evento,id_tipo_prodotto))}")
         except Exception as e:
             logger.error(f"Errore durante l'inserimento del prodotto: {str(e)}")
+            raise Exception(f"Errore nel inserimento: {e}")
 
 
     def inserisci_operazione_trasporto(self, id_azienda_trasporto: int,id_lotto_input: int, id_prodotto: int, id_azienda_richiedente: int, id_azienda_ricevente: int, quantita: int, co2_emessa: float):
@@ -187,7 +186,7 @@ class OperationRepositoryImpl(ABC):
 
 
             query = "SELECT quantita FROM Magazzino WHERE id_lotto = ?"
-            params = (id_lotto_input)
+            params = (id_lotto_input,)
 
             quantita_disponibile = self.db.fetch_one(query,params)
 
@@ -241,6 +240,7 @@ class OperationRepositoryImpl(ABC):
 
         except Exception as e:
             logger.error(f"Errore durante l'inserimento dell'operazione di trasporto: {str(e)}")
+            raise Exception(f"Errore nel inserimento: {e}")
 
 
     def inserisci_prodotto_trasformato(self,id_tipo_prodotto: int, descrizione : str, quantita_prodotta: int, materie_prime_usate: dict , id_azienda: int, co2_consumata : int):
@@ -293,8 +293,6 @@ class OperationRepositoryImpl(ABC):
             value = (id_azienda,value_output_lotto,quantita_prodotta)
             queries.append((query_magazzino, value))
 
-           
-            
 
             # 6. Inserisci operazione di trasformazione
             query_operazione, value_op = (
@@ -313,7 +311,7 @@ class OperationRepositoryImpl(ABC):
 
             token = self.token_opeazione(co2_consumata,tipo_evento,id_tipo_prodotto)
 
-            value_update= (co2_consumata,token ,token,id_azienda)
+            value_update= (co2_consumata,token,id_azienda)
             queries.append((self.QUERY_UPDATE_AZIENDA, value_update))
 
             

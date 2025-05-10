@@ -1,13 +1,12 @@
 from abc import ABC
 from configuration.database import Database
 from configuration.log_load_setting import logger
-from domain.repository.company_repository import CompanyRepository
 from model.company_model import CompanyModel
 from persistence.query_builder import QueryBuilder
 from persistence.repository_impl.database_standard import *
 
 
-class CompanyRepositoryImpl(CompanyRepository, ABC):
+class CompanyRepositoryImpl(ABC):
     """
      Implementing the aziende repository.
      """

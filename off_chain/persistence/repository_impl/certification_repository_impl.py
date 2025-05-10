@@ -1,6 +1,5 @@
 import datetime
 from abc import ABC
-from domain.repository.certification_repository import CertificationRepository
 from configuration.database import Database
 from model.certification_model import CertificationModel
 from model.lotto_for_cetification_model import LottoForCertificaion

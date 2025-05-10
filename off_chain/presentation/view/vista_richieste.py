@@ -81,13 +81,14 @@ class VisualizzaRichiesteView(QDialog):
             group_effettuate.setLayout(layout_effettuate)
             layout.addWidget(group_effettuate)
             self.carica_effettuate()
-        # Carica dati
-        self.carica_ricevute()
+        
         
 
-        self.bottone_aggiungi = QPushButton("Invia Richiesta")
-        self.bottone_aggiungi.clicked.connect(self.apri_invia_richiesta)
-        layout.addWidget(self.bottone_aggiungi)
+            self.bottone_aggiungi = QPushButton("Invia Richiesta")
+            self.bottone_aggiungi.clicked.connect(self.apri_invia_richiesta)
+            layout.addWidget(self.bottone_aggiungi)
+        
+        self.carica_ricevute()
 
         self.setLayout(layout)
         self.resize(1000, 700)

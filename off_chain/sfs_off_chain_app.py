@@ -46,25 +46,7 @@ if __name__ == "__main__":
 
     time.sleep(1)
 
-    rep = OperationRepositoryImpl()
     
-
-
-
-    db = Database()
-    query_builder = QueryBuilder()
-    query,value = (
-        query_builder.select("*")
-            .table("Operazione")
-            .get_query()
-    )
-    result = db.fetch_results(query,value)
-
-    
-
-    #print( "risultato " + str(result))
-
-
     finestra = VistaAccedi()
     finestra.show()
     splash.finish(finestra)

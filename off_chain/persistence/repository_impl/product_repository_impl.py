@@ -2,7 +2,6 @@ from abc import ABC
 import sqlite3
 from configuration.database import Database
 from configuration.log_load_setting import logger
-from domain.repository.product_repository import ProductRepository
 from model.materia_prima_model import MateriaPrimaModel
 from model.info_product_for_choice_model import ProductForChoiceModel
 from model.lotto_composizione_model import Composizione, Lotto

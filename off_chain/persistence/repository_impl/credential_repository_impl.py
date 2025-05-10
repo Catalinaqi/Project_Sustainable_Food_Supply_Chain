@@ -1,10 +1,7 @@
 from abc import ABC
-import re
 import sqlite3
 from typing import Union
-from domain.exception.authentication_exceptions import PasswordTooShortError, PasswordWeakError
 from domain.exception.database_exceptions import UniqueConstraintError
-from domain.repository.credential_repository import CredentialRepository
 from configuration.database import Database
 from configuration.log_load_setting import logger
 from persistence.query_builder import QueryBuilder
@@ -21,7 +18,7 @@ class "CredentialRepositoryImpl(CredentialRepository, ABC)"
 """
 
 
-class CredentialRepositoryImpl(CredentialRepository, ABC):
+class CredentialRepositoryImpl(ABC):
   
     def __init__(self):
         self.db = Database()
