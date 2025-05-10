@@ -24,7 +24,6 @@ from persistence.repository_impl.operation_repository_impl import OperationRepos
 def setup_database():
 
     try:
-        pass
         DatabaseMigrations.run_migrations()
     except Exception as e:
         logger.error(f"Error initializing database: {e}")

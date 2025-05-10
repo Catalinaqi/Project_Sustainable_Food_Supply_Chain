@@ -1,5 +1,7 @@
 from model.company_model import CompanyModel
 import time
+
+from domain.exception.login_exceptions import HaveToWaitException, ToManyTryLogEXcepition
 class Session:
     _instance = None
 
@@ -16,7 +18,9 @@ class Session:
         self.session_start_time = None
         self.session_timeout = 3600
         self.session_token = None
-        self.tentativi = 0
+        self.tentativi = 1
+        self.timer = 0
+        self.numero_tentativi = 6
 
     def start_session(self, user_data: CompanyModel):
         """Avvia una nuova sessione"""
@@ -36,10 +40,23 @@ class Session:
     def add_try(self):
         self.tentativi += 1
         
-    def can_log(self)->bool:
-       if self.tentativi <= 5:
-           return True
-       return False
+    def can_log(self):
+       self.add_try()
+       self.check_tentativi()
+       
+    
+    def check_tentativi(self):
+        if self.tentativi  < self.numero_tentativi:
+           return
+        if self.tentativi == self.numero_tentativi:
+            self.timer = time.time() + 30
+            raise ToManyTryLogEXcepition()
+        if self.tentativi > self.numero_tentativi:
+            secondi_mancanti = time.time() - self.timer
+            if secondi_mancanti > 0:
+                self.tentativi = 1
+                return
+            raise HaveToWaitException(str(secondi_mancanti))
 
     def is_authenticated(self):
         """Verifica se la sessione è ancora valida"""

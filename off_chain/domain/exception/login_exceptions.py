@@ -7,3 +7,7 @@ class ToManyTryLogEXcepition(Exception):
     """Eccezione sollevata quando la quantità disponibile è insufficiente."""
     def __init__(self,):
         super().__init__(f"Login fallito: troppi tentativi")
+
+class HaveToWaitException(Exception):
+    def __init__(self, msg : str):
+        super().__init__(f"Login inattivo per: {msg} secondi")

@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtWidgets import QWidget, QFormLayout, QHBoxLayout, QMainWindow, QAction, QCheckBox, QStackedWidget, \
     QComboBox
-from domain.exception.login_exceptions import LoginFailExetion, ToManyTryLogEXcepition
+from domain.exception.login_exceptions import HaveToWaitException, LoginFailExetion, ToManyTryLogEXcepition
 from presentation.controller.credential_controller import ControllerAutenticazione
 from presentation.view import funzioni_utili
 from presentation.view.home_page_aziende import HomePage
@@ -268,13 +268,10 @@ class VistaAccedi(QMainWindow):
                     self.home_page = HomePage(self.reset, utente)
                     self.home_page.show()
 
-                self.setVisible(False)  # Nascondi la finestra di login
-        except ToManyTryLogEXcepition as e : 
-            QMessageBox.warning(self,"SupplyChain",f"{e}")
-        except LoginFailExetion as e:
-            QMessageBox.warning(self, "SupplyChain", f"{e}")
+                self.setVisible(False)  # Nascondi la finestra di login       
+
         except Exception as e:
-            pass
+            QMessageBox.warning(self, "SupplyChain", f"{e}")
     '''
     Allow the user to enter as a guest
     '''
