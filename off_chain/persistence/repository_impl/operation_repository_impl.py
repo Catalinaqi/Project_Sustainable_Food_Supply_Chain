@@ -117,7 +117,7 @@ class OperationRepositoryImpl(ABC):
             query = "UPDATE Magazzino SET quantita = quantita - ? WHERE Id_azienda = ? AND Id_lotto = ?"
             params = (quantita,azienda,id_lotto_input)
 
-            self.db.execute_query(query,params)
+            queries.append((query, params))
 
             token_assegnati = self.token_opeazione(co2,evento,prodotto)
 

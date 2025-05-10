@@ -307,7 +307,7 @@ class VistaAccedi(QMainWindow):
                 QMessageBox.warning(
                     self, "SupplyChain", "Conferma password errata!")
             else:
-                success, message, secret_key = self.controller.registrazione(
+                success, message = self.controller.registrazione(
                     username, password, tipo, indirizzo
                 )
                 if success:

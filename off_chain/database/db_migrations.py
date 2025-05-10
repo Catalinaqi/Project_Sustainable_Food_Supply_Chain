@@ -27,8 +27,7 @@ class DatabaseMigrations:
             CREATE TABLE  Credenziali (
                 Id_credenziali INTEGER PRIMARY KEY AUTOINCREMENT,
                 Username TEXT UNIQUE NOT NULL,
-                Password TEXT NOT NULL,
-                topt_secret TEXT NOT NULL
+                Password TEXT NOT NULL                
             )
             ''',
             '''
@@ -168,18 +167,18 @@ class DatabaseMigrations:
         try:
             # Seed delle credenziali
             SEED_CREDENZIALI = [
-                ("aaa", "12345Aa@", "secret1"),
-                ("ttt", "12345Aa@", "secret2"),
-                ("trasf", "12345Aa@", "secret3"),
-                ("riv","12345Aa@","secret3"),
-                ("cert","12345Aa@","secret3")
+                ("aaa", "3f0409ad2ac4570392adef46536c00e46c60d702d3822788319590de4c146a45"),
+                ("ttt", "3f0409ad2ac4570392adef46536c00e46c60d702d3822788319590de4c146a45"),
+                ("trasf", "3f0409ad2ac4570392adef46536c00e46c60d702d3822788319590de4c146a45"),
+                ("riv","3f0409ad2ac4570392adef46536c00e46c60d702d3822788319590de4c146a45"),
+                ("cert","3f0409ad2ac4570392adef46536c00e46c60d702d3822788319590de4c146a45")
             ]
 
-            for username, password, topt in SEED_CREDENZIALI:
+            for username, password in SEED_CREDENZIALI:
                 db.execute_query("""
-                    INSERT OR IGNORE INTO Credenziali (Username, Password, topt_secret)
-                    VALUES (?, ?, ?)
-                """, (username, password, topt))
+                    INSERT OR IGNORE INTO Credenziali (Username, Password)
+                    VALUES (?, ?)
+                """, (username, password))
 
             # Ottieni gli ID delle credenziali inserite
             credenziali = db.fetch_results("SELECT Id_credenziali, Username FROM Credenziali")

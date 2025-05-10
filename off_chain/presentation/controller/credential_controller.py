@@ -6,6 +6,7 @@ from domain.exception.login_exceptions import HaveToWaitException, ToManyTryLogE
 from persistence.repository_impl.credential_repository_impl import CredentialRepositoryImpl
 from session import Session
 from model.company_model import CompanyModel
+from model.credential_model import UserModel
 
 
 class ControllerAutenticazione:
@@ -19,15 +20,14 @@ class ControllerAutenticazione:
     def registrazione(self, username, password, tipo, indirizzo):
         """Tenta di aggiungere un utente, gestendo eventuali errori."""
         try:
-            # Genera una chiave segreta per l'autenticazione a due fattori
-            secret_key = pyotp.random_base32()
+            
 
             # Inserisce le credenziali e la chiave segreta nel database
             # repo1 = CredentialRepositoryImpl()
-            self.credential.inserisci_credenziali_e_azienda(username, password, tipo, indirizzo, secret_key)
+            self.credential.inserisci_credenziali_e_azienda(username, password, tipo, indirizzo)
 
             # Restituisce il successo insieme alla chiave segreta
-            return True, "Utente registrato con successo!", secret_key
+            return True, "Utente registrato con successo!"
         except PasswordTooShortError as e:
             return False, str(e), None
         except PasswordWeakError as e:
@@ -47,7 +47,7 @@ class ControllerAutenticazione:
             logger.info(f"Username inserito: {username}, Password inserita: {password}")
 
             if credenziali is not None :
-                if credenziali.Password == password :
+                if credenziali.Password == UserModel.hash_password(password) :
                     try:
                         azienda = self.credential.get_azienda_by_id(credenziali.Id_credential)
                         self.sessione.start_session(azienda)

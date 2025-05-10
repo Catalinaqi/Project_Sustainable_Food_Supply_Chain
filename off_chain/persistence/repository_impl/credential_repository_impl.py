@@ -28,7 +28,8 @@ class CredentialRepositoryImpl(ABC):
     def get_user(self, user: str) -> Union[UserModel, None]:
         try:
             query,value = ( 
-                self.query_builder.select("*").table("credenziali").where("Username", "=",user).get_query())
+                self.query_builder.select("*").table("Credenziali").where("Username", "=",user).get_query())
+            logger.info(f"{self.db.fetch_results(query,value)}")    
             return UserModel(*self.db.fetch_results(query,value)[0])
         except Exception as e:
             logger.warning(f"Errore durante il recupero delle credenziali nel rep: {str(e)}")
@@ -71,44 +72,39 @@ class CredentialRepositoryImpl(ABC):
             return False
 
 
-    def inserisci_credenziali_e_azienda(self, username: str , password : str, tipo: aziende_enum, indirizzo : str, secret_key):
+    def inserisci_credenziali_e_azienda(self, username: str, password: str, tipo: aziende_enum, indirizzo: str):
         try:
-
             UserModel.validate_password(password)
 
-            # Avvia la transazione
-            #self.db.cur.execute("BEGIN TRANSACTION;")
+            hash_password = UserModel.hash_password(password= password)
 
-            # Inserimento delle credenziali
+            self.db.cur.execute("BEGIN TRANSACTION;")  # Inizio transazione manuale
+
+            # Prima INSERT: credenziali
             query_credenziali = """
-                    INSERT INTO Credenziali (Username, Password, topt_secret)
-                    VALUES (?, ?, ?);
-                    """
-            try:
-                self.db.execute_query(query_credenziali, (username, password, secret_key))
-            except sqlite3.IntegrityError:
-                raise UniqueConstraintError("Errore: Username già esistente.")
-            
-            try:
-                id_credenziali : int = self.db.cur.lastrowid
-            except Exception as e:
-                logger.error(f"Errore nel'ottenimento dell'id delle credenziali inserite")
-                raise Exception("Errore nel recupero dell'ID delle credenziali.")
+                INSERT INTO Credenziali (Username, Password)
+                VALUES (?, ?);
+            """
+            self.db.cur.execute(query_credenziali, (username, hash_password))
+            id_credenziali = self.db.cur.lastrowid  # Ottieni l'ID appena creato
 
-
-            # Inserimento dell'azienda con l'ID delle credenziali
+            # Seconda INSERT: azienda
             query_azienda = """
-                    INSERT INTO Azienda (Id_credenziali, Tipo, Nome, Indirizzo)
-                    VALUES (?, ?, ?, ?);
-                    """
-            self.db.execute_query(query_azienda, (id_credenziali, tipo, username, indirizzo,))
+                INSERT INTO Azienda (Id_credenziali, Tipo, Nome, Indirizzo)
+                VALUES (?, ?, ?, ?);
+            """
+            self.db.cur.execute(query_azienda, (id_credenziali, tipo, username, indirizzo))
 
-            # Commit della transazione
-            #self.conn.commit()
+            self.db.conn.commit()  # Commit manuale dell'intera transazione
 
-            return id_credenziali  # Può essere utile restituire l'ID
+            return id_credenziali
+
+        except sqlite3.IntegrityError:
+            self.db.conn.rollback()  # Rollback su vincolo violato
+            raise UniqueConstraintError("Errore: Username già esistente.")
 
         except Exception as e:
+            self.db.conn.rollback()
             logger.error(f"Errore durante l'inserimento delle credenziali e dell'azienda: {str(e)}")
-            # self.conn.rollback()  # Annulla le operazioni se c'è un errore
             raise e
+

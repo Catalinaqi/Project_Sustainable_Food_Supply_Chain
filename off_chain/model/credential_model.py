@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import hashlib
 import re
 
 from domain.exception.authentication_exceptions import PasswordTooShortError, PasswordWeakError
@@ -14,11 +15,10 @@ class UserModel:
     Password: str
     Topt_secret: str
 
-    def __init__(self,Id_credenziali,Username,Password,Topt_secret):
+    def __init__(self,Id_credenziali,Username,Password):
          self.Id_credential = Id_credenziali
          self.Username =Username
          self.Password = Password
-         self.Topt_secret = Topt_secret
          
 
     @staticmethod
@@ -35,3 +35,9 @@ class UserModel:
             raise PasswordWeakError("La password deve contenere almeno un numero.")
         if not re.search(r'\W', password):  # Almeno un carattere speciale
             raise PasswordWeakError("La password deve contenere almeno un carattere speciale (!, @, #, etc.).")
+        
+    @staticmethod
+    def hash_password(password: str) -> str:
+        """Restituisce un hash SHA-256 della password."""
+        return hashlib.sha256(password.encode()).hexdigest()
+

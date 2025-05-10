@@ -13,6 +13,7 @@ from presentation.view.vista_catena_prodotto import LottoTreeView
 from persistence.query_builder import QueryBuilder
 from session import Session
 from presentation.view.vista_accedi import VistaAccedi
+from model.credential_model import UserModel
 
 
 
@@ -45,6 +46,11 @@ if __name__ == "__main__":
     splash.show()
 
     time.sleep(1)
+
+    db = Database()
+    query = "SELECT * FROM Credenziali"
+    print(f"{db.fetch_results(query)}")
+
 
     
     finestra = VistaAccedi()
