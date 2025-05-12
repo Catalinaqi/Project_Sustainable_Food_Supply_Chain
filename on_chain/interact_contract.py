@@ -3,9 +3,39 @@ import json
 import os
 from web3 import Web3
 
+# Opzioni di connessione disponibili
+PROVIDERS = {
+    "truffle": "http://127.0.0.1:9545",  # Default per truffle develop
+    "ganache": "http://127.0.0.1:7545",  # Default per Ganache GUI
+    "ganache-cli": "http://127.0.0.1:8545"  # Default per ganache-cli
+}
+
+def select_provider():
+    """
+    Permette all'utente di selezionare un provider
+    """
+    print("Seleziona un provider:")
+    print("1. Truffle Develop (porta 9545)")
+    print("2. Ganache GUI (porta 7545)")
+    print("3. Ganache CLI (porta 8545)")
+    print("4. Inserisci un URL personalizzato")
+    
+    choice = input("Scelta [1]: ") or "1"
+    
+    if choice == "1":
+        return PROVIDERS["truffle"]
+    elif choice == "2":
+        return PROVIDERS["ganache"]
+    elif choice == "3":
+        return PROVIDERS["ganache-cli"]
+    elif choice == "4":
+        return input("Inserisci l'URL del provider: ")
+    else:
+        print("Scelta non valida, uso il provider Truffle predefinito")
+        return PROVIDERS["truffle"]
+
 # Configura il provider Web3
-# Sostituisci con l'URL del tuo provider (es. Infura, Ganache locale)
-PROVIDER_URL = "http://127.0.0.1:9545"  # Default per truffle develop
+PROVIDER_URL = select_provider()
 w3 = Web3(Web3.HTTPProvider(PROVIDER_URL))
 
 def load_contract(contract_name):
@@ -79,3 +109,7 @@ if __name__ == "__main__":
         interact_with_co2_token()
     else:
         print(f"Impossibile connettersi a {PROVIDER_URL}")
+        print("Assicurati di aver avviato il nodo Ethereum corretto:")
+        print("- Per Truffle: cd on_chain && truffle develop")
+        print("- Per Ganache GUI: avvia l'applicazione Ganache")
+        print("- Per Ganache CLI: npx ganache-cli")
