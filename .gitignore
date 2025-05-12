@@ -30,3 +30,5 @@ identifier.sqlite
 #Ignore log file
 *.log
 *.db
+
+node_modules/
