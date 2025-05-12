@@ -1,0 +1,34 @@
+{
+  "name": "sustainable-food-supply-chain",
+  "version": "1.0.0",
+  "description": "Smart contracts per una supply chain alimentare sostenibile",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test",
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "deploy:sepolia": "truffle migrate --network sepolia",
+    "deploy:goerli": "truffle migrate --network goerli",
+    "deploy:polygon": "truffle migrate --network polygon",
+    "deploy:mumbai": "truffle migrate --network mumbai",
+    "deploy:mainnet": "truffle migrate --network mainnet",
+    "verify:sepolia": "truffle run verify --network sepolia",
+    "verify:goerli": "truffle run verify --network goerli",
+    "verify:mainnet": "truffle run verify --network mainnet",
+    "verify:polygon": "truffle run verify --network polygon",
+    "verify:mumbai": "truffle run verify --network mumbai"
+  },
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^2.1.0",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "truffle": "^5.7.0",
+    "truffle-assertions": "^0.9.2",
+    "truffle-plugin-verify": "^0.6.1"
+  }
+} 
