@@ -7,9 +7,7 @@ from session import Session
 from presentation.controller.certification_controller import ControllerCertificatore
 from presentation.view import funzioni_utili
 from presentation.view.vista_stato_azienda import VistaStatoAzienda
-from presentation.view.vista_prodotti import VistaProdotti
 from presentation.view.vista_soglie import VistaSoglie
-from presentation.view.vista_sviluppatori import VistaSviluppatori
 
 
 class HomePageCertificatore(QMainWindow):

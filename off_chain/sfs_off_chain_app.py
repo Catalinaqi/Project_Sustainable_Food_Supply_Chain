@@ -8,12 +8,9 @@ from PyQt5.QtWidgets import QApplication, QSplashScreen
 from configuration.log_load_setting import logger
 from database.db_migrations import DatabaseMigrations
 from configuration.database import Database
-from presentation.view.home_page_guest import HomePageGuest
-from presentation.view.vista_catena_prodotto import LottoTreeView
-from persistence.query_builder import QueryBuilder
 from session import Session
 from presentation.view.vista_accedi import VistaAccedi
-from model.credential_model import UserModel
+
 
 
 
