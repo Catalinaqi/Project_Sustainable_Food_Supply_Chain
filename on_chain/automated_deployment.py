@@ -6,20 +6,38 @@ from web3 import Web3
 from solcx import compile_standard, install_solc
 import sys
 
+# Import logger from off_chain configuration
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from off_chain.configuration.log_load_setting import logger
+
 def start_ganache():
     """Connect to running Ganache instance"""
     try:
-        # Wait for Ganache to be ready
-        max_attempts = 10
-        for i in range(max_attempts):
-            try:
-                w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
-                if w3.is_connected():
-                    print("Connected to Ganache")
-                    return True
-            except:
-                print(f"Waiting for Ganache... ({i+1}/{max_attempts})")
-                time.sleep(1)
+        # Stop and remove any existing Ganache container
+        subprocess.run(["docker", "rm", "-f", "ganache-cli"], capture_output=True)
+        
+        # Start new Ganache container with specific network settings
+        result = subprocess.run([
+            "docker", "run", "-d",
+            "--name", "ganache-cli",
+            "-p", "8545:8545",
+            "--network", "host",  # Use host network for better connectivity
+            "trufflesuite/ganache-cli:latest",
+            "--networkId", "5777",
+            "--chainId", "1337",
+            "--db", "/ganache-db",  # Persist blockchain data
+            "--mnemonic", "test test test test test test test test test test test junk"  # Fixed accounts
+        ], capture_output=True, text=True)
+        
+        if result.returncode != 0:
+            logger.error(f"Failed to start Ganache: {result.stderr}")
+            return False
+            
+        logger.info("Ganache container started successfully")
+        return True
+    except Exception as e:
+        logger.error(f"Error in start_ganache: {e}")
+        return False
         
         print("Ganache started successfully")
         time.sleep(5)  # Give Ganache time to initialize
