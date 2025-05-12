@@ -6,7 +6,7 @@ import solcx
 from web3 import Web3
 
 # Configura il provider Web3
-PROVIDER_URL = "http://127.0.0.1:9545"  # Default per truffle develop
+PROVIDER_URL = "http://127.0.0.1:7545"  # Porta per Ganache
 w3 = Web3(Web3.HTTPProvider(PROVIDER_URL))
 
 def compile_contract(contract_file):
