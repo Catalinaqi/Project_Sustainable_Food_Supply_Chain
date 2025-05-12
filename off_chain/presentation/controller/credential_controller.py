@@ -80,4 +80,15 @@ class ControllerAutenticazione:
             logger.error(f"Errore nel'ottenimento del utente {e}")
             raise Exception(f"{e}")
 
-            
+    def verifica_password(self,old_password: str) -> bool:
+        try:
+            return self.credential.verifica_password(old_password,Session().current_user["id_azienda"])
+        except Exception as e:
+            logger.error(f"Eccezione {e}")
+            return False
+        
+    def cambia_password(self,password : str):
+        try:
+            self.credential.cambia_password(password,Session().current_user["id_azienda"])
+        except Exception as e:
+            raise Exception(e)            

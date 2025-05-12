@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, QFormLay
                              QHBoxLayout, QPushButton, QMessageBox)
 
 from model.company_model import CompanyModel
+from presentation.view.vista_cambia_password import VistaCambiaPassword
 from session import Session
 from presentation.view import funzioni_utili
 from presentation.controller.credential_controller import ControllerAutenticazione
@@ -37,7 +38,8 @@ class VistaStatoAzienda(QMainWindow):
         self.token_label = QLabel("Token accumulati")
         self.token_label_input = QLineEdit(str(azienda.Token)) 
 
-        self.conferma_button = QPushButton('Conferma modifiche')
+        self.cambia_password_button = QPushButton('Cambia password')
+        self.cambia_password_button.clicked.connect(self.apri_cambia_password)
 
         self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
@@ -98,6 +100,8 @@ class VistaStatoAzienda(QMainWindow):
         button_layout.setSpacing(10)
         button_layout.setAlignment(Qt.AlignCenter)
 
+        button_layout.addWidget(self.cambia_password_button)
+
 
         main_layout.addLayout(button_layout)
 
@@ -105,12 +109,9 @@ class VistaStatoAzienda(QMainWindow):
 
         funzioni_utili.center(self)
 
-    def on_conferma_button_clicked(self):
-        id_azienda = self.id_azienda_input.text()
-        nome = self.nome_input.text()
-        tipo = self.tipo_input.text()
-
-        #self.aggiungi(id_azienda, nome, tipo, indirizzo)
+    def apri_cambia_password(self):
+        self.vista_cambia_password = VistaCambiaPassword()
+        self.vista_cambia_password.show()
 
     def aggiungi(self, id_azienda, nome, tipo, indirizzo):
         QMessageBox.information(self, "SupplyChain",
