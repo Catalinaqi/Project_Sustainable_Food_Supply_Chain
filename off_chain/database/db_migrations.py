@@ -1,6 +1,5 @@
 from configuration.log_load_setting import logger
 from configuration.database import Database
-from configuration.db_manager_setting import DatabaseManagerSetting
 
 
 class DatabaseMigrations:
