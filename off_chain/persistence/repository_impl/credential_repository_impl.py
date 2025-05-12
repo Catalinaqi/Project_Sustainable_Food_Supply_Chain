@@ -1,13 +1,16 @@
 from abc import ABC
 import sqlite3
 from typing import Union
+
 from domain.exception.database_exceptions import UniqueConstraintError
 from configuration.database import Database
 from configuration.log_load_setting import logger
+from domain.exception.login_exceptions import HaveToWaitException, ToManyTryLogEXcepition
 from persistence.query_builder import QueryBuilder
 from model.credential_model import UserModel
 from model.company_model import CompanyModel
 from persistence.repository_impl.database_standard import aziende_enum
+from session import Session
 
 """
 class "CredentialRepositoryImpl(CredentialRepository, ABC)"
@@ -28,8 +31,7 @@ class CredentialRepositoryImpl(ABC):
     def get_user(self, user: str) -> Union[UserModel, None]:
         try:
             query,value = ( 
-                self.query_builder.select("*").table("Credenziali").where("Username", "=",user).get_query())
-            logger.info(f"{self.db.fetch_results(query,value)}")    
+                self.query_builder.select("*").table("Credenziali").where("Username", "=",user).get_query())  
             return UserModel(*self.db.fetch_results(query,value)[0])
         except Exception as e:
             logger.warning(f"Errore durante il recupero delle credenziali nel rep: {str(e)}")
@@ -107,4 +109,47 @@ class CredentialRepositoryImpl(ABC):
             self.db.conn.rollback()
             logger.error(f"Errore durante l'inserimento delle credenziali e dell'azienda: {str(e)}")
             raise e
+        
+    def verifica_password(self,old_psw,user_id: str) -> bool:
+        try:
+            query = "SELECT Password FROM Credenziali WHERE Id_credenziali = ?"
+            if Session().current_user["id_azienda"] == user_id:
+                param = (user_id,)
+                db_psw : str = self.db.fetch_one(query,param)
+            else:
+                raise Exception("Controllo username fallito")
+            
+            hash_old = UserModel.hash_password(old_psw)
+
+            if hash_old == db_psw:
+                return True
+            else:
+                return False
+
+        except Exception as e:
+            raise Exception("Errore nella verifica delle password")
+        
+
+    def cambia_password(self,new_password: str, user_id: str):
+        try:
+            UserModel.validate_password(new_password)
+            hash_password = UserModel.hash_password(new_password)
+
+            query = "UPDATE Credenziali SET password = ? WHERE Id_credenziali = ?"
+
+            if Session().current_user["id_azienda"] == user_id:
+                params = (hash_password,user_id)
+                self.db.execute_query(query,params)
+            else:
+                raise Exception("Controllo username fallito")
+            
+
+            
+        except HaveToWaitException as e:  
+                raise e
+        except  ToManyTryLogEXcepition as e:
+                raise e
+        except Exception as e:
+            raise Exception(f"Errore nel cambio della password {e}")
+
 

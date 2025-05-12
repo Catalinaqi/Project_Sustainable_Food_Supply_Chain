@@ -1,22 +1,15 @@
 import sys
 import time
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QSplashScreen
-
 from configuration.log_load_setting import logger
 from database.db_migrations import DatabaseMigrations
 from configuration.database import Database
 from session import Session
 from presentation.view.vista_accedi import VistaAccedi
-
-
-
-
-import sys
 from PyQt5.QtWidgets import QApplication
-from persistence.repository_impl.operation_repository_impl import OperationRepositoryImpl
+
 
 
 def setup_database():
@@ -41,15 +34,7 @@ if __name__ == "__main__":
     # Show Splash Screen
     splash = QSplashScreen(QPixmap("presentation/resources/logo_splash.png"), Qt.WindowStaysOnTopHint)
     splash.show()
-
-    time.sleep(1)
-
-    db = Database()
-    query = "SELECT * FROM Credenziali"
-    print(f"{db.fetch_results(query)}")
-
-
-    
+    time.sleep(1)    
     finestra = VistaAccedi()
     finestra.show()
     splash.finish(finestra)
