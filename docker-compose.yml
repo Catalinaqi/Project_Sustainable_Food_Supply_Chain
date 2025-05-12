@@ -1,11 +1,7 @@
 version: "3.13.2"
 services:
-  
-    build: ./off_chain
+  ganache:
+    image: trufflesuite/ganache-cli:latest
     ports:
-      - "5000:5000"
-
-  on_chain:
-    build: ./on_chain
-    depends_on:
-      - off_chain
+      - "8545:8545"
+    command: ["--networkId", "5777", "--chainId", "1337"]
