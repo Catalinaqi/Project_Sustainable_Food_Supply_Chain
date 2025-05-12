@@ -1,0 +1,17 @@
+# Truffle build
+build/
+
+# Node
+node_modules/
+package-lock.json
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db 
