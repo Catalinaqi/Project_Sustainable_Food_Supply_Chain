@@ -2,14 +2,19 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copia i file necessari
-COPY . .
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Installa le dipendenze
-RUN pip install web3 py-solc-x
+# Copy only necessary files
+COPY interact_counter.py .
+COPY truffle-config.js .
+COPY migrations/ ./migrations/
+COPY contracts/ ./contracts/
 
-# Il container sarà in ascolto sulla porta 8545
+# Set environment variables
+ENV GANACHE_HOST=ganache
+ENV CONTRACT_PATH=/app/build/contracts/Counter.json
+
 EXPOSE 8545
 
-# Imposta il comando di avvio
-CMD ["python", "automated_deployment.py"]
+CMD ["python", "interact_counter.py"]

@@ -1,25 +1,25 @@
-2025-05-12 13:57:01,353 - app_logger - INFO - [log_load_setting.py:69] - BackEnd: INITIAL LOADING OF GLOBAL - LOGGER
-2025-05-12 13:57:01,353 - app_logger - INFO - [log_load_setting.py:70] - BackEnd: Logger initialized successfully (File logging: enabled)
-2025-05-12 13:57:03,717 - app_logger - INFO - [database.py:17] - BackEnd: get_connection: Name database is: sfs_chain_database.db
-2025-05-12 13:57:03,718 - app_logger - INFO - [database.py:18] - BackEnd: get_connection: Path for the database is: C:\Users\fabio\Documents\GitHub\Project_Sustainable_Food_Supply_Chain\off_chain\database\sfs_chain_database.db
-2025-05-12 13:57:03,722 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Richiesta with params: ()
-2025-05-12 13:57:03,728 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Magazzino with params: ()
-2025-05-12 13:57:03,728 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Azioni_compensative with params: ()
-2025-05-12 13:57:03,729 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Certificato with params: ()
-2025-05-12 13:57:03,730 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Operazione with params: ()
-2025-05-12 13:57:03,731 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Prodotto with params: ()
-2025-05-12 13:57:03,731 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Azienda with params: ()
-2025-05-12 13:57:03,732 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Soglie with params: ()
-2025-05-12 13:57:03,732 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Credenziali with params: ()
-2025-05-12 13:57:03,732 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS ComposizioneLotto with params: ()
-2025-05-12 13:57:03,733 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
+2025-05-13 13:17:59,499 - app_logger - INFO - [log_load_setting.py:69] - BackEnd: INITIAL LOADING OF GLOBAL - LOGGER
+2025-05-13 13:17:59,500 - app_logger - INFO - [log_load_setting.py:70] - BackEnd: Logger initialized successfully (File logging: enabled)
+2025-05-13 13:17:59,506 - app_logger - INFO - [database.py:17] - BackEnd: get_connection: Name database is: sfs_chain_database.db
+2025-05-13 13:17:59,506 - app_logger - INFO - [database.py:18] - BackEnd: get_connection: Path for the database is: C:\Users\fabio\Documents\GitHub\Project_Sustainable_Food_Supply_Chain\off_chain\database\sfs_chain_database.db
+2025-05-13 13:17:59,511 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Richiesta with params: ()
+2025-05-13 13:17:59,518 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Magazzino with params: ()
+2025-05-13 13:17:59,519 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Azioni_compensative with params: ()
+2025-05-13 13:17:59,520 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Certificato with params: ()
+2025-05-13 13:17:59,520 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Operazione with params: ()
+2025-05-13 13:17:59,521 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Prodotto with params: ()
+2025-05-13 13:17:59,522 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Azienda with params: ()
+2025-05-13 13:17:59,523 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Soglie with params: ()
+2025-05-13 13:17:59,524 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Credenziali with params: ()
+2025-05-13 13:17:59,525 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS ComposizioneLotto with params: ()
+2025-05-13 13:17:59,526 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
             CREATE TABLE  Credenziali (
                 Id_credenziali INTEGER PRIMARY KEY AUTOINCREMENT,
                 Username TEXT UNIQUE NOT NULL,
                 Password TEXT NOT NULL                
             )
              with params: ()
-2025-05-12 13:57:03,733 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
+2025-05-13 13:17:59,527 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
             CREATE TABLE  Soglie (
                 Operazione TEXT NOT NULL,
                 Prodotto INTEGER NOT NULL,
@@ -28,7 +28,7 @@
                 PRIMARY KEY (Operazione, Prodotto)
             )
              with params: ()
-2025-05-12 13:57:03,734 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
+2025-05-13 13:17:59,527 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
             CREATE TABLE  Azienda (
                 Id_azienda INTEGER PRIMARY KEY AUTOINCREMENT,
                 Id_credenziali INTEGER NOT NULL,
@@ -42,7 +42,7 @@
                 FOREIGN KEY (Id_credenziali) REFERENCES Credenziali(Id_credenziali) ON DELETE CASCADE
             )
              with params: ()
-2025-05-12 13:57:03,734 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
+2025-05-13 13:17:59,528 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
             CREATE TABLE  Prodotto (
                 Id_prodotto INTEGER PRIMARY KEY AUTOINCREMENT,
                 Nome TEXT NOT NULL,
@@ -50,7 +50,7 @@
                 Data_di_inserimento TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
              with params: ()
-2025-05-12 13:57:03,735 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
+2025-05-13 13:17:59,528 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
             CREATE TABLE  Operazione (
                 Id_operazione INTEGER PRIMARY KEY AUTOINCREMENT,
                 Id_azienda INTEGER NOT NULL,
@@ -64,7 +64,7 @@
                 FOREIGN KEY (Id_prodotto) REFERENCES Prodotto(Id_prodotto) ON DELETE CASCADE
             )
              with params: ()
-2025-05-12 13:57:03,736 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
+2025-05-13 13:17:59,529 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
             CREATE TABLE ComposizioneLotto (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_lotto_output INTEGER NOT NULL,
@@ -73,7 +73,7 @@
                 FOREIGN KEY (id_lotto_input) REFERENCES Operazione(Id_lotto)
             )
              with params: ()
-2025-05-12 13:57:03,736 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
+2025-05-13 13:17:59,530 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
             CREATE TABLE  Certificato (
                 Id_certificato INTEGER PRIMARY KEY AUTOINCREMENT,
                 Id_lotto INTEGER NOT NULL,
@@ -83,7 +83,7 @@
                 FOREIGN KEY (Id_azienda_certificatore) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
             )
              with params: ()
-2025-05-12 13:57:03,740 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
+2025-05-13 13:17:59,531 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
             CREATE TABLE  Azioni_compensative (
                 Id_azione INTEGER PRIMARY KEY AUTOINCREMENT,
                 Data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -93,7 +93,7 @@
                 FOREIGN KEY (Id_azienda) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
             )
              with params: ()
-2025-05-12 13:57:03,741 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
+2025-05-13 13:17:59,532 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
             CREATE TABLE Magazzino (
                 id_azienda TEXT NOT NULL,
                 id_lotto TEXT NOT NULL,
@@ -103,7 +103,7 @@
                 FOREIGN KEY (id_lotto) REFERENCES Operazione(Id_lotto)
 )
              with params: ()
-2025-05-12 13:57:03,742 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
+2025-05-13 13:17:59,533 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
             CREATE TABLE  Richiesta (
                 Id_richiesta INTEGER PRIMARY KEY AUTOINCREMENT,
                 Id_richiedente INTEGER NOT NULL,
@@ -119,14 +119,57 @@
                 FOREIGN KEY (Id_trasportatore) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
             )
              with params: ()
-2025-05-12 13:57:03,750 - app_logger - INFO - [db_migrations.py:148] - BackEnd: run_migrations: Migrations completed successfully.
-2025-05-12 13:57:04,268 - app_logger - INFO - [db_migrations.py:392] - Seed dei dati iniziali completato.
-2025-05-12 13:57:04,268 - app_logger - INFO - [db_migrations.py:159] - BackEnd: run_migrations: Seed dei dati iniziali completato.
-2025-05-12 13:57:04,269 - app_logger - INFO - [sfs_off_chain_app.py:67] - Blockchain: Starting Docker Desktop and initializing environment...
-2025-05-12 13:57:04,347 - app_logger - INFO - [sfs_off_chain_app.py:116] - Frontend: Starting the PyQt application...
-2025-05-12 13:57:04,349 - app_logger - INFO - [sfs_off_chain_app.py:119] - Start session on 2025/05/12/13-57
-2025-05-12 13:57:05,237 - app_logger - INFO - [sfs_off_chain_app.py:34] - Docker Desktop is not running, attempting to start it...
-2025-05-12 13:57:17,319 - app_logger - INFO - [sfs_off_chain_app.py:50] - Docker Desktop started successfully
-2025-05-12 13:57:44,796 - app_logger - ERROR - [sfs_off_chain_app.py:94] - Blockchain: Error initializing blockchain environment: Failed to connect to Ganache
-2025-05-12 13:57:45,807 - app_logger - INFO - [credential_repository_impl.py:28] - BackEnd: Successfully initializing the instance for CredentialRepositoryImpl.
-2025-05-12 13:57:45,809 - app_logger - INFO - [credential_controller.py:16] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:17:59,539 - app_logger - INFO - [db_migrations.py:148] - BackEnd: run_migrations: Migrations completed successfully.
+2025-05-13 13:18:00,041 - app_logger - INFO - [db_migrations.py:392] - Seed dei dati iniziali completato.
+2025-05-13 13:18:00,041 - app_logger - INFO - [db_migrations.py:159] - BackEnd: run_migrations: Seed dei dati iniziali completato.
+2025-05-13 13:18:00,112 - app_logger - INFO - [sfs_off_chain_app.py:163] - Frontend: Starting the PyQt application...
+2025-05-13 13:18:00,113 - app_logger - INFO - [sfs_off_chain_app.py:166] - Start session on 2025/05/13/13-18
+2025-05-13 13:18:01,511 - app_logger - INFO - [sfs_off_chain_app.py:35] - Docker Desktop is already running
+2025-05-13 13:18:02,297 - app_logger - INFO - [automated_deployment.py:36] - Ganache container started successfully
+2025-05-13 13:18:07,302 - app_logger - INFO - [sfs_off_chain_app.py:137] - Waiting for Ganache to be ready...
+2025-05-13 13:18:07,373 - app_logger - INFO - [sfs_off_chain_app.py:141] - Successfully connected to Ganache
+2025-05-13 13:18:07,414 - app_logger - INFO - [sfs_off_chain_app.py:180] - Blockchain setup completed successfully
+2025-05-13 13:18:08,420 - app_logger - INFO - [credential_repository_impl.py:28] - BackEnd: Successfully initializing the instance for CredentialRepositoryImpl.
+2025-05-13 13:18:08,420 - app_logger - INFO - [credential_controller.py:16] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:18:19,500 - app_logger - INFO - [credential_repository_impl.py:34] - [(1, 'aaa', '3f0409ad2ac4570392adef46536c00e46c60d702d3822788319590de4c146a45')]
+2025-05-13 13:18:19,501 - app_logger - INFO - [credential_controller.py:47] - Username inserito: aaa, Password inserita: Abcd@1234
+2025-05-13 13:18:37,902 - app_logger - INFO - [credential_repository_impl.py:88] - Inserisco le credenziali del nuovo utente Fabio
+2025-05-13 13:18:37,903 - app_logger - INFO - [credential_repository_impl.py:96] - Inserisco le informazione dell'azienda collegata all'utente Fabio
+2025-05-13 13:18:48,788 - app_logger - INFO - [credential_repository_impl.py:34] - [(6, 'Fabio', 'efc8fba9489b1d63fb2efe99f2695aa40a8e3ee9c00738145ddd632f8c4c39d2')]
+2025-05-13 13:18:48,789 - app_logger - INFO - [credential_controller.py:47] - Username inserito: Fabio, Password inserita: Abcd@1234
+2025-05-13 13:18:48,789 - app_logger - INFO - [credential_controller.py:54] - Username Fabio ha eseguito l'accesso
+2025-05-13 13:18:50,206 - app_logger - INFO - [company_controller.py:48] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:18:51,648 - app_logger - INFO - [company_controller.py:48] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:18:54,320 - app_logger - INFO - [company_controller.py:48] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:19:00,295 - app_logger - INFO - [operation_repository_impl.py:372] - b990173ff0b8d24e9d41dbaa64a39cda476c54cf50b465811c788ee36a211369
+2025-05-13 13:19:00,295 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: INSERT INTO Operazione (Id_azienda, Id_prodotto, Data_operazione, Consumo_CO2, Tipo, Id_lotto, quantita) VALUES (?, ?, ?, ?, ?, ?, ?) with params: [6, 1, datetime.date(2000, 1, 1), 0.1, 'produzione', 2001, 1.0]
+2025-05-13 13:19:00,297 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: INSERT INTO Magazzino (Id_azienda, id_lotto, quantita) VALUES (?, ?, ?) with params: [6, 2001, 1.0]
+2025-05-13 13:19:00,298 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
+                            UPDATE Azienda  
+                            SET Co2_emessa = Co2_emessa + ?, Token = Token + ?  
+                            WHERE Id_azienda = ?;
+                         with params: (0.1, 51.9, 6)
+2025-05-13 13:19:00,302 - app_logger - INFO - [operation_repository_impl.py:170] - Operazione registrata con successo.
+2025-05-13 13:19:06,829 - app_logger - INFO - [company_controller.py:48] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:19:09,232 - app_logger - INFO - [company_controller.py:48] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:19:13,321 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query: 
+            INSERT INTO Azioni_compensative (Data, Id_azienda, Co2_compensata, Nome_azione)
+            VALUES (?, ?, ?, ?);
+             with params: ('2025-05-13', 6, 1.0, 'a')
+2025-05-13 13:19:13,324 - app_logger - INFO - [database.py:100] - BackEnd: execute_transaction: Info executing query:  UPDATE Azienda  SET Co2_compensata = Co2_compensata + ? 
+            WHERE Id_azienda = ?; with params: (1.0, 6)
+2025-05-13 13:19:13,328 - app_logger - INFO - [compensation_action_repository_impl.py:82] - Azione compensativa aggiunta con successo
+2025-05-13 13:19:16,903 - app_logger - INFO - [company_controller.py:48] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:19:22,425 - app_logger - INFO - [credential_repository_impl.py:28] - BackEnd: Successfully initializing the instance for CredentialRepositoryImpl.
+2025-05-13 13:19:22,425 - app_logger - INFO - [credential_controller.py:16] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:19:23,877 - app_logger - INFO - [credential_repository_impl.py:28] - BackEnd: Successfully initializing the instance for CredentialRepositoryImpl.
+2025-05-13 13:19:23,877 - app_logger - INFO - [credential_controller.py:16] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:20:09,902 - app_logger - INFO - [credential_repository_impl.py:34] - [(6, 'Fabio', '50ab167ce2b38f455abad61f6687381dc870d7ac75a5c7434330cd470bb7b9e1')]
+2025-05-13 13:20:09,903 - app_logger - INFO - [credential_controller.py:47] - Username inserito: Fabio, Password inserita: Abcd@1234
+2025-05-13 13:20:17,274 - app_logger - INFO - [credential_repository_impl.py:34] - [(6, 'Fabio', '50ab167ce2b38f455abad61f6687381dc870d7ac75a5c7434330cd470bb7b9e1')]
+2025-05-13 13:20:17,275 - app_logger - INFO - [credential_controller.py:47] - Username inserito: Fabio, Password inserita: Abcde@1234
+2025-05-13 13:20:17,275 - app_logger - INFO - [credential_controller.py:54] - Username Fabio ha eseguito l'accesso
+2025-05-13 13:20:19,093 - app_logger - INFO - [company_controller.py:48] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:20:24,308 - app_logger - INFO - [guest_controller.py:32] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:20:27,120 - app_logger - INFO - [guest_controller.py:32] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-13 13:20:28,664 - app_logger - INFO - [guest_controller.py:32] - BackEnd: Successful initialization of 'class instances' for repository implements
