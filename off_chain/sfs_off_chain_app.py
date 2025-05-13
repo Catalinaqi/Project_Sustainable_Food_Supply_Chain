@@ -188,10 +188,6 @@ if __name__ == "__main__":
 
     time.sleep(1)
 
-    db = Database()
-    query = "SELECT * FROM Credenziali"
-    print(f"{db.fetch_results(query)}")
-
     # Create the main window
     window = VistaAccedi()
     window.show()

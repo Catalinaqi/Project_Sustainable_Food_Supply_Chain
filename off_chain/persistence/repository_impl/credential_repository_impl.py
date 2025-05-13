@@ -74,35 +74,33 @@ class CredentialRepositoryImpl(ABC):
             return False
 
 
-    def inserisci_credenziali_e_azienda(self, username: str, password: str, tipo: aziende_enum, indirizzo: str):
+    def register(self, username: str, password: str, tipo: aziende_enum, indirizzo: str):
         try:
             UserModel.validate_password(password)
-
             hash_password = UserModel.hash_password(password= password)
-
             self.db.cur.execute("BEGIN TRANSACTION;")  # Inizio transazione manuale
-
             # Prima INSERT: credenziali
             query_credenziali = """
                 INSERT INTO Credenziali (Username, Password)
                 VALUES (?, ?);
             """
             self.db.cur.execute(query_credenziali, (username, hash_password))
+            logger.info(f"Inserisco le credenziali del nuovo utente {username}")
             id_credenziali = self.db.cur.lastrowid  # Ottieni l'ID appena creato
-
             # Seconda INSERT: azienda
             query_azienda = """
                 INSERT INTO Azienda (Id_credenziali, Tipo, Nome, Indirizzo)
                 VALUES (?, ?, ?, ?);
             """
             self.db.cur.execute(query_azienda, (id_credenziali, tipo, username, indirizzo))
+            logger.info(f"Inserisco le informazione dell'azienda collegata all'utente {username}")
 
             self.db.conn.commit()  # Commit manuale dell'intera transazione
-
             return id_credenziali
 
         except sqlite3.IntegrityError:
             self.db.conn.rollback()  # Rollback su vincolo violato
+            logger.error(f"Errore: Username già esistente.")
             raise UniqueConstraintError("Errore: Username già esistente.")
 
         except Exception as e:

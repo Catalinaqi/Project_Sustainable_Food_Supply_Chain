@@ -40,7 +40,6 @@ class OperationRepositoryImpl(ABC):
         super().__init__()
         self.db = Database()
         self.query_builder = QueryBuilder()
-        logger.info("BackEnd: Successfully initializing the instance for OperationRepositoryImpl.")
         
 
     def get_operazioni_by_azienda(self, azienda: int) -> list[OperazioneEstesaModel]:

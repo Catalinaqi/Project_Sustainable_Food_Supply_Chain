@@ -24,7 +24,7 @@ class ControllerAutenticazione:
 
             # Inserisce le credenziali e la chiave segreta nel database
             # repo1 = CredentialRepositoryImpl()
-            self.credential.inserisci_credenziali_e_azienda(username, password, tipo, indirizzo)
+            self.credential.register(username, password, tipo, indirizzo)
 
             # Restituisce il successo insieme alla chiave segreta
             return True, "Utente registrato con successo!"
