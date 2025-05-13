@@ -31,7 +31,7 @@ This project implements a blockchain-based solution for tracking sustainable foo
 ### Development Setup
 1. Clone repository:
 ```bash
-git clone https://github.com/your-repo.git
+git clone https://github.com/Catalinaqi/Project_Sustainable_Food_Supply_Chain.git
 cd Project_Sustainable_Food_Supply_Chain
 ```
 2. Install dependencies:
