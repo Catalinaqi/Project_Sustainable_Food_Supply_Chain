@@ -21,7 +21,6 @@ def start_ganache():
             "docker", "run", "-d",
             "--name", "ganache-cli",
             "-p", "8545:8545",
-            "--network", "host",  # Use host network for better connectivity
             "trufflesuite/ganache-cli:latest",
             "--networkId", "5777",
             "--chainId", "1337",
@@ -34,24 +33,35 @@ def start_ganache():
             return False
             
         logger.info("Ganache container started successfully")
-        return True
+        
+        # Add delay to allow Ganache to fully initialize
+        logger.info("Waiting for Ganache to initialize...")
+        time.sleep(5)
+        
+        # Verify connection
+        max_attempts = 30
+        for i in range(max_attempts):
+            try:
+                w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
+                if w3.is_connected():
+                    logger.info("Successfully connected to Ganache")
+                    return True
+            except Exception as e:
+                if i == max_attempts - 1:
+                    logger.error(f"Failed to connect to Ganache after {max_attempts} attempts")
+                    return False
+                time.sleep(1)
+                
+        return False
     except Exception as e:
         logger.error(f"Error in start_ganache: {e}")
         return False
-        
-        print("Ganache started successfully")
-        time.sleep(5)  # Give Ganache time to initialize
-        return True
-    except Exception as e:
-        print(f"Error starting Ganache: {e}")
-        sys.exit(1)
 
 def compile_contracts():
     """Compile all Solidity contracts"""
     contract_sources = {}
     contracts_dir = os.path.join(os.path.dirname(__file__), "contracts")
-    
-    # Install specific Solidity version
+      # Install specific Solidity version required by contracts
     install_solc("0.8.0")
     
     # Read all Solidity contracts
@@ -70,8 +80,7 @@ def compile_contracts():
                     "*": ["abi", "metadata", "evm.bytecode", "evm.sourceMap"]
                 }
             }
-        }
-    }, solc_version="0.8.0")
+        }    }, solc_version="0.8.0")
     
     return compiled_contracts
 
@@ -120,12 +129,21 @@ def save_contract_data(deployed_contracts):
 def main():
     try:
         # Start Ganache
-        start_ganache()
+        if not start_ganache():
+            raise Exception("Failed to start and connect to Ganache")
         
         # Connect to Ganache
-        w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
-        if not w3.is_connected():
-            raise Exception("Failed to connect to Ganache")
+        max_attempts = 30
+        w3 = None
+        for i in range(max_attempts):
+            try:
+                w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
+                if w3.is_connected():
+                    break
+            except Exception:
+                if i == max_attempts - 1:
+                    raise Exception("Failed to connect to Ganache")
+                time.sleep(1)
         
         # Compile contracts
         print("Compiling contracts...")

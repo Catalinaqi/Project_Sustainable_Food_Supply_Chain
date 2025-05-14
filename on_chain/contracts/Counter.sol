@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.0;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Counter is Ownable {
     uint256 private _count;
 
-    event Incremented(uint256 newCount);    constructor() Ownable(msg.sender) {
+    event Incremented(uint256 newCount);
+    
+    constructor() Ownable(msg.sender) {
         _count = 0;
     }
 
