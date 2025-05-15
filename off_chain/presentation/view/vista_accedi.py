@@ -48,7 +48,7 @@ class VistaAccedi(QMainWindow):
         self.guest_button = QPushButton('Entra come guest')
         self.logo = QLabel()
 
-        self.username_label_ = QLabel('Nome Azienda:')
+        self.username_label_ = QLabel('Nome Utente:')
         self.username_input_ = QLineEdit()
         self.tipo_label = QLabel('Tipo Azienda:')
         self.tipo_input = QComboBox()

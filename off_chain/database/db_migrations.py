@@ -5,20 +5,21 @@ from configuration.database import Database
 class DatabaseMigrations:
     # Variable of the class to track if the migrations were executed
     _migrations_executed = False
-
+    
     @staticmethod
     def run_migrations():
+        # Tables must be dropped in reverse order of dependencies
         TABLE_DELETION_QUERIES = [
-            'DROP TABLE IF EXISTS Richiesta',
-            'DROP TABLE IF EXISTS Magazzino',
-            'DROP TABLE IF EXISTS Azioni_compensative',
-            'DROP TABLE IF EXISTS Certificato',
-            'DROP TABLE IF EXISTS Operazione',
-            'DROP TABLE IF EXISTS Prodotto',
-            'DROP TABLE IF EXISTS Azienda',
-            'DROP TABLE IF EXISTS Soglie',
-            'DROP TABLE IF EXISTS Credenziali',
-            'DROP TABLE IF EXISTS ComposizioneLotto',
+            'DROP TABLE IF EXISTS Richiesta',  # Depends on Azienda
+            'DROP TABLE IF EXISTS Magazzino',  # Depends on Azienda and Operazione
+            'DROP TABLE IF EXISTS ComposizioneLotto',  # Depends on Operazione
+            'DROP TABLE IF EXISTS Azioni_compensative',  # Depends on Azienda
+            'DROP TABLE IF EXISTS Certificato',  # Depends on Azienda
+            'DROP TABLE IF EXISTS Operazione',  # Depends on Azienda and Prodotto
+            'DROP TABLE IF EXISTS Prodotto',   # No dependencies
+            'DROP TABLE IF EXISTS Soglie',     # No dependencies
+            'DROP TABLE IF EXISTS Azienda',    # Depends on Credenziali
+            'DROP TABLE IF EXISTS Credenziali' # No dependencies
         ]
 
         TABLE_CREATION_QUERIES = [
