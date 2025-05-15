@@ -1,5 +1,5 @@
+# pylint: disable=import-error
 from abc import ABC
-
 from configuration.database import Database
 from configuration.log_load_setting import logger
 from model.threshold_model import ThresholdModel
@@ -17,17 +17,16 @@ class ThresholdRepositoryImpl(ABC):
    
 
     def get_lista_soglie(self) -> list[ThresholdModel]:
-            self.query_builder.select("P.Nome","Soglia_Massima","Operazione").table("Soglie") \
-                            .join("Prodotto AS P","P.Id_prodotto", "Prodotto")
-      
-                
-            query, value = (self.query_builder.get_query() )
-
-            try:
+        self.query_builder.select("P.Nome","Soglia_Massima","Operazione").table("Soglie") \
+                        .join("Prodotto AS P","P.Id_prodotto", "Prodotto")
+    
             
-                return [ThresholdModel(*x) for x in self.db.fetch_results(query, value)]
-        
-            except Exception as e:
-               logger.error(f"Errore durante il recupero delle soglie: {e}")
+        query, value = (self.query_builder.get_query() )
+
+        try:
+            return [ThresholdModel(*x) for x in self.db.fetch_results(query, value)]
+    
+        except Exception as e:
+            logger.error(f"Errore durante il recupero delle soglie: {e}")
             return []
         

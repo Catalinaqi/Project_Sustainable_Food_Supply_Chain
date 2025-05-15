@@ -1,4 +1,5 @@
 # pylint: disable=no-name-in-module
+# pylint: disable=import-error
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, QFormLayout, QLineEdit,
@@ -31,16 +32,12 @@ class VistaStatoAzienda(QMainWindow):
 
         self.co2_consumata_totale_label = QLabel("CO2 consumata totale")
         self.co2_consumata_totale_input = QLineEdit(str(azienda.Co2_consumata))
-
         self.co2_risparmiata_totale_label = QLabel("CO2 risparmiata totale")
         self.co2_risparmiata_totale_input = QLineEdit(str(azienda.Co2_compensata)) 
-
         self.token_label = QLabel("Token accumulati")
         self.token_label_input = QLineEdit(str(azienda.Token)) 
-
         self.cambia_password_button = QPushButton('Cambia password')
         self.cambia_password_button.clicked.connect(self.apri_cambia_password)
-
         self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         self.init_ui()

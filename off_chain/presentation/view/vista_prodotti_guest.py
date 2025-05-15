@@ -8,12 +8,6 @@ from PyQt5.QtWidgets import (
 from presentation.view.vista_catena_prodotto import LottoTreeView
 from presentation.controller.guest_controller import ControllerGuest
 from model.prodotto_finito_cliente import ProdottoFinito
-
-
-
-
-
-
 class ProdottiFinitiView(QWidget):
 
     def __init__(self, parent=None):
@@ -22,9 +16,9 @@ class ProdottiFinitiView(QWidget):
         self.prodotti : list[ProdottoFinito]= self.controller.get_prodotti()  # Tutti i prodotti
         self.prodotti_filtrati = self.prodotti.copy()  # Quelli attualmente visibili
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         self.setWindowTitle("Visualizza Prodotti Finiti")
         layout = QVBoxLayout()
 

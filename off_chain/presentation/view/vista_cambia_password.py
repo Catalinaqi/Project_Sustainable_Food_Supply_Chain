@@ -1,9 +1,11 @@
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
 from PyQt5.QtWidgets import (
-    QWidget, QLabel, QLineEdit, QPushButton,
+    QWidget, QLineEdit, QPushButton,
     QVBoxLayout, QFormLayout, QMessageBox
 )
 from PyQt5.QtCore import Qt
-import re
+
 
 from presentation.controller.credential_controller import ControllerAutenticazione
 

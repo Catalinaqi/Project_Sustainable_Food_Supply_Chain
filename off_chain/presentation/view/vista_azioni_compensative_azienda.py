@@ -1,3 +1,5 @@
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QTableWidget, QTableWidgetItem,
     QHeaderView, QPushButton, QDateEdit
@@ -20,9 +22,9 @@ class AzioniAziendaView(QWidget):
         self.azioni_compensative: list[CompensationActionModel] = self.controller.lista_azioni_compensative(self.id_azienda)
         self.azioni_compensative_filtrate = self.azioni_compensative.copy()
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         layout = QVBoxLayout()
 
         layout.addWidget(QLabel(f"<b>ID azienda:</b> {self.id_azienda}"))

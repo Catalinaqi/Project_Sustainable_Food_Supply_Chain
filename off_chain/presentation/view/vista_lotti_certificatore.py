@@ -1,10 +1,12 @@
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLineEdit, QListWidget, QListWidgetItem
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 from model.lotto_for_cetification_model import LottoForCertificaion
 from presentation.view.vista_aggiungi_certificazione import VistaCertificazioniLotto
-from presentation.controller.certification_controller import ControllerCertificatore  # Sostituisci col tuo controller
+from presentation.controller.certification_controller import ControllerCertificatore
 
 class VistaRicercaLotti(QWidget):
     lotto_selezionato = pyqtSignal(int)  # Emit l'id del lotto selezionato

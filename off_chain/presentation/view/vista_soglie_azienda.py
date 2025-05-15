@@ -1,4 +1,5 @@
 # pylint: disable=no-name-in-module
+# pylint: disable=import-error
 
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QTableWidget, QTableWidgetItem,
@@ -20,9 +21,9 @@ class SoglieAziendaView(QWidget):
         self.soglie : list[ThresholdModel]= self.controller.lista_soglie() # Mock data
         self.soglie_filtrate = self.soglie.copy()
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         layout = QVBoxLayout()
 
         layout.addWidget(QLabel(f"<b>Soglie dell'azienda:</b> {self.tipo_azienda}"))

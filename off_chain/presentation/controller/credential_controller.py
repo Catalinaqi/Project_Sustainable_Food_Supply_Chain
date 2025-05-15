@@ -1,4 +1,4 @@
-import pyotp
+# pylint: disable=import-error
 from configuration.log_load_setting import logger
 from domain.exception.authentication_exceptions import PasswordTooShortError, PasswordWeakError
 from domain.exception.database_exceptions import UniqueConstraintError, DatabaseError
@@ -78,7 +78,7 @@ class ControllerAutenticazione:
              return self.credential.get_azienda_by_id(Session().current_user["id_azienda"])
         except Exception as e:
             logger.error(f"Errore nel'ottenimento del utente {e}")
-            raise Exception(f"{e}")
+            raise e
 
     def verifica_password(self,old_password: str) -> bool:
         try:
@@ -91,4 +91,4 @@ class ControllerAutenticazione:
         try:
             self.credential.cambia_password(password,Session().current_user["id_azienda"])
         except Exception as e:
-            raise Exception(e)            
+            raise e           

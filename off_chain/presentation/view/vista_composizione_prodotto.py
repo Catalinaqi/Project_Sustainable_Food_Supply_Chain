@@ -1,10 +1,10 @@
-from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QLabel, QLineEdit, QSpinBox, QListWidget, QListWidgetItem,
-        QComboBox,  QPushButton, QInputDialog, QMessageBox, QDialog, 
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
+from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QLineEdit, QSpinBox,\
+                              QListWidget, QListWidgetItem,QComboBox,\
+                                    QPushButton, QInputDialog, QMessageBox, QDialog, 
 )
 from PyQt5.QtCore import Qt, pyqtSignal
-
-from model.product_model import ProductModel  
 from model.product_standard_model import ProductStandardModel
 from presentation.controller.company_controller import ControllerAzienda
 from model.materia_prima_model import MateriaPrimaModel 

@@ -1,3 +1,5 @@
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
 from configuration.log_load_setting import logger
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QTableWidget, QTableWidgetItem,
@@ -8,7 +10,6 @@ from presentation.view.vista_composizione_prodotto import VistaCreaProdottoTrasf
 from presentation.controller.company_controller import ControllerAzienda
 from presentation.view.vista_aggiungi_operazione import AggiungiOperazioneView
 from session import Session
-
 
 class OperazioniAziendaView(QWidget):
     def __init__(self, parent=None):
@@ -21,9 +22,9 @@ class OperazioniAziendaView(QWidget):
         self.operazioni : list[OperazioneEstesaModel]= self.controller.lista_operazioni(self.id_azienda) # Mock data
         self.operazioni_filtrate = self.operazioni.copy()
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         layout = QVBoxLayout()
 
         layout.addWidget(QLabel(f"<b>ID azienda:</b> {self.id_azienda}"))

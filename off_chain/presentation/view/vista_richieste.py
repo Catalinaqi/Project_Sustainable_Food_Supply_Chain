@@ -23,9 +23,9 @@ class VisualizzaRichiesteView(QDialog):
 
         self.richieste_effettuate: list[RichiestaModel] = self.controller.get_richieste_effettuate()
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         self.setWindowTitle("Gestione Richieste")
 
         layout = QVBoxLayout()

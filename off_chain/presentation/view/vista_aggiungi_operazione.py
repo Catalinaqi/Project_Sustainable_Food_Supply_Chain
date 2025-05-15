@@ -1,9 +1,9 @@
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QPushButton, QDateEdit, QLineEdit, QComboBox, QDoubleSpinBox, QListWidget, QListWidgetItem
 )
 from PyQt5.QtCore import pyqtSignal, Qt
-
-from model.operation_model import OperationModel
 from model.prodotto_finito_model import ProdottoFinitoModel
 from session import Session
 from presentation.controller.company_controller import PERMESSI_OPERAZIONI, ControllerAzienda
@@ -19,9 +19,9 @@ class AggiungiOperazioneView(QDialog):
         self.controller = ControllerAzienda()
         self.role_azienda : str = Session().current_user["role"]
         
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         self.setWindowTitle("Aggiungi Operazione")
 
         layout = QVBoxLayout()

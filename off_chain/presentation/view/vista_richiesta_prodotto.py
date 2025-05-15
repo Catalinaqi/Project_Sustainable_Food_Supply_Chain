@@ -16,17 +16,13 @@ class RichiestaProdottoView(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.controller = ControllerAzienda()
-        
-       
+        self.controller = ControllerAzienda()       
         self.prodotti: list[ProductForChoiceModel] = self.controller.get_prodotti_ordinabili()  
-        
-        
         self.aziende_trasporto : list[CompanyModel] = self.controller.get_aziende_trasporto()
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         self.setWindowTitle("Richiedi Prodotto")
         layout = QVBoxLayout()
 
@@ -52,7 +48,7 @@ class RichiestaProdottoView(QDialog):
         layout.addWidget(QLabel("Seleziona azienda di trasporto:"))
         self.combo_azienda = QComboBox()
         for azienda in self.aziende_trasporto:
-            self.combo_azienda.addItem(azienda.Nome, azienda.Id_credenziali)  # Mostra nome, ma salva id
+            self.combo_azienda.addItem(azienda.Nome, azienda.Id_credenziali)
         layout.addWidget(self.combo_azienda)
 
         # Bottone richiesta
@@ -67,8 +63,9 @@ class RichiestaProdottoView(QDialog):
         self.tabella.setRowCount(len(self.prodotti))
         for row, prodotto in enumerate(self.prodotti):
             self.tabella.setItem(row, 0, QTableWidgetItem(prodotto.nome_prodotto))
-            self.tabella.setItem(row, 1, QTableWidgetItem(prodotto.nome_azienda + str(prodotto.id_azienda)))  # Placeholder
-            self.tabella.setItem(row, 2, QTableWidgetItem(str(prodotto.quantita))) # Placeholder
+            self.tabella.setItem(row, 1, QTableWidgetItem(prodotto.nome_azienda +\
+                                                           str(prodotto.id_azienda)))
+            self.tabella.setItem(row, 2, QTableWidgetItem(str(prodotto.quantita)))
             self.tabella.setRowHeight(row, 30)
 
     def invia_richiesta(self):

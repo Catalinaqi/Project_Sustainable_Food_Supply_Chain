@@ -1,3 +1,5 @@
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QLabel, QLineEdit
@@ -12,12 +14,14 @@ class VisualizzaMagazzinoView(QDialog):
         super().__init__(parent)
         self.controller = ControllerAzienda()
 
-        self.prodotti_magazzino_completi: list[MateriaPrimaModel] = self.controller.get_materie_prime_magazzino_azienda()
-        self.prodotti_finiti_magazzino: list[ProdottoFinitoModel] = self.controller.get_prodotti_finiti_magazzino_azienda()
+        self.prodotti_magazzino_completi: list[MateriaPrimaModel] = \
+              self.controller.get_materie_prime_magazzino_azienda()
+        self.prodotti_finiti_magazzino: list[ProdottoFinitoModel] = \
+              self.controller.get_prodotti_finiti_magazzino_azienda()
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         self.setWindowTitle("Magazzino Azienda")
         layout = QVBoxLayout()
 
@@ -79,7 +83,7 @@ class VisualizzaMagazzinoView(QDialog):
 
     def mostra_prodotti_finiti(self, prodotti: list[ProdottoFinitoModel]):
         self.tabella_prodotti_finiti.setRowCount(len(prodotti))
-        for row, prodotto in enumerate(prodotti):
+        for row,prodotto in enumerate(prodotti):
             self.tabella_prodotti_finiti.setItem(row, 0, QTableWidgetItem(prodotto.nome))
             self.tabella_prodotti_finiti.setItem(row, 1, QTableWidgetItem(prodotto.id_prodotto))
             self.tabella_prodotti_finiti.setItem(row, 2, QTableWidgetItem(str(prodotto.quantita)))
