@@ -7,10 +7,10 @@ class CompensationActionModel:
     """
     Model for CompensationActionModel.
     """
-    Id_azione: int = None
-    Data_azione: datetime = None
-    Id_azienda: int = None
-    Co2_compensata: float = None
-    Nome_azione: str = None
+    id_azione: int = None
+    data_azione: datetime = None
+    id_azienda: int = None
+    co2_compensata: float = None
+    nome_azione: str = None
 
 

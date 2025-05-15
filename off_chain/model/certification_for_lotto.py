@@ -3,6 +3,6 @@ from dataclasses import dataclass
 
 @dataclass
 class CertificationForLotto:
-    Descrizione : str
-    Nome_azienda : str
-    Data : str
+    descrizione : str
+    nome_azienda : str
+    data : str

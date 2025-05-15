@@ -45,7 +45,7 @@ class RichiestaProdottoView(QDialog):
         layout.addWidget(QLabel("Seleziona azienda di trasporto:"))
         self.combo_azienda = QComboBox()
         for azienda in self.aziende_trasporto:
-            self.combo_azienda.addItem(azienda.Nome, azienda.Id_credenziali)
+            self.combo_azienda.addItem(azienda.nome, azienda.id_azienda)
         layout.addWidget(self.combo_azienda)
 
         self.btn_richiesta = QPushButton("Invia richiesta")

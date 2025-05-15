@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 import datetime
-from model.operation_model import OperationModel
-from model.product_model import ProductModel
 
 @dataclass
 class OperazioneEstesaModel:

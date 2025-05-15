@@ -19,20 +19,17 @@ class Lotto:
         self.quantita = quantita
         self.cons_co2 = consumo_co2
         self.composizione = []
-        
-
-
 
     def get_costo_totale_lotto_unitario(self):
         self.co2_costo_composizione = 0
         if  self.composizione.__len__:
             for comp in self.composizione:
-                self.co2_costo_composizione += comp.get_co2_consumata_quantità_utilizzata()
-        self.co2_totale_lotto_unitario = (self.co2_costo_composizione + self.cons_co2 ) / self.quantita
+                self.co2_costo_composizione += \
+                      comp.get_co2_consumata_quantità_utilizzata()
+        self.co2_totale_lotto_unitario = \
+            (self.co2_costo_composizione + self.cons_co2 ) / self.quantita
 
         return self.co2_totale_lotto_unitario 
-
-
     
 
 @dataclass

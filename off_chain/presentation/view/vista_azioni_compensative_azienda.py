@@ -75,12 +75,12 @@ class AzioniAziendaView(QWidget):
         for op in self.azioni_compensative:
             try:
                 # Converte la data dell'azione in oggetto datetime.date
-                if isinstance(op.Data_azione, str):
-                    data_op = datetime.strptime(op.Data_azione, "%Y-%m-%d").date()
+                if isinstance(op.data_azione, str):
+                    data_op = datetime.strptime(op.data_azione, "%Y-%m-%d").date()
                 else:
-                    data_op = op.Data_azione
+                    data_op = op.data_azione
 
-                if (testo in op.Nome_azione.lower() or testo in str(op.Co2_compensata).lower()) and data_da <= data_op <= data_a:
+                if (testo in op.nome_azione.lower() or testo in str(op.co2_compensata).lower()) and data_da <= data_op <= data_a:
                     filtrate.append(op)
             except Exception as e:
                 print(f"[ERRORE filtro]: {e} su record {op}")
@@ -92,18 +92,18 @@ class AzioniAziendaView(QWidget):
         self.tabella.setRowCount(len(self.azioni_compensative_filtrate))
 
         for row, op in enumerate(self.azioni_compensative_filtrate):
-            self.tabella.setItem(row, 0, QTableWidgetItem(op.Nome_azione))
+            self.tabella.setItem(row, 0, QTableWidgetItem(op.nome_azione))
 
             try:
-                co2_float = float(op.Co2_compensata)
+                co2_float = float(op.co2_compensata)
                 item_co2 = QTableWidgetItem(str(co2_float))
                 item_co2.setData(Qt.UserRole, co2_float)  # Sorting numerico
             except Exception as e:
-                print(f"[ERRORE parsing CO2]: {e} su {op.Co2_compensata}")
-                item_co2 = QTableWidgetItem(op.Co2_compensata)
+                print(f"[ERRORE parsing CO2]: {e} su {op.co2_compensata}")
+                item_co2 = QTableWidgetItem(op.co2_compensata)
             self.tabella.setItem(row, 1, item_co2)
 
-            self.tabella.setItem(row, 2, QTableWidgetItem(str(op.Data_azione)))
+            self.tabella.setItem(row, 2, QTableWidgetItem(str(op.data_azione)))
 
     def apri_aggiungi_operazione(self):
         self.finestra_aggiungi = VistaAggiungiAzioneCompensativa(self)

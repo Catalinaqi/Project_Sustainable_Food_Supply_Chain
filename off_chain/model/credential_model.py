@@ -10,21 +10,21 @@ class UserModel:
     """
     Data Transfer Object (DTO) for user authentication.
     """
-    Id_credential: int
-    Username: str
-    Password: str
-    Topt_secret: str
+    id_credential: int
+    username: str
+    password: str
+    topt_secret: str
 
-    def __init__(self,Id_credenziali,Username,Password):
-         self.Id_credential = Id_credenziali
-         self.Username =Username
-         self.Password = Password
+    def __init__(self,id_credenziali,username,password):
+        self.id_credential = id_credenziali
+        self.username =username
+        self.password = password
          
 
     @staticmethod
     def validate_password(password : str):
         if len(password) < 8:
-                raise PasswordTooShortError("La password deve contenere almeno 8 caratteri!")
+            raise PasswordTooShortError("La password deve contenere almeno 8 caratteri!")
 
         # Controllo complessità con regex
         if not re.search(r'[A-Z]', password):  # Almeno una lettera maiuscola
