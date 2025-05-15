@@ -132,17 +132,34 @@ class BlockchainSetupThread(threading.Thread):
             self.success = False
 
 
-def wait_for_ganache(w3, max_attempts=30):  # Aumentato a 30 tentativi
+def wait_for_ganache(w3, max_attempts=30):
     """Wait for Ganache to be ready and accepting connections"""
     logger.info("Waiting for Ganache to be ready...")
     for i in range(max_attempts):
         try:
-            if w3.is_connected() and len(w3.eth.accounts) > 0:
-                logger.info("Successfully connected to Ganache")
-                return True
+            # First check basic connection
+            if not w3.is_connected():
+                raise Exception("Not connected to node")
+            
+            # Then check if accounts are available
+            accounts = w3.eth.accounts
+            if not accounts or len(accounts) == 0:
+                raise Exception("No accounts available")
+                
+            # Finally check if we can make a basic call
+            block = w3.eth.get_block('latest')
+            if not block:
+                raise Exception("Cannot get latest block")
+                
+            logger.info(f"Successfully connected to Ganache with {len(accounts)} accounts")
+            return True
+            
         except Exception as e:
-            logger.debug(f"Attempt {i+1}/{max_attempts} to connect to Ganache: {e}")
-        time.sleep(2)  # Aumentato a 2 secondi per tentativo
+            if i == max_attempts - 1:
+                logger.error(f"Final attempt to connect to Ganache failed: {str(e)}")
+            else:
+                logger.debug(f"Attempt {i+1}/{max_attempts} to connect to Ganache failed: {str(e)}")
+            time.sleep(2)
     return False
 
 
