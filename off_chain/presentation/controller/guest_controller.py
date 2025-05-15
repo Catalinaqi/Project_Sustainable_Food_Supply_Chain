@@ -1,4 +1,3 @@
-# pylint: disable=import-error
 from typing import List, Optional
 from configuration.log_load_setting import logger
 from model.company_model import CompanyModel
@@ -23,9 +22,7 @@ class ControllerGuest:
         self.product = ProductRepositoryImpl()
         self.threshold = ThresholdRepositoryImpl()
         self.company = CompanyRepositoryImpl()
-        logger.info(
-            "BackEnd: Successful initialization of repository implementations"
-        )
+        logger.info("BackEnd: Successful initialization of repository implementations")
 
     def lista_rivenditori(self) -> List[CompanyModel]:
         """Restituisce la lista delle aziende di tipo rivenditore."""
@@ -55,9 +52,9 @@ class ControllerGuest:
         """Verifica se un prodotto è certificato."""
         try:
             return self.certification.is_certificato(id_prodotto)
-        except Exception as e:
+        except Exception as error:
             logger.error(
-                f"Errore durante il recupero della certificazione per il prodotto {id_prodotto}: {e}"
+                f"Errore durante il recupero della certificazione per il prodotto {id_prodotto}: {error}"
             )
             return None
 
@@ -65,47 +62,25 @@ class ControllerGuest:
         """Restituisce la certificazione associata a un prodotto."""
         try:
             return self.certification.get_certificazione_by_prodotto(id_prodotto)
-        except Exception as e:
+        except Exception as error:
             logger.error(
-                f"Errore durante il recupero della certificazione per il prodotto {id_prodotto}: {e}"
+                f"Errore durante il recupero della certificazione per il prodotto {id_prodotto}: {error}"
             )
             return None
-
-    def scarto_soglia(self, co2: float, operazione: str, prodotto: ProductModel) -> Optional[float]:
-        """Calcola lo scarto rispetto alla soglia di riferimento per CO2."""
-        try:
-            soglia = self.threshold.get_soglia_by_operazione_and_prodotto(operazione, prodotto)
-            return soglia - co2
-        except Exception as e:
-            logger.error(f"Errore nel calcolo dello scarto soglia: {e}")
-            return None
-
-    def carica_prodotto_con_storia(self, prodotto_id: int) -> Optional[ProductModel]:
-        """
-        Carica un prodotto con la sua storia a partire dal suo ID.
-        Nota: implementazione simulata.
-        """
-        try:
-            prodotto = self.get_fake_prodotto(prodotto_id)  # Metodo da implementare o mock
-            return prodotto
-        except Exception as e:
-            logger.error(f"Errore durante il caricamento del prodotto con ID {prodotto_id}: {e}")
-            return None
-
-    # Funzioni Mock
 
     def get_prodotti(self) -> List[ProdottoFinito]:
         """Recupera la lista di prodotti finiti."""
         try:
             return self.product.get_lista_prodotti()
-        except Exception as e:
-            logger.error(f"Errore durante il recupero dei prodotti: {e}")
+        except Exception as error:
+            logger.error(f"Errore durante il recupero dei prodotti: {error}")
             return []
 
     def get_certificazioni_by_lotto(self, lotto_id: int) -> List[CertificationModel]:
         """Recupera la lista di certificazioni associate a un lotto."""
         try:
-            return self.certification.get_certificati_catena(lotto_id) or []
-        except Exception as e:
-            logger.error(f"Errore nel recuperare i certificati per lotto {lotto_id}: {e}")
+            certificati = self.certification.get_certificati_catena(lotto_id)
+            return certificati if certificati is not None else []
+        except Exception as error:
+            logger.error(f"Errore nel recuperare i certificati per lotto {lotto_id}: {error}")
             return []

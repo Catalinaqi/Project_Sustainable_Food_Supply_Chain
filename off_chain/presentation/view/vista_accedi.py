@@ -1,12 +1,10 @@
-# pylint: disable=no-name-in-module, import-error
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtWidgets import (
     QWidget, QFormLayout, QHBoxLayout, QVBoxLayout, QMainWindow, QAction,
-    QCheckBox, QStackedWidget, QComboBox, QDialog, QLabel, QLineEdit,
-    QPushButton, QMessageBox
+    QCheckBox, QStackedWidget, QComboBox, QMessageBox, QLabel,
+    QLineEdit, QPushButton
 )
-import pyotp
 
 from presentation.controller.credential_controller import ControllerAutenticazione
 from presentation.view import funzioni_utili
@@ -26,7 +24,7 @@ class VistaAccedi(QMainWindow):
         self.home_page = None
         self.home_guest = None
 
-        self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
+        self.setWindowIcon(QIcon("presentation/resources/logo_centro.png"))
 
         # Login UI elements
         self.login_label = QLabel("Login")
@@ -149,7 +147,7 @@ class VistaAccedi(QMainWindow):
 
         main_layout.addLayout(button_layout)
 
-        self.logo.setPixmap(QPixmap("presentation\\resources\\logo_trasparente.png"))
+        self.logo.setPixmap(QPixmap("presentation/resources/logo_trasparente.png"))
         self.logo.setScaledContents(True)
         self.logo.setFixedSize(300, 300)
         main_layout.addWidget(self.logo, alignment=Qt.AlignCenter)
@@ -182,7 +180,7 @@ class VistaAccedi(QMainWindow):
         # Add password visibility toggle actions
         self.icons_action.clear()
         for pwd_field in self.password_fields:
-            action = QAction(QIcon("presentation\\resources\\pass_invisibile.png"), "", pwd_field)
+            action = QAction(QIcon("presentation/resources/pass_invisibile.png"), "", pwd_field)
             action.triggered.connect(self.change_password_visibility)
             pwd_field.addAction(action, QLineEdit.TrailingPosition)
             self.icons_action.append(action)
@@ -222,7 +220,8 @@ class VistaAccedi(QMainWindow):
             utente = self.controller.login(username, password)
             if utente:
                 QMessageBox.information(self, "SupplyChain", "Accesso effettuato correttamente!")
-                if Session().current_user.get("role") == "Certificatore":
+                role = Session().current_user.get("role")
+                if role == "Certificatore":
                     self.home_certificatore = HomePageCertificatore(self.reset)
                     self.home_certificatore.show()
                 else:
@@ -247,4 +246,44 @@ class VistaAccedi(QMainWindow):
 
         username = self.username_input_reg.text()
         password = self.password_input_reg.text()
-        conferma_password = self.confer
+        conferma_password = self.conferma_password_input.text()
+
+        if password != conferma_password:
+            QMessageBox.warning(self, "SupplyChain", "Le password non corrispondono!")
+            return
+
+        try:
+            self.controller.register(
+                username=username,
+                password=password,
+                tipo=self.tipo_input.currentText(),
+                indirizzo=self.indirizzo_input.text(),
+            )
+            QMessageBox.information(self, "SupplyChain", "Registrazione avvenuta con successo!")
+            self.section_switcher.setChecked(False)
+        except Exception as err:
+            QMessageBox.warning(self, "SupplyChain", str(err))
+
+    def change_password_visibility(self):
+        """Toggle password visibility in password fields."""
+        self.password_visible = not self.password_visible
+        icon_visible = QIcon("presentation/resources/pass_visibile.png")
+        icon_invisible = QIcon("presentation/resources/pass_invisibile.png")
+        icon = icon_visible if self.password_visible else icon_invisible
+
+        for pwd_field, action in zip(self.password_fields, self.icons_action):
+            pwd_field.setEchoMode(QLineEdit.Normal if self.password_visible else QLineEdit.Password)
+            action.setIcon(icon)
+
+    def reset(self):
+        """Reset the login and registration fields and show login view."""
+        self.username_input.clear()
+        self.password_input.clear()
+        self.username_input_reg.clear()
+        self.password_input_reg.clear()
+        self.conferma_password_input.clear()
+        self.indirizzo_input.clear()
+        self.tipo_input.setCurrentIndex(0)
+        self.tcu_cb.setChecked(False)
+        self.section_switcher.setChecked(False)
+        self.setVisible(True)

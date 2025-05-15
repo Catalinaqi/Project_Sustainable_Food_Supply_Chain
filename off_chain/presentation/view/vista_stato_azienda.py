@@ -14,29 +14,25 @@ from presentation.controller.credential_controller import ControllerAutenticazio
 
 
 class VistaStatoAzienda(QMainWindow):
+    """Vista per mostrare lo stato e i dati dell'azienda corrente."""
+
     def __init__(self, callback) -> None:
         super().__init__()
-
         self.callback = callback
         self.controller = ControllerAutenticazione()
         azienda: CompanyModel = self.controller.get_user()
 
-        # Labels e inputs
+        # Campi e label
         self.id_azienda_label = QLabel("ID")
         self.id_azienda_input = QLineEdit(str(azienda.id_azienda))
-
         self.nome_label = QLabel("Nome")
         self.nome_input = QLineEdit(str(azienda.nome))
-
         self.tipo_label = QLabel("Tipo")
         self.tipo_input = QLineEdit(str(azienda.tipo))
-
         self.co2_consumata_totale_label = QLabel("CO2 consumata totale")
         self.co2_consumata_totale_input = QLineEdit(str(azienda.co2_consumata))
-
         self.co2_risparmiata_totale_label = QLabel("CO2 risparmiata totale")
         self.co2_risparmiata_totale_input = QLineEdit(str(azienda.co2_compensata))
-
         self.token_label = QLabel("Token accumulati")
         self.token_label_input = QLineEdit(str(azienda.token))
 
@@ -44,10 +40,10 @@ class VistaStatoAzienda(QMainWindow):
         self.cambia_password_button.clicked.connect(self.apri_cambia_password)
 
         self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
-
         self.init_ui()
 
     def init_ui(self) -> None:
+        """Inizializza l'interfaccia utente."""
         self.setWindowTitle("SupplyChain")
         self.setGeometry(0, 0, 750, 650)
 
@@ -55,10 +51,9 @@ class VistaStatoAzienda(QMainWindow):
         self.setCentralWidget(central_widget)
 
         outer_layout = QVBoxLayout(central_widget)
-
         main_layout = QVBoxLayout()
         main_layout.setSpacing(20)
-        main_layout.setAlignment(Qt.AlignCenter)  # Centra verticalmente
+        main_layout.setAlignment(Qt.AlignCenter)
 
         welcome_label = QLabel("Informazioni azienda")
         funzioni_utili.insert_label(welcome_label, main_layout)
@@ -70,23 +65,22 @@ class VistaStatoAzienda(QMainWindow):
         form_container.addLayout(form_layout)
         form_container.setContentsMargins(150, 0, 150, 0)
 
+        # Imposta i campi in sola lettura
         self.id_azienda_input.setReadOnly(True)
-        funzioni_utili.add_field_to_form(self.id_azienda_label, self.id_azienda_input, form_layout)
-
         self.nome_input.setReadOnly(True)
-        funzioni_utili.add_field_to_form(self.nome_label, self.nome_input, form_layout)
-
         self.tipo_input.setReadOnly(True)
+
+        funzioni_utili.add_field_to_form(self.id_azienda_label, self.id_azienda_input, form_layout)
+        funzioni_utili.add_field_to_form(self.nome_label, self.nome_input, form_layout)
         funzioni_utili.add_field_to_form(self.tipo_label, self.tipo_input, form_layout)
 
         if Session().current_user.get("role") != "Certificatore":
             self.co2_consumata_totale_input.setReadOnly(True)
-            funzioni_utili.add_field_to_form(self.co2_consumata_totale_label, self.co2_consumata_totale_input, form_layout)
-
             self.co2_risparmiata_totale_input.setReadOnly(True)
-            funzioni_utili.add_field_to_form(self.co2_risparmiata_totale_label, self.co2_risparmiata_totale_input, form_layout)
-
             self.token_label_input.setReadOnly(True)
+
+            funzioni_utili.add_field_to_form(self.co2_consumata_totale_label, self.co2_consumata_totale_input, form_layout)
+            funzioni_utili.add_field_to_form(self.co2_risparmiata_totale_label, self.co2_risparmiata_totale_input, form_layout)
             funzioni_utili.add_field_to_form(self.token_label, self.token_label_input, form_layout)
 
         main_layout.addLayout(form_container)
@@ -102,10 +96,12 @@ class VistaStatoAzienda(QMainWindow):
         funzioni_utili.center(self)
 
     def apri_cambia_password(self) -> None:
+        """Apre la finestra per cambiare la password."""
         self.vista_cambia_password = VistaCambiaPassword()
         self.vista_cambia_password.show()
 
     def aggiungi(self, id_azienda: int, nome: str, tipo: str, indirizzo: str) -> None:
+        """Mostra un messaggio di conferma e chiude la vista, chiamando la callback."""
         QMessageBox.information(
             self,
             "SupplyChain",

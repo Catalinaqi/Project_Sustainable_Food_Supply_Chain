@@ -1,107 +1,173 @@
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from functools import wraps
 import logging
 from datetime import datetime
 
+
+class SafetyViolationError(Exception):
+    """Exception raised for safety violations."""
+    pass
+
+
 class SafetyEnforcer:
-    def __init__(self):
-        self.safety_violations = []
-        self.safety_rules = {
-            'temperature_range': (-5, 30),  # Celsius
-            'humidity_range': (30, 75),     # Percentage
-            'max_transit_time': 72,         # Hours
-            'min_quality_score': 0.7,       # Quality threshold
-            'max_co2_emissions': 1000,      # kg CO2 equivalent
+    """
+    Class to enforce safety rules before and after function execution.
+    """
+
+    def __init__(self) -> None:
+        self.safety_violations: List[Dict[str, Any]] = []
+        self.safety_rules: Dict[str, Union[Tuple[float, float], float, int]] = {
+            'temperature_range': (-5.0, 30.0),  # Celsius
+            'humidity_range': (30.0, 75.0),     # Percentage
+            'max_transit_time': 72,              # Hours
+            'min_quality_score': 0.7,            # Quality threshold
+            'max_co2_emissions': 1000.0,         # kg CO2 equivalent
         }
         self.logger = logging.getLogger(__name__)
 
-    def enforce_safety(self, operation_type: str = 'default') -> Callable:
-        def decorator(function: Callable) -> Callable:
-            @wraps(function)
-            def wrapper(*args, **kwargs) -> Any:
-                operation_context = {
+    def enforce_safety(self, operation_type: str = 'default') -> Callable[..., Any]:
+        """
+        Decorator to enforce safety preconditions and postconditions.
+
+        Args:
+            operation_type: Type of operation for context (not used currently).
+
+        Returns:
+            Callable decorator.
+        """
+
+        def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+            @wraps(func)
+            def wrapper(*args: Any, **kwargs: Any) -> Any:
+                context = {
                     'operation_type': operation_type,
                     'timestamp': datetime.now(),
                     'args': args,
                     'kwargs': kwargs
                 }
-
-                # Pre-execution safety checks
-                self._check_preconditions(operation_context)
-
                 try:
-                    result = function(*args, **kwargs)
-                    # Post-execution safety checks
-                    self._check_postconditions(result, operation_context)
+                    self._check_preconditions(context)
+                    result = func(*args, **kwargs)
+                    self._check_postconditions(result, context)
                     return result
-                except Exception as e:
-                    self.logger.error(f"Safety violation in {function.__name__}: {str(e)}")
-                    self.safety_violations.append({
-                        'timestamp': datetime.now(),
-                        'operation': function.__name__,
-                        'error': str(e)
-                    })
-                    raise SafetyViolationError(f"Safety violation in {function.__name__}: {str(e)}")
-
+                except SafetyViolationError as sve:
+                    self.logger.error(f"Safety violation in '{func.__name__}': {str(sve)}")
+                    self._record_violation(func.__name__, str(sve))
+                    raise
+                except Exception as exc:
+                    self.logger.error(f"Unexpected error in '{func.__name__}': {str(exc)}")
+                    raise
             return wrapper
         return decorator
 
     def _check_preconditions(self, context: Dict[str, Any]) -> None:
-        """Verify safety conditions before operation execution"""
-        kwargs = context['kwargs']
-        
-        if 'temperature' in kwargs:
-            temp = kwargs['temperature']
+        """
+        Verify safety preconditions based on input arguments.
+
+        Args:
+            context: Dictionary with function call context including kwargs.
+
+        Raises:
+            SafetyViolationError: If any safety rule is violated.
+        """
+        kwargs = context.get('kwargs', {})
+
+        temperature = kwargs.get('temperature')
+        if temperature is not None:
             min_temp, max_temp = self.safety_rules['temperature_range']
-            if not (min_temp <= temp <= max_temp):
+            if not (min_temp <= temperature <= max_temp):
                 raise SafetyViolationError(
-                    f"Temperature {temp}°C is outside safe range [{min_temp}, {max_temp}]°C"
+                    f"Temperature {temperature}°C outside safe range [{min_temp}, {max_temp}]°C"
                 )
 
-        if 'humidity' in kwargs:
-            humidity = kwargs['humidity']
+        humidity = kwargs.get('humidity')
+        if humidity is not None:
             min_hum, max_hum = self.safety_rules['humidity_range']
             if not (min_hum <= humidity <= max_hum):
                 raise SafetyViolationError(
-                    f"Humidity {humidity}% is outside safe range [{min_hum}, {max_hum}]%"
+                    f"Humidity {humidity}% outside safe range [{min_hum}, {max_hum}]%"
                 )
 
-        if 'quality_score' in kwargs:
-            quality = kwargs['quality_score']
-            if quality < self.safety_rules['min_quality_score']:
+        quality_score = kwargs.get('quality_score')
+        if quality_score is not None:
+            min_quality = self.safety_rules['min_quality_score']
+            if quality_score < min_quality:
                 raise SafetyViolationError(
-                    f"Quality score {quality} is below minimum threshold {self.safety_rules['min_quality_score']}"
+                    f"Quality score {quality_score} below minimum threshold {min_quality}"
                 )
 
-        if 'co2_emissions' in kwargs:
-            emissions = kwargs['co2_emissions']
-            if emissions > self.safety_rules['max_co2_emissions']:
+        co2_emissions = kwargs.get('co2_emissions')
+        if co2_emissions is not None:
+            max_emissions = self.safety_rules['max_co2_emissions']
+            if co2_emissions > max_emissions:
                 raise SafetyViolationError(
-                    f"CO2 emissions {emissions} kg exceed maximum allowed {self.safety_rules['max_co2_emissions']} kg"
+                    f"CO2 emissions {co2_emissions} kg exceed max allowed {max_emissions} kg"
                 )
 
     def _check_postconditions(self, result: Any, context: Dict[str, Any]) -> None:
-        """Verify safety conditions after operation execution"""
-        if isinstance(result, dict):
-            if 'quality_score' in result and result['quality_score'] < self.safety_rules['min_quality_score']:
-                raise SafetyViolationError(f"Result quality score {result['quality_score']} below minimum threshold")
-            
-            if 'temperature' in result:
-                min_temp, max_temp = self.safety_rules['temperature_range']
-                if not (min_temp <= result['temperature'] <= max_temp):
-                    raise SafetyViolationError(f"Result temperature outside safe range")
+        """
+        Verify safety postconditions based on function result.
 
-    def get_safety_violations(self) -> list:
-        """Return list of all safety violations"""
+        Args:
+            result: Function return value.
+            context: Function call context.
+
+        Raises:
+            SafetyViolationError: If any safety rule is violated.
+        """
+        if isinstance(result, dict):
+            quality_score = result.get('quality_score')
+            if quality_score is not None:
+                min_quality = self.safety_rules['min_quality_score']
+                if quality_score < min_quality:
+                    raise SafetyViolationError(
+                        f"Result quality score {quality_score} below minimum threshold {min_quality}"
+                    )
+
+            temperature = result.get('temperature')
+            if temperature is not None:
+                min_temp, max_temp = self.safety_rules['temperature_range']
+                if not (min_temp <= temperature <= max_temp):
+                    raise SafetyViolationError(
+                        f"Result temperature {temperature}°C outside safe range [{min_temp}, {max_temp}]°C"
+                    )
+
+    def _record_violation(self, operation: str, error: str) -> None:
+        """
+        Record a safety violation event.
+
+        Args:
+            operation: Name of the operation/function.
+            error: Description of the safety violation.
+        """
+        violation = {
+            'timestamp': datetime.now(),
+            'operation': operation,
+            'error': error
+        }
+        self.safety_violations.append(violation)
+
+    def get_safety_violations(self) -> List[Dict[str, Any]]:
+        """
+        Retrieve all recorded safety violations.
+
+        Returns:
+            List of safety violation dictionaries.
+        """
         return self.safety_violations
 
-    def update_safety_rule(self, rule_name: str, value: Union[tuple, float, int]) -> None:
-        """Update a safety rule with new values"""
-        if rule_name in self.safety_rules:
-            self.safety_rules[rule_name] = value
-            self.logger.info(f"Updated safety rule {rule_name} to {value}")
-        else:
-            raise ValueError(f"Unknown safety rule: {rule_name}")
+    def update_safety_rule(self, rule_name: str, value: Union[Tuple[float, float], float, int]) -> None:
+        """
+        Update a safety rule value.
 
-class SafetyViolationError(Exception):
-    pass
+        Args:
+            rule_name: The name of the safety rule to update.
+            value: New value for the rule.
+
+        Raises:
+            ValueError: If the rule_name does not exist.
+        """
+        if rule_name not in self.safety_rules:
+            raise ValueError(f"Unknown safety rule: {rule_name}")
+        self.safety_rules[rule_name] = value
+        self.logger.info(f"Updated safety rule '{rule_name}' to {value}")

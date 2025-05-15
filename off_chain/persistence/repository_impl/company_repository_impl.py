@@ -1,63 +1,92 @@
 from abc import ABC
+from typing import Optional, List
 from configuration.database import Database
 from configuration.log_load_setting import logger
 from model.company_model import CompanyModel
 from persistence.query_builder import QueryBuilder
-from persistence.repository_impl.database_standard import *
+from persistence.repository_impl.database_standard import aziende_enum
 
 
 class CompanyRepositoryImpl(ABC):
     """
-     Implementing the aziende repository.
-     """
+    Implementation of the repository for managing Azienda entities.
+    """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.db = Database()
-        self.query_builder = QueryBuilder()
 
+    def get_aziende_trasporto(self) -> List[CompanyModel]:
+        """
+        Retrieve all transport companies ("Trasportatore") from the database.
 
-    def get_aziende_trasporto(self) -> list[CompanyModel]:
+        Returns:
+            List[CompanyModel]: List of transport companies.
         """
-        Get all the transport companies from the database.
-        """
-        self.query_builder.select("*").table("Azienda").where("Tipo", "=", "Trasportatore")
-        query, value = (self.query_builder.get_query())
-        result = self.db.fetch_results(query, value)
+        query_builder = QueryBuilder()
+        query_builder.select("*").table("Azienda").where("Tipo", "=", "Trasportatore")
+        query, values = query_builder.get_query()
+
         try:
-            return [CompanyModel(*x) for x in result]
-        except Exception as e:
-            print(e)
+            results = self.db.fetch_results(query, values)
+            return [CompanyModel(*row) for row in results]
+        except Exception as exc:
+            logger.error(f"Error retrieving transport companies: {exc}")
             return []
 
-    def get_lista_aziende(self, tipo: aziende_enum = None, 
-                          nome : str = None, id : int = None ) -> list[CompanyModel]:
-        
-        self.query_builder.select("*").table("Azienda")
-        #TODO aggiungere colonne
-        #self.query_builder.select("Id_azienda","Tipo","Indirizzo","Nome","Co2_consumata", "Co2_compensata").table("Azienda")
+    def get_lista_aziende(
+        self,
+        tipo: Optional[aziende_enum] = None,
+        nome: Optional[str] = None,
+        id_azienda: Optional[int] = None,
+    ) -> List[CompanyModel]:
+        """
+        Retrieve a list of companies filtered optionally by type, name, or ID.
 
+        Args:
+            tipo (Optional[aziende_enum]): Filter by company type.
+            nome (Optional[str]): Filter by company name.
+            id_azienda (Optional[int]): Filter by company ID.
 
-        if not tipo: 
-                self.query_builder.where("Tipo", "!=" , str(aziende_enum.CERIFICATORE.value))
+        Returns:
+            List[CompanyModel]: List of matching companies.
+        """
+        query_builder = QueryBuilder()
+        query_builder.select("*").table("Azienda")
+
+        if not tipo:
+            query_builder.where("Tipo", "!=", str(aziende_enum.CERIFICATORE.value))
+        else:
+            query_builder.where("Tipo", "=", str(tipo.value))
 
         if nome:
-            self.query_builder.where("Nome", "=",nome)
+            query_builder.where("Nome", "=", nome)
 
-        if id:
-            self.query_builder.where("Id_azienda", "=",id)
+        if id_azienda:
+            query_builder.where("Id_azienda", "=", id_azienda)
 
-        query, value= (self.query_builder.get_query())
-        result = self.db.fetch_results(query,value)
+        query, values = query_builder.get_query()
+
         try:
-            print(result[0])
-            return [CompanyModel(*x) for x in result]
-        
-        except Exception as e:
-            print(e)
+            results = self.db.fetch_results(query, values)
+            return [CompanyModel(*row) for row in results]
+        except Exception as exc:
+            logger.error(f"Error retrieving company list: {exc}")
             return []
-            
 
+    def get_azienda(self, n: int) -> Optional[CompanyModel]:
+        """
+        Retrieve the company at index `n` from the list of companies.
 
-    def get_azienda(self, n: int) -> CompanyModel:
-        return self.get_lista_aziende()[n]
+        Args:
+            n (int): Index of the company to retrieve.
+
+        Returns:
+            Optional[CompanyModel]: The company if found, else None.
+        """
+        companies = self.get_lista_aziende()
+        try:
+            return companies[n]
+        except IndexError:
+            logger.warning(f"Index {n} out of range when retrieving company.")
+            return None

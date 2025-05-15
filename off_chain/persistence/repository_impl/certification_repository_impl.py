@@ -1,5 +1,7 @@
 import datetime
 from abc import ABC
+from typing import List
+
 from configuration.database import Database
 from model.certification_model import CertificationModel
 from model.lotto_for_cetification_model import LottoForCertificaion
@@ -13,16 +15,16 @@ class CertificationRepositoryImpl(ABC):
     Repository implementation for handling certifications.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.db = Database()
         self.query_builder = QueryBuilder()
 
-    def get_certifications_by_product_interface(self, id_prodotto: int) -> list:
+    def get_certifications_by_product_interface(self, id_prodotto: int) -> List:
         """
         Get all certifications related to a specific product.
         """
-        query, value = (
+        query, values = (
             self.query_builder
             .select(
                 "Certificato.Id_certificato", "Prodotto.Nome",
@@ -34,7 +36,7 @@ class CertificationRepositoryImpl(ABC):
             .where("Certificato.Id_prodotto", "=", id_prodotto)
             .get_query()
         )
-        return self.db.fetch_results(query, value)
+        return self.db.fetch_results(query, values)
 
     def get_numero_certificazioni(self, id_azienda: int) -> int:
         """
@@ -48,25 +50,26 @@ class CertificationRepositoryImpl(ABC):
             .get_query()
         )
         try:
-            return int(self.db.fetch_results(query, values)[0])
+            result = self.db.fetch_results(query, values)
+            return int(result[0]) if result else 0
         except (IndexError, TypeError, ValueError) as err:
-            logger.error("Errore nel conteggio delle certificazioni: %s", err)
-            raise ValueError from err
+            logger.error(f"Errore nel conteggio delle certificazioni: {err}")
+            raise ValueError("Impossibile recuperare il numero di certificazioni") from err
 
     def is_certificato(self, id_prodotto: int) -> bool:
         """
         Check if a product has been certified.
         """
-        query, value = (
+        query, values = (
             self.query_builder
             .table("Certificato")
             .select("*")
             .where("Id_prodotto", "=", id_prodotto)
             .get_query()
         )
-        return bool(self.db.fetch_results(query, value))
+        return bool(self.db.fetch_results(query, values))
 
-    def get_certificazione_by_prodotto(self, id_prodotto: int) -> list:
+    def get_certificazione_by_prodotto(self, id_prodotto: int) -> List:
         """
         Retrieve certification info for a product.
         """
@@ -84,14 +87,13 @@ class CertificationRepositoryImpl(ABC):
         )
         return self.db.fetch_results(query, values)
 
-    def get_certificati_catena(self, id_lotto: int) -> list[CertificationModel]:
+    def get_certificati_catena(self, id_lotto: int) -> List[CertificationModel]:
         """
         Get all certifications for a batch and its input batches recursively.
         """
+        certificati: List[CertificationModel] = []
         try:
-            certificati: list[CertificationModel] = []
-
-            query, value = (
+            query, values = (
                 self.query_builder
                 .select("Id_certificato", "Id_lotto", "Descrizione", "az.Nome", "Data")
                 .table("Certificato")
@@ -99,7 +101,7 @@ class CertificationRepositoryImpl(ABC):
                 .where("Id_lotto", "=", id_lotto)
                 .get_query()
             )
-            result = self.db.fetch_results(query, value)
+            result = self.db.fetch_results(query, values)
             certificati.extend(CertificationModel(*row) for row in result)
 
             lotti_input = self.db.fetch_results(
@@ -109,17 +111,16 @@ class CertificationRepositoryImpl(ABC):
             for (id_lotto_input,) in lotti_input:
                 certificati.extend(self.get_certificati_catena(id_lotto_input))
 
-            return certificati
         except Exception as err:
-            logger.error("Errore durante la conversione dei certificati: %s", err)
-            return []
+            logger.error(f"Errore durante la conversione dei certificati: {err}")
+        return certificati
 
-    def get_lotti_certificabili(self) -> list[LottoForCertificaion]:
+    def get_lotti_certificabili(self) -> List[LottoForCertificaion]:
         """
         Get all batches that can be certified (excluding transport and sales).
         """
         try:
-            query, value = (
+            query, values = (
                 self.query_builder
                 .select(
                     "o.Id_lotto", "o.Tipo", "o.Data_operazione",
@@ -132,19 +133,18 @@ class CertificationRepositoryImpl(ABC):
                 .join("Azienda AS a", "o.Id_azienda", "a.Id_azienda")
                 .get_query()
             )
-
-            result = self.db.fetch_results(query, value)
+            result = self.db.fetch_results(query, values)
             return [LottoForCertificaion(*row) for row in result]
         except Exception as err:
-            logger.error("Errore nel recupero dei lotti: %s", err)
+            logger.error(f"Errore nel recupero dei lotti: {err}")
             return []
 
-    def get_certificati_lotto(self, id_lotto: int) -> list[CertificationForLotto]:
+    def get_certificati_lotto(self, id_lotto: int) -> List[CertificationForLotto]:
         """
         Retrieve certifications related to a specific batch.
         """
         try:
-            query, value = (
+            query, values = (
                 self.query_builder
                 .select("Descrizione", "az.Nome", "Data")
                 .table("Certificato")
@@ -152,13 +152,12 @@ class CertificationRepositoryImpl(ABC):
                 .where("Id_lotto", "=", id_lotto)
                 .get_query()
             )
-
-            result = self.db.fetch_results(query, value)
+            result = self.db.fetch_results(query, values)
             if not result:
-                logger.warning("Nessuna certificazione trovata per il lotto %s", id_lotto)
+                logger.warning(f"Nessuna certificazione trovata per il lotto {id_lotto}")
             return [CertificationForLotto(*row) for row in result]
         except Exception as err:
-            logger.error("Errore nel recupero dei certificati: %s", err)
+            logger.error(f"Errore nel recupero dei certificati: {err}")
             return []
 
     def aggiungi_certificazione(self, id_lotto: int, descrizione: str, id_azienda: int) -> None:
@@ -167,10 +166,10 @@ class CertificationRepositoryImpl(ABC):
         """
         try:
             query = """
-            INSERT INTO Certificato (Id_lotto, Descrizione, Id_azienda_certificatore)
-            VALUES (?, ?, ?)
+                INSERT INTO Certificato (Id_lotto, Descrizione, Id_azienda_certificatore)
+                VALUES (?, ?, ?)
             """
-            value = (id_lotto, descrizione, id_azienda)
-            self.db.execute_query(query, value)
+            values = (id_lotto, descrizione, id_azienda)
+            self.db.execute_query(query, values)
         except Exception as err:
-            logger.error("Errore nell'aggiunta del certificato: %s", err)
+            logger.error(f"Errore nell'aggiunta del certificato: {err}")

@@ -12,36 +12,38 @@ from model.richiesta_model import RichiestaModel
 
 
 class VisualizzaRichiesteView(QDialog):
+    """View per visualizzare e gestire le richieste aziendali."""
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.controller = ControllerAzienda()
         self.richieste_ricevute: list[RichiestaModel] = self.controller.get_richieste_ricevute()
         self.richieste_effettuate: list[RichiestaModel] = self.controller.get_richieste_effettuate()
-
         self.init_ui()
 
-    def init_ui(self):
+    def init_ui(self) -> None:
+        """Inizializza l'interfaccia grafica."""
         self.setWindowTitle("Gestione Richieste")
         layout = QVBoxLayout()
-
         current_role = Session().current_user["role"]
-        headers = ["Azienda Destinataria", "Prodotto", "Quantità",
-                   "Stato Ricevente", "Stato Trasportatore", "Data"]
+        headers = [
+            "Azienda Destinataria", "Prodotto", "Quantità",
+            "Stato Ricevente", "Stato Trasportatore", "Data"
+        ]
 
-        # Sezione richieste ricevute
-        if current_role != "Rivendiore":
+        # Sezione richieste ricevute (escluso ruolo Rivenditore)
+        if current_role != "Rivenditore":
             group_ricevute = QGroupBox("Richieste Ricevute")
             layout_ricevute = QVBoxLayout()
 
             self.tabella_ricevute = QTableWidget()
-            self.tabella_ricevute.setColumnCount(6)
+            self.tabella_ricevute.setColumnCount(len(headers))
             self.tabella_ricevute.setHorizontalHeaderLabels(headers)
             self.tabella_ricevute.setSelectionBehavior(QTableWidget.SelectRows)
             self.tabella_ricevute.setSelectionMode(QTableWidget.SingleSelection)
             self.tabella_ricevute.setEditTriggers(QTableWidget.NoEditTriggers)
             self.tabella_ricevute.horizontalHeader().setStretchLastSection(True)
             self.tabella_ricevute.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-
             layout_ricevute.addWidget(self.tabella_ricevute)
 
             btn_layout = QHBoxLayout()
@@ -51,23 +53,21 @@ class VisualizzaRichiesteView(QDialog):
             self.btn_rifiuta.clicked.connect(self.rifiuta_richiesta)
             btn_layout.addWidget(self.btn_accetta)
             btn_layout.addWidget(self.btn_rifiuta)
-
             layout_ricevute.addLayout(btn_layout)
             group_ricevute.setLayout(layout_ricevute)
             layout.addWidget(group_ricevute)
 
-        # Sezione richieste effettuate
+        # Sezione richieste effettuate (per Trasformatore e Rivenditore)
         if current_role in ("Trasformatore", "Rivenditore"):
             group_effettuate = QGroupBox("Richieste Effettuate")
             layout_effettuate = QVBoxLayout()
 
             self.tabella_effettuate = QTableWidget()
-            self.tabella_effettuate.setColumnCount(6)
+            self.tabella_effettuate.setColumnCount(len(headers))
             self.tabella_effettuate.setHorizontalHeaderLabels(headers)
             self.tabella_effettuate.setEditTriggers(QTableWidget.NoEditTriggers)
             self.tabella_effettuate.horizontalHeader().setStretchLastSection(True)
             self.tabella_effettuate.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-
             layout_effettuate.addWidget(self.tabella_effettuate)
             group_effettuate.setLayout(layout_effettuate)
             layout.addWidget(group_effettuate)
@@ -82,7 +82,8 @@ class VisualizzaRichiesteView(QDialog):
         self.setLayout(layout)
         self.resize(1000, 700)
 
-    def carica_ricevute(self):
+    def carica_ricevute(self) -> None:
+        """Carica i dati delle richieste ricevute nella tabella."""
         self.tabella_ricevute.setRowCount(len(self.richieste_ricevute))
         for row, richiesta in enumerate(self.richieste_ricevute):
             self.tabella_ricevute.setItem(row, 0, QTableWidgetItem(richiesta.nome_azienda_richiedente))
@@ -92,7 +93,8 @@ class VisualizzaRichiesteView(QDialog):
             self.tabella_ricevute.setItem(row, 4, QTableWidgetItem(richiesta.stato_trasportatore))
             self.tabella_ricevute.setItem(row, 5, QTableWidgetItem(str(richiesta.data)))
 
-    def carica_effettuate(self):
+    def carica_effettuate(self) -> None:
+        """Carica i dati delle richieste effettuate nella tabella."""
         self.richieste_effettuate = self.controller.get_richieste_effettuate()
         self.tabella_effettuate.setRowCount(len(self.richieste_effettuate))
         for row, richiesta in enumerate(self.richieste_effettuate):
@@ -103,13 +105,21 @@ class VisualizzaRichiesteView(QDialog):
             self.tabella_effettuate.setItem(row, 4, QTableWidgetItem(richiesta.stato_trasportatore))
             self.tabella_effettuate.setItem(row, 5, QTableWidgetItem(str(richiesta.data)))
 
-    def accetta_richiesta(self):
+    def accetta_richiesta(self) -> None:
+        """Accetta la richiesta selezionata."""
         self._gestisci_richiesta("Accettata")
 
-    def rifiuta_richiesta(self):
+    def rifiuta_richiesta(self) -> None:
+        """Rifiuta la richiesta selezionata."""
         self._gestisci_richiesta("Rifiutata")
 
-    def _gestisci_richiesta(self, nuovo_stato):
+    def _gestisci_richiesta(self, nuovo_stato: str) -> None:
+        """
+        Gestisce l'aggiornamento dello stato di una richiesta.
+
+        Args:
+            nuovo_stato (str): Nuovo stato da impostare alla richiesta.
+        """
         row = self.tabella_ricevute.currentRow()
         if row == -1:
             QMessageBox.warning(self, "Attenzione", "Seleziona una richiesta.")
@@ -124,7 +134,10 @@ class VisualizzaRichiesteView(QDialog):
                 return
 
             co2, ok = QInputDialog.getDouble(
-                self, "CO₂ Emessa", "Inserisci la quantità di CO₂ emessa (kg):", decimals=2
+                self,
+                "CO₂ Emessa",
+                "Inserisci la quantità di CO₂ emessa (kg):",
+                decimals=2
             )
             if not ok:
                 return
@@ -152,7 +165,8 @@ class VisualizzaRichiesteView(QDialog):
         except Exception as exc:
             QMessageBox.critical(self, "Errore", f"Errore durante la gestione: {exc}")
 
-    def apri_invia_richiesta(self):
+    def apri_invia_richiesta(self) -> None:
+        """Apre la finestra per l'invio di una nuova richiesta."""
         self.finestra_aggiungi = RichiestaProdottoView(self)
         self.finestra_aggiungi.salva_richiesta.connect(self.carica_effettuate)
         self.finestra_aggiungi.exec_()

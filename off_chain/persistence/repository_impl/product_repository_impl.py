@@ -1,5 +1,6 @@
 from abc import ABC
-import sqlite3
+from typing import List, Optional, Tuple, Union
+
 from configuration.database import Database
 from configuration.log_load_setting import logger
 from model.prodotto_finito_model import ProdottoLottoModel
@@ -8,163 +9,186 @@ from model.lotto_composizione_model import Composizione, Lotto
 from model.prodotto_finito_cliente import ProdottoFinito
 from model.product_standard_model import ProductStandardModel
 from persistence.query_builder import QueryBuilder
-from model.prodotto_finito_model import ProdottoLottoModel
 from persistence.repository_impl import db_default_string
 
 
-class ProductRepositoryImpl( ABC):
+class ProductRepositoryImpl(ABC):
     """
-     Implementing the prodotto repository.
-     """
-    def __init__(self):
+    Implementazione del repository per prodotti.
+    """
+
+    def __init__(self) -> None:
         super().__init__()
         self.db = Database()
         self.query_builder = QueryBuilder()
 
-    def co2_consumata_prodotti(self, prodotti: [int]) -> list:
+    def co2_consumata_prodotti(self, prodotti: List[Tuple[int]]) -> List[Tuple[Tuple[int], float]]:
+        """
+        Calcola la CO2 consumata per ogni prodotto dato in input.
+        :param prodotti: lista di tuple contenenti id prodotto
+        :return: lista di tuple (prodotto, totale_co2)
+        """
         lista_con_co2 = []
         for prodotto in prodotti:
-            #repo = ProductRepositoryImpl()
             storico = self.get_storico_prodotto(prodotto[0])
             totale_co2 = sum(t[4] for t in storico)
             lista_con_co2.append((prodotto, totale_co2))
         return lista_con_co2
 
-
-    def get_prodotti_standard_agricoli(self) ->list[ProductStandardModel]:
+    def get_prodotti_standard_agricoli(self) -> List[ProductStandardModel]:
+        """
+        Restituisce lista prodotti agricoli (stato = 0).
+        """
         try:
-            result = self.db.fetch_results("SELECT Id_prodotto, Nome  FROM Prodotto WHERE  Stato = 0")
-            print(result)
+            result = self.db.fetch_results("SELECT Id_prodotto, Nome FROM Prodotto WHERE Stato = 0")
+            logger.info(f"Prodotti standard agricoli trovati: {result}")
             return [ProductStandardModel(*x) for x in result] if result else []
-        except Exception as e:
-            logger.warning("Nessun prodotto trovato")
-            return[]
-         
+        except Exception as err:
+            logger.warning(f"Nessun prodotto agricolo trovato: {err}")
+            return []
 
-    def get_prodotti_standard_trasformazione(self)  -> list[ProductStandardModel]:
+    def get_prodotti_standard_trasformazione(self) -> List[ProductStandardModel]:
+        """
+        Restituisce lista prodotti trasformazione (stato = 1).
+        """
         try:
-            result = self.db.fetch_results("SELECT Id_prodotto, Nome  FROM Prodotto WHERE  Stato = 1")
-            print(f"risultao----{result}")
+            result = self.db.fetch_results("SELECT Id_prodotto, Nome FROM Prodotto WHERE Stato = 1")
+            logger.info(f"Prodotti standard trasformazione trovati: {result}")
             return [ProductStandardModel(*x) for x in result] if result else []
-        except Exception as e:
-            logger.warning("Nessun prodotto trovato")
-            return[]
+        except Exception as err:
+            logger.warning(f"Nessun prodotto di trasformazione trovato: {err}")
+            return []
 
-
-
-
-    """ Funzioni definitive"""
-
-    def get_materie_prime_magazzino_azienda(self, id_azienda : int) -> list[ProdottoLottoModel]:
+    def get_materie_prime_magazzino_azienda(self, id_azienda: int) -> List[ProdottoLottoModel]:
+        """
+        Restituisce materie prime disponibili in magazzino per azienda.
+        """
         query, value = (
             self.query_builder
-            .select("Prodotto.id_prodotto","Magazzino.id_azienda","Magazzino.quantita", "Prodotto.nome", "Operazione.id_lotto")
+            .select(
+                "Prodotto.id_prodotto",
+                "Magazzino.id_azienda",
+                "Magazzino.quantita",
+                "Prodotto.nome",
+                "Operazione.id_lotto"
+            )
             .table("Magazzino")
             .join("Operazione", "Magazzino.id_lotto", "Operazione.id_lotto")
             .join("Prodotto", "Operazione.id_prodotto", "Prodotto.id_prodotto")
             .where("Magazzino.id_azienda", "=", id_azienda)
-            .where("Prodotto.stato", "=", 0)  # Stato 0 indica che è una materia prima
+            .where("Prodotto.stato", "=", 0)  # Materia prima
             .get_query()
         )
 
         try:
-            logger.info(f"Query in get_materie_prime_magazzino_azienda: {query} - Value: {value}")
+            logger.info(f"Query get_materie_prime_magazzino_azienda: {query} - Valori: {value}")
             result = self.db.fetch_results(query, value)
-        except Exception as e:
-            logger.error(f"Error in get_materie_prime_magazzino_azienda: {e}")
+        except Exception as err:
+            logger.error(f"Errore in get_materie_prime_magazzino_azienda: {err}")
             return []
 
-        
         if not result:
-            logger.warning("The get_materie_prime_magazzino_azienda is empty or the query returned no results.")
-        else:
-            logger.info(f"Obtained in get_materie_prime_magazzino_azienda: {result}")
+            logger.warning("Nessun risultato per get_materie_prime_magazzino_azienda")
+            return []
+
         try:
-            return [ProdottoLottoModel(*x) for x in result] if result else [] 
-        except Exception as e:
-            logger.error(f"Error in converting result to ProdottoLottoModel: {e}")
-            return []   
-     # Assicurati che il path sia corretto
+            return [ProdottoLottoModel(*x) for x in result]
+        except Exception as err:
+            logger.error(f"Errore conversione in ProdottoLottoModel: {err}")
+            return []
 
-
-    def get_prodotti_finiti_magazzino_azienda (self, id_azienda : int) -> list[ProdottoLottoModel]:
+    def get_prodotti_finiti_magazzino_azienda(self, id_azienda: int) -> List[ProdottoLottoModel]:
+        """
+        Restituisce prodotti finiti disponibili in magazzino per azienda.
+        """
         query, value = (
             self.query_builder
-            .select("Prodotto.id_prodotto","Magazzino.id_azienda","Magazzino.quantita", "Prodotto.nome", "Operazione.id_lotto")
+            .select(
+                "Prodotto.id_prodotto",
+                "Magazzino.id_azienda",
+                "Magazzino.quantita",
+                "Prodotto.nome",
+                "Operazione.id_lotto"
+            )
             .table("Magazzino")
             .join("Operazione", "Magazzino.id_lotto", "Operazione.id_lotto")
             .join("Prodotto", "Operazione.id_prodotto", "Prodotto.id_prodotto")
             .where("Magazzino.id_azienda", "=", id_azienda)
-            .where("Prodotto.stato", "=", 1)  # Stato 0 indica che è una materia prima
+            .where("Prodotto.stato", "=", 1)  # Prodotto finito
             .get_query()
         )
 
         try:
-            logger.info(f"Query in get_prodotti_finiti_magazzino_azienda : {query} - Value: {value}")
+            logger.info(f"Query get_prodotti_finiti_magazzino_azienda: {query} - Valori: {value}")
             result = self.db.fetch_results(query, value)
-        except Exception as e:
-            logger.error(f"Error in get_prodotti_finiti_magazzino_azienda: {e}")
+        except Exception as err:
+            logger.error(f"Errore in get_prodotti_finiti_magazzino_azienda: {err}")
             return []
 
-        
         if not result:
-            logger.warning("The get_prodotti_finiti_magazzino_azienda is empty or the query returned no results.")
-        else:
-            logger.info(f"Obtained in get_prodotti_finiti_magazzino_azienda: {result}")
-        try:
-            return [ProdottoLottoModel(*x) for x in result] if result else [] 
-        except Exception as e:
-            logger.error(f"Error in converting result to ProdottoLottoModel: {e}")
+            logger.warning("Nessun risultato per get_prodotti_finiti_magazzino_azienda")
             return []
 
+        try:
+            return [ProdottoLottoModel(*x) for x in result]
+        except Exception as err:
+            logger.error(f"Errore conversione in ProdottoLottoModel: {err}")
+            return []
 
-    def get_prodotti_ordinabili(self,tipo_prodoto : int = 0) -> list[ProductForChoiceModel]:
-        
+    def get_prodotti_ordinabili(self, tipo_prodotto: int = 0) -> List[ProductForChoiceModel]:
+        """
+        Restituisce prodotti ordinabili filtrati per tipo prodotto.
+        :param tipo_prodotto: 0 = agricolo, 1 = trasformazione
+        """
         self.query_builder \
-            .select("Azienda.Nome","Prodotto.nome","Magazzino.quantita",
-                    "Prodotto.id_prodotto","Azienda.Id_azienda",  "Operazione.Consumo_CO2") \
+            .select(
+                "Azienda.Nome",
+                "Prodotto.nome",
+                "Magazzino.quantita",
+                "Prodotto.id_prodotto",
+                "Azienda.Id_azienda",
+                "Operazione.Consumo_CO2"
+            ) \
             .table("Magazzino") \
             .join("Operazione", "Magazzino.id_lotto", "Operazione.id_lotto") \
             .join("Azienda", "Operazione.id_azienda", "Azienda.id_azienda") \
             .join("Prodotto", "Operazione.id_prodotto", "Prodotto.id_prodotto") \
             .where("Magazzino.quantita", ">", 0)
-            
-        if tipo_prodoto == 0:
-            self.query_builder.where("Prodotto.stato", "=", 0)\
-                             .where("Azienda.Tipo", "=", db_default_string.TIPO_AZIENDA_AGRICOLA)
-        elif tipo_prodoto == 1:
+
+        if tipo_prodotto == 0:
+            self.query_builder.where("Prodotto.stato", "=", 0) \
+                              .where("Azienda.Tipo", "=", db_default_string.TIPO_AZIENDA_AGRICOLA)
+        elif tipo_prodotto == 1:
             self.query_builder.where("Prodotto.stato", "=", 1) \
-                            .where("Azienda.Tipo", "=", db_default_string.TIPO_AZIENDA_TRASPORTATORE)
+                              .where("Azienda.Tipo", "=", db_default_string.TIPO_AZIENDA_TRASPORTATORE)
         else:
             raise ValueError("Tipo di prodotto non identificato")
 
-
-
-        query,value = self.query_builder.get_query()
+        query, value = self.query_builder.get_query()
 
         try:
-            logger.info(f"Query in get_prodotti_ordinabili: {query} - Value: {value}")
+            logger.info(f"Query get_prodotti_ordinabili: {query} - Valori: {value}")
             result = self.db.fetch_results(query, value)
-        except Exception as e:
-            logger.error(f"Error in get_prodotti_ordinabili: {e}")
+        except Exception as err:
+            logger.error(f"Errore in get_prodotti_ordinabili: {err}")
             return []
 
-        
         if not result:
-            logger.warning("The get_prodotti_ordinabili is empty or the query returned no results.")
-        else:
-            logger.info(f"Obtained in get_prodotti_ordinabili: {result}")
-        try:
-            return [ProductForChoiceModel(*x) for x in result] if result else []
-        except Exception as e:
-            logger.error(f"Error in converting result to ProductForChoiceModel: {e}")
+            logger.warning("Nessun risultato in get_prodotti_ordinabili")
             return []
 
+        try:
+            return [ProductForChoiceModel(*x) for x in result]
+        except Exception as err:
+            logger.error(f"Errore conversione in ProductForChoiceModel: {err}")
+            return []
 
-
-# Funzione per caricare un lotto e la sua composizione ricorsiva
-    def carica_lotto_con_composizione(self, id_lotto) -> Lotto:
-    # 1. Recupero dati dell'operazione (lotto)
+    def carica_lotto_con_composizione(self, id_lotto: int) -> Optional[Lotto]:
+        """
+        Carica un lotto e la sua composizione ricorsivamente.
+        :param id_lotto: id del lotto
+        :return: oggetto Lotto o None se non trovato
+        """
         query, value = (
             self.query_builder
             .select("Id_lotto", "Tipo", "quantita", "Consumo_CO2")
@@ -175,17 +199,15 @@ class ProductRepositoryImpl( ABC):
 
         try:
             rows = self.db.fetch_results(query, value)
-           
             if not rows:
                 logger.warning(f"Nessuna operazione trovata per id_lotto: {id_lotto}")
                 return None
-            row = rows[0]
-            lotto = Lotto(*row)  # Istanza singola
-        except Exception as e:
-            logger.error(f"Errore nel recupero dell'operazione: {e}")
+
+            lotto = Lotto(*rows[0])
+        except Exception as err:
+            logger.error(f"Errore recupero operazione: {err}")
             return None
 
-        # 2. Recupero composizioni
         query, value = (
             self.query_builder
             .select("id_lotto_input", "quantità_utilizzata")
@@ -196,12 +218,11 @@ class ProductRepositoryImpl( ABC):
 
         try:
             rows = self.db.fetch_results(query, value)
-            composizioni_raw: list[Composizione] = [Composizione(*x) for x in rows] if rows else []
-        except Exception as e:
-            logger.error(f"Errore nel recupero della composizione: {e}")
+            composizioni_raw = [Composizione(*x) for x in rows] if rows else []
+        except Exception as err:
+            logger.error(f"Errore recupero composizione: {err}")
             return None
 
-        # 3. Ricorsione per ogni composizione
         for comp in composizioni_raw:
             input_lotto = self.carica_lotto_con_composizione(comp.id_lotto_input)
             composizione = Composizione(
@@ -212,16 +233,19 @@ class ProductRepositoryImpl( ABC):
             lotto.composizione.append(composizione)
 
         return lotto
-    
 
-    def get_lista_prodotti(self):
-
-        query,value = (
-            self.query_builder.select(
+    def get_lista_prodotti(self) -> List[ProdottoFinito]:
+        """
+        Recupera lista prodotti venduti (tipo operazione = vendita).
+        :return: lista di ProdottoFinito
+        """
+        query, value = (
+            self.query_builder
+            .select(
                 "Prodotto.nome",
                 "Operazione.Id_lotto",
                 "Azienda.nome",
-                "Operazione.Id_prodotto",
+                "Operazione.Id_prodotto"
             )
             .table("Operazione")
             .join("Azienda", "Operazione.Id_azienda", "Azienda.Id_azienda")
@@ -229,18 +253,29 @@ class ProductRepositoryImpl( ABC):
             .where("Operazione.Tipo", "=", db_default_string.TIPO_OP_VENDITA)
             .get_query()
         )
-        
+
         try:
-            # Esegui direttamente il raw SQL (non serve builder qui)
             results = self.db.fetch_results(query, value)
             if results:
-                prodotti_co2 = [ProdottoFinito(*r) for r in results]
-            
-                return prodotti_co2
-            else:
-                logger.warning("Nessun risultato trovato ")
-                return []
-        except Exception as e:
-            logger.error(f"Errore in calcola_co2_totale_per_prodotti_finiti: {e}")
+                return [ProdottoFinito(*r) for r in results]
+
+            logger.warning("Nessun risultato trovato in get_lista_prodotti")
             return []
-    
+        except Exception as err:
+            logger.error(f"Errore in get_lista_prodotti: {err}")
+            return []
+
+    # Metodo mancante in originale: serve definire get_storico_prodotto se usato in co2_consumata_prodotti
+    def get_storico_prodotto(self, id_prodotto: int) -> List[Tuple]:
+        """
+        Recupera storico consumi CO2 per prodotto.
+        :param id_prodotto: ID prodotto
+        :return: lista di tuple con dati storici (definire struttura in base a DB)
+        """
+        query = "SELECT * FROM Storico WHERE id_prodotto = ?"
+        try:
+            result = self.db.fetch_results(query, (id_prodotto,))
+            return result if result else []
+        except Exception as err:
+            logger.error(f"Errore in get_storico_prodotto per id {id_prodotto}: {err}")
+            return []
