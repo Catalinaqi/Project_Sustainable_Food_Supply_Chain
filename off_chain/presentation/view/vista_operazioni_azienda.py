@@ -1,9 +1,8 @@
+from configuration.log_load_setting import logger
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QTableWidget, QTableWidgetItem,
     QHeaderView, QPushButton
 )
-from PyQt5.QtCore import Qt
-
 from model.operation_estesa_model import OperazioneEstesaModel 
 from presentation.view.vista_composizione_prodotto import VistaCreaProdottoTrasformato
 from presentation.controller.company_controller import ControllerAzienda
@@ -54,6 +53,7 @@ class OperazioniAziendaView(QWidget):
         try:
             testo = testo.strip()
         except Exception as e :
+            logger.error(f"Errore durante il filtraggio delle operazioni: {e}")
             return
         if isinstance(testo, str):
 

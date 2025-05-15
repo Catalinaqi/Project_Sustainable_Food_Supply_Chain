@@ -1,3 +1,5 @@
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QLineEdit, QDoubleSpinBox,
     QDateEdit, QPushButton, QMessageBox

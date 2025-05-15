@@ -1,8 +1,8 @@
+# pylint: disable=no-name-in-module
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, QFormLayout, QLineEdit,
                              QHBoxLayout, QPushButton, QMessageBox)
-
 from model.company_model import CompanyModel
 from presentation.view.vista_cambia_password import VistaCambiaPassword
 from session import Session

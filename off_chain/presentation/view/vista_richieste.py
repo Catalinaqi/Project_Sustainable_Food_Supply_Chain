@@ -1,7 +1,8 @@
-import datetime
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
-    QPushButton, QMessageBox, QLabel, QGroupBox, QHeaderView , QInputDialog
+    QPushButton, QMessageBox, QGroupBox, QHeaderView , QInputDialog
 )
 
 from PyQt5.QtCore import Qt
@@ -68,12 +69,16 @@ class VisualizzaRichiesteView(QDialog):
             self.tabella_effettuate = QTableWidget()
             self.tabella_effettuate.setColumnCount(6)  # 6 colonne!
             self.tabella_effettuate.setHorizontalHeaderLabels([
-                "Azienda Destinataria", "Prodotto", "Quantità", "Stato Ricevente", "Stato Trasportatore", "Data"
+                "Azienda Destinataria", "Prodotto", "Quantità", \
+                    "Stato Ricevente", "Stato Trasportatore", "Data"
             ])
             self.tabella_effettuate.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.tabella_effettuate.horizontalHeader().setStretchLastSection(True)
-            self.tabella_ricevute.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-            self.tabella_effettuate.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+            self.tabella_effettuate.horizontalHeader().\
+                setStretchLastSection(True)
+            self.tabella_ricevute.horizontalHeader().\
+                setSectionResizeMode(QHeaderView.ResizeToContents)
+            self.tabella_effettuate.horizontalHeader().\
+                setSectionResizeMode(QHeaderView.ResizeToContents)
 
 
             layout_effettuate.addWidget(self.tabella_effettuate)
@@ -81,9 +86,6 @@ class VisualizzaRichiesteView(QDialog):
             group_effettuate.setLayout(layout_effettuate)
             layout.addWidget(group_effettuate)
             self.carica_effettuate()
-        
-        
-
             self.bottone_aggiungi = QPushButton("Invia Richiesta")
             self.bottone_aggiungi.clicked.connect(self.apri_invia_richiesta)
             layout.addWidget(self.bottone_aggiungi)
@@ -170,7 +172,7 @@ class VisualizzaRichiesteView(QDialog):
                 id_richiesta=richiesta.Id_richiesta,
                 nuovo_stato=nuovo_stato
             )
-            QMessageBox.information(self, "Successo", f"Richiesta  con successo.")
+            QMessageBox.information(self, "Successo", "Richiesta  con successo.")
 
             # Ricarica dati
             #self.richieste_ricevute = self.controller.get_richieste_ricevute(self.id_azienda)
@@ -183,15 +185,3 @@ class VisualizzaRichiesteView(QDialog):
         self.finestra_aggiungi = RichiestaProdottoView(self)
         self.finestra_aggiungi.salva_richiesta.connect(self.carica_effettuate)
         self.finestra_aggiungi.exec_()
-
-
-class richiesta():
-    def __init__(self, id_richiesta, id_azienda_richiedente, id_prodotto, quantita, stato, data):
-        self.Id_richiesta = id_richiesta
-        self.Id_azienda_richiedente = id_azienda_richiedente
-        self.Id_azienda_destinataria = 1
-        self.Id_prodotto = id_prodotto
-        self.Quantita = quantita
-        self.Stato = stato
-        self.Data : datetime = data
-        self.Nome_azienda_richiedente = "Azienda A"

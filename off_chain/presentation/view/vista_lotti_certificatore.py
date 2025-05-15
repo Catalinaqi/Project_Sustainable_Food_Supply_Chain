@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QLineEdit, QListWidget, QListWidgetItem, QApplication
+    QWidget, QVBoxLayout, QLineEdit, QListWidget, QListWidgetItem
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 from model.lotto_for_cetification_model import LottoForCertificaion

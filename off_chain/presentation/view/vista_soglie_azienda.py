@@ -1,11 +1,11 @@
+# pylint: disable=no-name-in-module
+
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QTableWidget, QTableWidgetItem,
-    QHeaderView, QPushButton
+    QHeaderView
 )
 from PyQt5.QtCore import Qt
-
 from presentation.controller.company_controller import ControllerAzienda
-from presentation.view.vista_aggiungi_operazione import AggiungiOperazioneView
 from session import Session
 from model.threshold_model import ThresholdModel
 
