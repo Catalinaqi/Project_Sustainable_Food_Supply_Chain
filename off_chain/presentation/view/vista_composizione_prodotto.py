@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QLineEdit, QSpinBox,\
 from PyQt5.QtCore import Qt, pyqtSignal
 from model.product_standard_model import ProductStandardModel
 from presentation.controller.company_controller import ControllerAzienda
-from model.materia_prima_model import MateriaPrimaModel 
+from model.prodotto_finito_model import ProdottoLottoModel 
 
 
 class VistaCreaProdottoTrasformato(QDialog):
@@ -19,7 +19,7 @@ class VistaCreaProdottoTrasformato(QDialog):
         self.setWindowTitle("Crea Nuovo Prodotto Trasformato")
         self.controller = ControllerAzienda()
         
-        self.materie_prime : list[MateriaPrimaModel] = self.controller.get_materie_prime_magazzino_azienda()  
+        self.materie_prime : list[ProdottoLottoModel] = self.controller.get_materie_prime_magazzino_azienda()  
 
 
         self.quantita_usata_per_materia = {}
@@ -73,8 +73,8 @@ class VistaCreaProdottoTrasformato(QDialog):
         for i in range(self.lista_materie.count()):
             item = self.lista_materie.item(i)
             if item.checkState() == Qt.Checked:
-                materia: MateriaPrimaModel = item.data(Qt.UserRole)
-                if isinstance(materia, MateriaPrimaModel):
+                materia: ProdottoLottoModel = item.data(Qt.UserRole)
+                if isinstance(materia, ProdottoLottoModel):
                     q, ok = QInputDialog.getInt(
                         self,
                         "Quantità usata",
@@ -101,7 +101,7 @@ class VistaCreaProdottoTrasformato(QDialog):
             return
 
         for _, (materia , q) in self.quantita_usata_per_materia.items():
-            if isinstance(materia, MateriaPrimaModel):
+            if isinstance(materia, ProdottoLottoModel):
                 if q <= 0:
                     QMessageBox.warning(self, "Errore", f"La quantità usata deve essere maggiore di zero per {materia.nome}.")
                     return

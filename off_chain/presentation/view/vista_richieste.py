@@ -4,8 +4,6 @@ from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
     QPushButton, QMessageBox, QGroupBox, QHeaderView , QInputDialog
 )
-
-from PyQt5.QtCore import Qt
 from presentation.view.vista_richiesta_prodotto import RichiestaProdottoView
 from session import Session
 from presentation.controller.company_controller import ControllerAzienda
@@ -163,7 +161,7 @@ class VisualizzaRichiesteView(QDialog):
                     id_lotto_input=lotto_input,
                 )
             except Exception as e:
-                QMessageBox.critical(self, "Errore", f"Errore nel salvataggio CO₂: {str(e)}")
+                QMessageBox.critical(self, "Errore", f"Errore nel salvataggio CO₂: {e}")
                 return
 
 
@@ -178,7 +176,7 @@ class VisualizzaRichiesteView(QDialog):
             #self.richieste_ricevute = self.controller.get_richieste_ricevute(self.id_azienda)
             self.carica_ricevute()
         except Exception as e:
-            QMessageBox.critical(self, "Errore", f"Errore durante la gestione: {str(e)}")
+            QMessageBox.critical(self, "Errore", f"Errore durante la gestione: {e}")
 
 
     def apri_invia_richiesta(self):

@@ -2,13 +2,13 @@ from abc import ABC
 import sqlite3
 from configuration.database import Database
 from configuration.log_load_setting import logger
-from model.materia_prima_model import MateriaPrimaModel
+from model.prodotto_finito_model import ProdottoLottoModel
 from model.info_product_for_choice_model import ProductForChoiceModel
 from model.lotto_composizione_model import Composizione, Lotto
 from model.prodotto_finito_cliente import ProdottoFinito
 from model.product_standard_model import ProductStandardModel
 from persistence.query_builder import QueryBuilder
-from model.prodotto_finito_model import ProdottoFinitoModel
+from model.prodotto_finito_model import ProdottoLottoModel
 from persistence.repository_impl import db_default_string
 
 
@@ -55,7 +55,7 @@ class ProductRepositoryImpl( ABC):
 
     """ Funzioni definitive"""
 
-    def get_materie_prime_magazzino_azienda(self, id_azienda : int) -> list[MateriaPrimaModel]:
+    def get_materie_prime_magazzino_azienda(self, id_azienda : int) -> list[ProdottoLottoModel]:
         query, value = (
             self.query_builder
             .select("Prodotto.id_prodotto","Magazzino.id_azienda","Magazzino.quantita", "Prodotto.nome", "Operazione.id_lotto")
@@ -80,14 +80,14 @@ class ProductRepositoryImpl( ABC):
         else:
             logger.info(f"Obtained in get_materie_prime_magazzino_azienda: {result}")
         try:
-            return [MateriaPrimaModel(*x) for x in result] if result else [] 
+            return [ProdottoLottoModel(*x) for x in result] if result else [] 
         except Exception as e:
-            logger.error(f"Error in converting result to MateriaPrimaModel: {e}")
+            logger.error(f"Error in converting result to ProdottoLottoModel: {e}")
             return []   
      # Assicurati che il path sia corretto
 
 
-    def get_prodotti_finiti_magazzino_azienda (self, id_azienda : int) -> list[ProdottoFinitoModel]:
+    def get_prodotti_finiti_magazzino_azienda (self, id_azienda : int) -> list[ProdottoLottoModel]:
         query, value = (
             self.query_builder
             .select("Prodotto.id_prodotto","Magazzino.id_azienda","Magazzino.quantita", "Prodotto.nome", "Operazione.id_lotto")
@@ -112,9 +112,9 @@ class ProductRepositoryImpl( ABC):
         else:
             logger.info(f"Obtained in get_prodotti_finiti_magazzino_azienda: {result}")
         try:
-            return [ProdottoFinitoModel(*x) for x in result] if result else [] 
+            return [ProdottoLottoModel(*x) for x in result] if result else [] 
         except Exception as e:
-            logger.error(f"Error in converting result to ProdottoFinitoModel: {e}")
+            logger.error(f"Error in converting result to ProdottoLottoModel: {e}")
             return []
 
 
