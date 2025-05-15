@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Optional, List
 
 
 @dataclass
@@ -7,44 +7,50 @@ class Lotto:
     id_lotto: int
     tipo: str
     quantita: float
-    cons_co2: float
+    cons_co2: float 
     composizione: List["Composizione"] = field(default_factory=list)
-    co2_costo_composizione: float = 0.0
-    co2_totale_lotto_unitario: float = 0.0
+    co2_da_composizione: float = 0.0  
+    co2_totale_unitaria: float = 0.0 
 
-    def get_costo_totale_lotto_unitario(self) -> float:
-        """
-        Calcola il costo totale di CO2 unitario del lotto
-        considerando la somma del consumo CO2 diretto più quello
-        derivante dalla composizione.
+    def __init__(self, id_lotto, tipo, quantita, consumo_co2):
+        self.id_lotto = id_lotto
+        self.tipo = tipo
+        self.quantita = quantita
+        self.cons_co2 = consumo_co2
+        self.composizione = []
 
-        Returns:
-            float: costo CO2 unitario per unità di quantità del lotto.
+    def calcola_co2_lotto(self) -> float: 
         """
-        self.co2_costo_composizione = 0.0
-        if len(self.composizione) > 0:
+        Calcola la CO2 totale unitaria del lotto, aggiornando
+        co2_da_composizione e co2_totale_unitaria.
+        Restituisce la CO2 totale unitaria.
+        """
+        self.co2_da_composizione = 0.0 # Resettato prima del ricalcolo
+        if self.composizione:
             for comp in self.composizione:
-                self.co2_costo_composizione += comp.get_co2_consumata_quantità_utilizzata()
+                co2_componente = comp.get_co2_da_quantita_utilizzata()
+                self.co2_da_composizione += co2_componente
 
-        self.co2_totale_lotto_unitario = (self.co2_costo_composizione + self.cons_co2) / self.quantita
+        if self.quantita > 0: # Evitiamo divisione per zero
+            self.co2_totale_unitaria = (
+                self.co2_da_composizione + self.cons_co2
+            ) / self.quantita
+        else:
+            self.co2_totale_unitaria = 0.0 
 
-        return self.co2_totale_lotto_unitario
-
+        return self.co2_totale_unitaria
+    
 
 @dataclass
 class Composizione:
     id_lotto_input: int
     quantita_utilizzata: float
     lotto_input: Optional[Lotto] = None
-
-    def get_co2_consumata_quantità_utilizzata(self) -> float:
+    def get_co2_da_quantita_utilizzata(self) -> float: # Nome metodo corretto
         """
-        Calcola la CO2 consumata in base alla quantità utilizzata
-        e al costo CO2 unitario del lotto di input.
-
-        Returns:
-            float: CO2 consumata per la quantità utilizzata.
+        Calcola la CO2 consumata attribuibile alla quantità utilizzata di questo componente.
         """
         if isinstance(self.lotto_input, Lotto):
-            return self.lotto_input.get_costo_totale_lotto_unitario() * self.quantita_utilizzata
+            costo_unitario_input = self.lotto_input.calcola_co2_lotto() 
+            return costo_unitario_input * self.quantita_utilizzata
         return 0.0

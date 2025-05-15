@@ -1,26 +1,31 @@
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Optional, List, Dict
 from functools import wraps
 import asyncio
 import time
 import logging
 from datetime import datetime
+from dataclasses import dataclass, field
 
+# Definiamo un dataclass per contenere le informazioni sulla violazione
+@dataclass
+class ViolationInfo:
+    function_name: str
+    operation_type: str
+    execution_time: float
+    timeout_limit: float
+    error_message: Optional[str] = None
+    timestamp: datetime = field(default_factory=datetime.now)
 
 class GuaranteeResponseError(Exception):
-    """Exception raised when a guaranteed response time is violated."""
+    """Custom exception for response time violations."""
     pass
 
-
 class GuaranteeResponseEnforcer:
-    """
-    Class to enforce and log guaranteed response times on synchronous and asynchronous operations.
-    """
-
-    def __init__(self) -> None:
-        self.response_violations: List[Dict[str, Any]] = []
-        self.timeout_limits: Dict[str, float] = {
-            'default': 5.0,                # seconds
-            'blockchain_operation': 30.0,  # longer timeout for blockchain operations
+    def __init__(self):
+        self.response_violations: List[ViolationInfo] = [] # Tipo specificato
+        self.timeout_limits: Dict[str, float] = {      # Tipo specificato
+            'default': 5.0,                 # seconds
+            'blockchain_operation': 30.0,   # longer timeout for blockchain operations
             'database_query': 3.0,         # database operations
             'product_validation': 2.0,     # product validation checks
             'quality_check': 4.0,          # quality control operations
@@ -28,146 +33,163 @@ class GuaranteeResponseEnforcer:
         }
         self.logger = logging.getLogger(__name__)
 
-    def enforce_response_time(self, operation_type: str = 'default') -> Callable[..., Any]:
-        """
-        Decorator to enforce maximum response time for functions (sync or async).
-        
-        Args:
-            operation_type: Type of operation to determine timeout limit.
-            
-        Returns:
-            A decorator that wraps the function with timeout enforcement.
-        """
-        def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
-            timeout_limit = self.timeout_limits.get(operation_type, self.timeout_limits['default'])
+    def enforce_response_time(self, operation_type: str = 'default') -> Callable:
+        def decorator(function: Callable) -> Callable:
+            @wraps(function)
+            async def async_wrapper(*args, **kwargs) -> Any:
+                # C0301: Line too long - spezzata l'assegnazione di timeout
+                default_timeout = self.timeout_limits['default']
+                timeout = self.timeout_limits.get(operation_type, default_timeout)
+                start_time = time.time()
 
-            if asyncio.iscoroutinefunction(func):
-                @wraps(func)
-                async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
-                    start_time = time.perf_counter()
-                    try:
-                        result = await asyncio.wait_for(func(*args, **kwargs), timeout=timeout_limit)
-                        exec_time = time.perf_counter() - start_time
-                        self._log_execution_metrics(func.__name__, operation_type, exec_time, timeout_limit)
-                        return result
-                    except asyncio.TimeoutError:
-                        exec_time = time.perf_counter() - start_time
-                        self._record_violation(func.__name__, operation_type, exec_time, timeout_limit)
-                        raise GuaranteeResponseError(
-                            f"Operation '{func.__name__}' timed out after {timeout_limit:.2f} seconds"
-                        )
-                return async_wrapper
-
-            @wraps(func)
-            def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
-                start_time = time.perf_counter()
                 try:
-                    result = func(*args, **kwargs)
-                    exec_time = time.perf_counter() - start_time
-                    if exec_time > timeout_limit:
-                        self._record_violation(func.__name__, operation_type, exec_time, timeout_limit)
-                        raise GuaranteeResponseError(
-                            f"Operation '{func.__name__}' exceeded timeout limit of {timeout_limit:.2f} seconds"
-                        )
-                    self._log_execution_metrics(func.__name__, operation_type, exec_time, timeout_limit)
-                    return result
-                except Exception as exc:
-                    exec_time = time.perf_counter() - start_time
-                    self._record_violation(func.__name__, operation_type, exec_time, timeout_limit, error=str(exc))
-                    raise
-            return sync_wrapper
+                    # La chiamata ad asyncio.wait_for è mantenuta su una riga se possibile
+                    result = await asyncio.wait_for(
+                        function(*args, **kwargs),
+                        timeout=timeout
+                    )
+                    execution_time = time.time() - start_time
 
+                    self._log_execution_metrics(
+                        function.__name__,
+                        operation_type,
+                        execution_time,
+                        timeout
+                    )
+
+                    return result
+
+                # W0707: raise-missing-from
+                except asyncio.TimeoutError as te:
+                    execution_time = time.time() - start_time
+                    # R0913, R0917: Usare ViolationInfo
+                    error_msg = "Async operation timed out via asyncio.wait_for"
+                    violation_details = ViolationInfo(
+                        function_name=function.__name__,
+                        operation_type=operation_type,
+                        execution_time=execution_time,
+                        timeout_limit=timeout,
+                        error_message=error_msg
+                    )
+                    self._record_violation(violation_details)
+                    # C0301: Line too long - spezzata la stringa dell'eccezione
+                    error_display_msg = (
+                        f"Operation {function.__name__} timed out"
+                        f" after {timeout:.2f} seconds"
+                    )
+                    raise GuaranteeResponseError(error_display_msg) from te
+
+            @wraps(function)
+            def sync_wrapper(*args, **kwargs) -> Any:
+                # C0301: Line too long - spezzata l'assegnazione di timeout
+                default_timeout = self.timeout_limits['default']
+                timeout = self.timeout_limits.get(operation_type, default_timeout)
+                start_time = time.time()
+
+                try:
+                    result = function(*args, **kwargs)
+                    execution_time = time.time() - start_time
+
+                    if execution_time > timeout:
+                        # R0913, R0917: Usare ViolationInfo
+                        error_msg = "Sync operation exceeded timeout"
+                        violation_details = ViolationInfo(
+                            function_name=function.__name__,
+                            operation_type=operation_type,
+                            execution_time=execution_time,
+                            timeout_limit=timeout,
+                            error_message=error_msg
+                        )
+                        self._record_violation(violation_details)
+                        # C0301: Line too long - spezzata la stringa dell'eccezione
+                        error_display_msg = (
+                            f"Operation {function.__name__} exceeded timeout"
+                            f" of {timeout:.2f} seconds"
+                        )
+                        raise GuaranteeResponseError(error_display_msg)
+
+                    self._log_execution_metrics(
+                        function.__name__,
+                        operation_type,
+                        execution_time,
+                        timeout
+                    )
+
+                    return result
+                # C0103: invalid-name (rinominato 'e' in 'exc')
+                except Exception as exc:
+                    execution_time = time.time() - start_time
+                    # R0913, R0917: Usare ViolationInfo
+                    violation_details = ViolationInfo(
+                        function_name=function.__name__,
+                        operation_type=operation_type,
+                        execution_time=execution_time,
+                        timeout_limit=timeout,
+                        error_message=str(exc)
+                    )
+                    self._record_violation(violation_details)
+                    raise # Rilancia l'eccezione originale
+
+            return async_wrapper if asyncio.iscoroutinefunction(function) else sync_wrapper
         return decorator
 
-    def _record_violation(
-        self,
-        function_name: str,
-        operation_type: str,
-        execution_time: float,
-        timeout_limit: float,
-        error: Optional[str] = None
-    ) -> None:
-        """
-        Record a response time violation and log a warning.
-        
-        Args:
-            function_name: Name of the function where violation occurred.
-            operation_type: Type of the operation.
-            execution_time: Time the function took to execute.
-            timeout_limit: Maximum allowed timeout.
-            error: Optional error message associated with the violation.
-        """
-        violation = {
-            'timestamp': datetime.now(),
-            'function': function_name,
-            'operation_type': operation_type,
-            'execution_time': execution_time,
-            'timeout_limit': timeout_limit,
-            'error': error
-        }
-        self.response_violations.append(violation)
-        self.logger.warning(
-            f"Response time violation in '{function_name}': "
-            f"execution took {execution_time:.3f}s (limit {timeout_limit:.3f}s). "
-            + (f"Error: {error}" if error else "")
-        )
+    # R0913, R0917: Modificato per accettare un oggetto ViolationInfo
+    def _record_violation(self, info: ViolationInfo) -> None:
+        """Record a response time violation"""
+        self.response_violations.append(info)
 
-    def _log_execution_metrics(
-        self,
-        function_name: str,
-        operation_type: str,
-        execution_time: float,
-        timeout_limit: float
-    ) -> None:
-        """
-        Log execution time metrics for monitoring purposes.
-        
-        Args:
-            function_name: Name of the function executed.
-            operation_type: Type of the operation.
-            execution_time: Time taken to execute function.
-            timeout_limit: Maximum allowed timeout.
-        """
+        # W1203: Use lazy % formatting in logging functions
+        # C0301: Line too long - spezzata la stringa di formato del log
+        log_format_string = (
+            "Violation in %s (type: %s): exec_time %.2fs, limit %.2fs."
+        )
+        log_args = [info.function_name, info.operation_type,
+                    info.execution_time, info.timeout_limit]
+
+        if info.error_message:
+            log_format_string += " Error: %s"
+            log_args.append(info.error_message)
+
+        self.logger.warning(log_format_string, *log_args)
+
+
+    def _log_execution_metrics(self,
+                             function_name: str,
+                             operation_type: str,
+                             execution_time: float,
+                             timeout: float) -> None:
+        """Log execution metrics for monitoring"""
+        # W1203: Use lazy % formatting in logging functions
+        # C0301: Line too long - spezzata la stringa di formato del log
+        log_format_string = (
+            "Operation metrics - Function: %s, Type: %s, "
+            "Time: %.2fs, Limit: %.2fs"
+        )
         self.logger.info(
-            f"Operation metrics - Function: '{function_name}', "
-            f"Type: '{operation_type}', "
-            f"Execution Time: {execution_time:.3f}s, "
-            f"Timeout Limit: {timeout_limit:.3f}s"
+            log_format_string,
+            function_name,
+            operation_type,
+            execution_time,
+            timeout
         )
 
-    def get_response_violations(self) -> List[Dict[str, Any]]:
-        """
-        Retrieve all recorded response time violations.
-        
-        Returns:
-            List of violation dictionaries.
-        """
+    def get_response_violations(self) -> List[ViolationInfo]: 
+        """Return list of all response time violations"""
         return self.response_violations
 
     def update_timeout_limit(self, operation_type: str, timeout: float) -> None:
-        """
-        Update the timeout limit for a given operation type.
-        
-        Args:
-            operation_type: The operation type to update.
-            timeout: New timeout value in seconds (must be positive).
-        
-        Raises:
-            ValueError: If timeout is not positive.
-        """
+        """Update timeout limit for an operation type"""
         if timeout <= 0:
             raise ValueError("Timeout must be positive")
         self.timeout_limits[operation_type] = timeout
-        self.logger.info(f"Updated timeout limit for '{operation_type}' to {timeout:.3f}s")
+        # W1203: Use lazy % formatting in logging functions
+        self.logger.info(
+            "Updated timeout limit for %s to %.2fs",
+            operation_type,
+            timeout
+        )
 
     def get_timeout_limit(self, operation_type: str) -> float:
-        """
-        Get the timeout limit for a given operation type.
-        
-        Args:
-            operation_type: The operation type to query.
-        
-        Returns:
-            Timeout limit in seconds.
-        """
-        return self.timeout_limits.get(operation_type, self.timeout_limits['default'])
+        """Get timeout limit for an operation type"""
+        default_timeout = self.timeout_limits['default']
+        return self.timeout_limits.get(operation_type, default_timeout)
