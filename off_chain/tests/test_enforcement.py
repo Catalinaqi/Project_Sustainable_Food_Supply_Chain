@@ -1,5 +1,5 @@
-import pytest
 import asyncio
+import pytest
 from off_chain.enforcement import (
     SafetyEnforcer,
     SafetyViolationError,
@@ -14,7 +14,8 @@ response_enforcer = GuaranteeResponseEnforcer()
 # Example of using both enforcers together
 @safety_enforcer.enforce_safety('product_validation')
 @response_enforcer.enforce_response_time('quality_check')
-async def validate_product_quality(temperature: float, humidity: float, quality_score: float):
+async def validate_product_quality(
+    temperature: float, humidity: float, quality_score: float):
     # Simulate some processing time
     await asyncio.sleep(1)
     return {
@@ -49,15 +50,13 @@ async def test_invalid_temperature():
 @pytest.mark.asyncio
 async def test_slow_response():
     # Update timeout to a very small value to force a timeout
-    response_enforcer.update_timeout_limit('quality_check', 0.1)
-    
+    response_enforcer.update_timeout_limit('quality_check', 0.1) 
     with pytest.raises(GuaranteeResponseError):
         await validate_product_quality(
             temperature=20.0,
             humidity=50.0,
             quality_score=0.8
         )
-    
     # Reset timeout to original value
     response_enforcer.update_timeout_limit('quality_check', 4.0)
 
