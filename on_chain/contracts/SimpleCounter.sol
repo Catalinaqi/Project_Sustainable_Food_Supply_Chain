@@ -1,14 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-
-contract Counter is Ownable {
+contract SimpleCounter {
     uint256 private _count;
+    address private _owner;
 
     event Incremented(uint256 newCount);
-    
-    constructor() Ownable(msg.sender) {
+
+    modifier onlyOwner() {
+        require(msg.sender == _owner, "Not the owner");
+        _;
+    }
+
+    constructor() {
+        _owner = msg.sender;
         _count = 0;
     }
 

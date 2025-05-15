@@ -1,10 +1,8 @@
-# pylint: disable=no-name-in-module
-# pylint: disable=import-error
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QTableWidget,
     QTableWidgetItem, QLabel, QHeaderView, QComboBox, QMessageBox
 )
-
+from PyQt5.QtCore import Qt
 from presentation.view.vista_catena_prodotto import LottoTreeView
 from presentation.controller.guest_controller import ControllerGuest
 from model.prodotto_finito_cliente import ProdottoFinito
@@ -39,7 +37,7 @@ class ProdottiFinitiView(QWidget):
 
         self.ordina_combo = QComboBox()
         self.ordina_combo.addItems(["Nessun Ordinamento", "CO₂ Crescente", "CO₂ Decrescente"])
-        self.ordina_combo.currentIndexChanged.connect(self.applica_filtri)
+        self.ordina_combo.currentIndexChanged.connect(self.applica_filtri)  # Cambia ordinamento live
         filtro_layout.addWidget(QLabel("Ordina:"))
         filtro_layout.addWidget(self.ordina_combo)
 

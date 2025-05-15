@@ -1,11 +1,10 @@
-# pylint: disable=no-name-in-module
-# pylint: disable=import-error
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QLabel, QGridLayout,
     QPushButton, QMessageBox
 )
+
 from presentation.view.vista_richieste import VisualizzaRichiesteView
 from presentation.view.vista_magazzino import VisualizzaMagazzinoView
 from presentation.controller.company_controller import ControllerAzienda

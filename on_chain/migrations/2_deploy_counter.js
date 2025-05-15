@@ -1,5 +1,12 @@
-const Counter = artifacts.require("Counter");
+const SimpleCounter = artifacts.require("SimpleCounter");
 
-module.exports = function (deployer) {
-  deployer.deploy(Counter);
+module.exports = async function (deployer) {
+  try {
+    await deployer.deploy(SimpleCounter);
+    const instance = await SimpleCounter.deployed();
+    console.log("Counter deployed to:", instance.address);
+  } catch (error) {
+    console.error("Error deploying Counter:", error);
+    throw error;
+  }
 };
