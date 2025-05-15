@@ -1,5 +1,5 @@
-
 # pylint: disable=import-error
+from typing import List, Optional
 from configuration.log_load_setting import logger
 from model.company_model import CompanyModel
 from model.product_model import ProductModel
@@ -14,108 +14,98 @@ from persistence.repository_impl.database_standard import aziende_enum
 
 class ControllerGuest:
     """
-    As the instance has been created, in the repository implement layer, to access your methods,
-    we initialize the instances of the classes 'class instances' with:
-            CertificationRepositoryImpl()
-            ProductRepositoryImpl()
-            ThresholdRepositoryImpl()
-            CompanyRepositoryImpl()
-
-            get_certifications_by_product_interface
+    Controller per accesso ai dati di aziende, prodotti, certificazioni e soglie.
+    Inizializza le istanze delle classi di repository per l'accesso ai dati.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.certification = CertificationRepositoryImpl()
         self.product = ProductRepositoryImpl()
         self.threshold = ThresholdRepositoryImpl()
         self.company = CompanyRepositoryImpl()
         logger.info(
-            "BackEnd: Successful initialization of 'class instances' for repository implements")
+            "BackEnd: Successful initialization of repository implementations"
+        )
 
-    def lista_rivenditori(self)-> list[CompanyModel]:
-        rivenditori = self.company.get_lista_aziende(tipo= aziende_enum.RIVENDIORE)
-        return rivenditori
+    def lista_rivenditori(self) -> List[CompanyModel]:
+        """Restituisce la lista delle aziende di tipo rivenditore."""
+        return self.company.get_lista_aziende(tipo=aziende_enum.RIVENDIORE)
 
-    # Restituisce la lista di tutte le aziende
-    def lista_aziende(self) -> list[CompanyModel]:
-        lista_aziende = self.company.get_lista_aziende()
-        return lista_aziende
+    def lista_aziende(self) -> List[CompanyModel]:
+        """Restituisce la lista di tutte le aziende."""
+        return self.company.get_lista_aziende()
 
-    # Restituisce la lista di tutte le aziende filtrate per tipo
-    def lista_aziende_filtro_tipo(self, tipo_azienda : aziende_enum) -> list[CompanyModel]:
-        
-        lista_aziende = self.company.get_lista_aziende(tipo = tipo_azienda)
-        return lista_aziende
+    def lista_aziende_filtro_tipo(self, tipo_azienda: aziende_enum) -> List[CompanyModel]:
+        """Restituisce la lista di aziende filtrate per tipo."""
+        return self.company.get_lista_aziende(tipo=tipo_azienda)
 
-    # Restituisce la lista di tutte le aziende filtrate per nome (unica azienda)
-    def azienda_by_nome(self, nome_azienda)-> CompanyModel:
-        
-        azienda = self.company.get_lista_aziende(nome = nome_azienda)
-        return azienda
+    def azienda_by_nome(self, nome_azienda: str) -> Optional[CompanyModel]:
+        """Restituisce l'azienda corrispondente al nome."""
+        aziende = self.company.get_lista_aziende(nome=nome_azienda)
+        if aziende:
+            return aziende[0]
+        logger.warning(f"Azienda con nome '{nome_azienda}' non trovata.")
+        return None
 
-    # Restituisce la lista di tutti i prodotti finali
-    def lista_prodotti(self):
-        # repo6 = ProductRepositoryImpl()
-        lista_prodotti = self.product.get_lista_prodotti()
-        return lista_prodotti
+    def lista_prodotti(self) -> List[ProductModel]:
+        """Restituisce la lista di tutti i prodotti finali."""
+        return self.product.get_lista_prodotti()
 
-    def is_certificato(self, id_prodotto):
-
-        # return self.certification.is_certificato(id_prodotto)
+    def is_certificato(self, id_prodotto: int) -> Optional[bool]:
+        """Verifica se un prodotto è certificato."""
         try:
-            certificazione = self.certification.is_certificato(id_prodotto)
-            return certificazione
+            return self.certification.is_certificato(id_prodotto)
         except Exception as e:
-            logger.error(f"Errore durante il recupero della certificazione per il prodotto {id_prodotto}: {str(e)}")
-            return None  # O gestire l'errore in un altro modo, come ritornare un messaggio d'errore
+            logger.error(
+                f"Errore durante il recupero della certificazione per il prodotto {id_prodotto}: {e}"
+            )
+            return None
 
-
-
-    def certificazione_by_prodotto(self, id_prodotto):
-        # repo16 = CertificationRepositoryImpl()
+    def certificazione_by_prodotto(self, id_prodotto: int) -> Optional[CertificationModel]:
+        """Restituisce la certificazione associata a un prodotto."""
         try:
-            certificazione = self.certification.get_certificazione_by_prodotto(id_prodotto)
-            return certificazione
+            return self.certification.get_certificazione_by_prodotto(id_prodotto)
         except Exception as e:
-            logger.error(f"Errore durante il recupero della certificazione per il prodotto {id_prodotto}: {str(e)}")
-            return None  # O gestire l'errore in un altro modo, come ritornare un messaggio d'errore
+            logger.error(
+                f"Errore durante il recupero della certificazione per il prodotto {id_prodotto}: {e}"
+            )
+            return None
 
- 
+    def scarto_soglia(self, co2: float, operazione: str, prodotto: ProductModel) -> Optional[float]:
+        """Calcola lo scarto rispetto alla soglia di riferimento per CO2."""
+        try:
+            soglia = self.threshold.get_soglia_by_operazione_and_prodotto(operazione, prodotto)
+            return soglia - co2
+        except Exception as e:
+            logger.error(f"Errore nel calcolo dello scarto soglia: {e}")
+            return None
 
-    # Restituisce lo scarto dalla soglia di riferimento
-
-    def scarto_soglia(self, co2, operazione, prodotto):
-        # repo17 = ThresholdRepositoryImpl()
-        soglia = self.threshold.get_soglia_by_operazione_and_prodotto(operazione, prodotto)
-        return soglia - float(co2)
-    
-
-    def carica_prodotto_con_storia(self, prodotto_id : int) -> ProductModel:
+    def carica_prodotto_con_storia(self, prodotto_id: int) -> Optional[ProductModel]:
         """
         Carica un prodotto con la sua storia a partire dal suo ID.
+        Nota: implementazione simulata.
         """
         try:
-            prodotto = self.get_fake_prodotto(prodotto_id )  # Simulazione del caricamento del prodotto
+            prodotto = self.get_fake_prodotto(prodotto_id)  # Metodo da implementare o mock
             return prodotto
         except Exception as e:
-            logger.error(f"Errore durante il caricamento del prodotto con ID {prodotto_id}: {str(e)}")
+            logger.error(f"Errore durante il caricamento del prodotto con ID {prodotto_id}: {e}")
             return None
-        
 
-    """ Funzioni Mock"""
+    # Funzioni Mock
 
-    def get_prodotti(self) -> list[ProdottoFinito]:
+    def get_prodotti(self) -> List[ProdottoFinito]:
+        """Recupera la lista di prodotti finiti."""
         try:
             return self.product.get_lista_prodotti()
         except Exception as e:
-            logger.error(f"Errore durante il recupero dei prodotti: {str(e)}")
+            logger.error(f"Errore durante il recupero dei prodotti: {e}")
             return []
-            
-    def get_certificazioni_by_lotto(self,lotto_id : int)-> list[CertificationModel]:
+
+    def get_certificazioni_by_lotto(self, lotto_id: int) -> List[CertificationModel]:
+        """Recupera la lista di certificazioni associate a un lotto."""
         try:
             return self.certification.get_certificati_catena(lotto_id) or []
         except Exception as e:
-                logger.error(f"Errore nel recuperare i certificai {e}")
-        
-
-  
+            logger.error(f"Errore nel recuperare i certificati per lotto {lotto_id}: {e}")
+            return []

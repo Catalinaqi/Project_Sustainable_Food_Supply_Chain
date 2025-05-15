@@ -26,13 +26,10 @@ PERMESSI_OPERAZIONI = {
 
 
 class ControllerAzienda:
-    """
-    Controller per la gestione delle operazioni aziendali.
-    Inizializza i repository per accedere ai dati di operazioni, prodotti,
-    soglie, aziende, azioni compensative e richieste.
-    """
+    """Controller per la gestione delle operazioni aziendali."""
 
     def __init__(self):
+        self._session = Session()
         self.operation_repository = OperationRepositoryImpl()
         self.compensation_action = CompensationActionRepositoryImpl()
         self.product = ProductRepositoryImpl()
@@ -41,46 +38,48 @@ class ControllerAzienda:
         self.richieste = RichiesteRepositoryImpl()
         logger.info("BackEnd: Inizializzazione completata dei repository")
 
+    @property
+    def id_azienda(self):
+        return self._session.current_user["id_azienda"]
+
+    @property
+    def ruolo_utente(self):
+        return self._session.current_user["role"]
+
     def lista_soglie(self) -> list[ThresholdModel]:
         return self.threshold.get_lista_soglie()
 
     def get_prodotti_to_composizione(self) -> list[ProdottoLottoModel]:
         try:
-            return self.product.get_prodotti_finiti_magazzino_azienda(
-                Session().current_user["id_azienda"]
-            )
+            return self.product.get_prodotti_finiti_magazzino_azienda(self.id_azienda)
         except Exception as exc:
             logger.error("Errore nel recupero prodotti per composizione: %s", exc)
             return []
 
-    def lista_operazioni(self, azienda: int) -> list[OperazioneEstesaModel]:
+    def lista_operazioni(self, azienda_id: int) -> list[OperazioneEstesaModel]:
         try:
-            return self.operation_repository.get_operazioni_by_azienda(azienda)
+            return self.operation_repository.get_operazioni_by_azienda(azienda_id)
         except Exception as exc:
             logger.error("Errore nel recupero operazioni: %s", exc, exc_info=True)
             return []
 
-    def lista_azioni_compensative(self, azienda: int) -> list[CompensationActionModel]:
+    def lista_azioni_compensative(self, azienda_id: int) -> list[CompensationActionModel]:
         try:
-            return self.compensation_action.get_lista_azioni(azienda)
+            return self.compensation_action.get_lista_azioni(azienda_id)
         except Exception as exc:
             logger.error("Errore nel recupero azioni compensative: %s", exc, exc_info=True)
             return []
 
     def get_materie_prime_magazzino_azienda(self) -> list[ProdottoLottoModel]:
         try:
-            return self.product.get_materie_prime_magazzino_azienda(
-                Session().current_user["id_azienda"]
-            )
+            return self.product.get_materie_prime_magazzino_azienda(self.id_azienda)
         except Exception as exc:
             logger.error("Errore nel recupero materie prime: %s", exc, exc_info=True)
             return []
 
     def get_prodotti_finiti_magazzino_azienda(self) -> list[ProdottoLottoModel]:
         try:
-            return self.product.get_prodotti_finiti_magazzino_azienda(
-                Session().current_user["id_azienda"]
-            )
+            return self.product.get_prodotti_finiti_magazzino_azienda(self.id_azienda)
         except Exception as exc:
             logger.error("Errore nel recupero prodotti finiti: %s", exc, exc_info=True)
             return []
@@ -90,13 +89,13 @@ class ControllerAzienda:
         id_tipo: int,
         descrizione: str,
         quantita: int,
-        quantita_usata_per_materia: dict[ProdottoLottoModel, int],
+        quantita_per_materia: dict[ProdottoLottoModel, int],
         co2: int,
     ):
         try:
-            id_azienda = Session().current_user["id_azienda"]
             self.operation_repository.inserisci_prodotto_trasformato(
-                id_tipo, descrizione, quantita, quantita_usata_per_materia, id_azienda, co2
+                id_tipo, descrizione, quantita, quantita_per_materia,
+                self.id_azienda, co2
             )
         except Exception as exc:
             logger.error("Errore nella creazione prodotto trasformato: %s", exc, exc_info=True)
@@ -113,8 +112,7 @@ class ControllerAzienda:
         if not self.check_utente(tipo):
             raise PermissionError("Operazione non consentita per questo utente.")
         self.operation_repository.inserisci_operazione_azienda_agricola(
-            id_tipo_prodotto, descrizione, quantita,
-            Session().current_user["id_azienda"], data, co2
+            id_tipo_prodotto, descrizione, quantita, self.id_azienda, data, co2
         )
 
     def salva_operazione_distributore(
@@ -127,9 +125,8 @@ class ControllerAzienda:
     ):
         try:
             self.operation_repository.inserisci_operazione_azienda_rivenditore(
-                Session().current_user["id_azienda"],
-                id_prodotto, data, co2, "vendita",
-                id_lotto_input, quantita
+                self.id_azienda, id_prodotto, data, co2,
+                "vendita", id_lotto_input, quantita
             )
         except Exception as exc:
             logger.error("Errore salvataggio operazione rivendita: %s", exc)
@@ -144,15 +141,14 @@ class ControllerAzienda:
         id_lotto_input: int
     ):
         self.operation_repository.inserisci_operazione_trasporto(
-            Session().current_user["id_azienda"], id_lotto_input,
-            id_prodotto, id_azienda_richiedente,
-            id_azienda_ricevente, quantita, co2
+            self.id_azienda, id_lotto_input, id_prodotto,
+            id_azienda_richiedente, id_azienda_ricevente, quantita, co2
         )
 
     def get_prodotti_ordinabili(self) -> list[ProductForChoiceModel]:
         try:
-            ruolo = Session().current_user["role"]
-            return self.product.get_prodotti_ordinabili(1 if ruolo == "Rivenditore" else None)
+            filtro = 1 if self.ruolo_utente == "Rivenditore" else None
+            return self.product.get_prodotti_ordinabili(filtro)
         except Exception as exc:
             logger.error("Errore nel recupero prodotti ordinabili: %s", exc, exc_info=True)
             return []
@@ -164,54 +160,44 @@ class ControllerAzienda:
             logger.error("Errore nel recupero aziende trasporto: %s", exc, exc_info=True)
             return []
 
-    def invia_richiesta(
-        self, id_az_ricevente: int,
-        id_az_trasporto: int,
-        id_prodotto: int,
-        quantita: int
-    ):
+    def invia_richiesta(self, id_az_ricevente: int, id_az_trasporto: int, id_prodotto: int, quantita: int):
         try:
             self.richieste.inserisci_richiesta(
-                Session().current_user["id_azienda"],
-                id_az_ricevente, id_az_trasporto,
-                id_prodotto, quantita
+                self.id_azienda, id_az_ricevente, id_az_trasporto, id_prodotto, quantita
             )
         except Exception as exc:
             logger.error("Errore invio richiesta: %s", exc, exc_info=True)
 
     def get_richieste_ricevute(self) -> list[RichiestaModel]:
         try:
-            azienda = Session().current_user["id_azienda"]
-            is_trasportatore = Session().current_user["role"] == "Trasportatore"
-            return self.richieste.get_richieste_ricevute(azienda, check_trasporto=is_trasportatore)
+            is_trasportatore = self.ruolo_utente == "Trasportatore"
+            return self.richieste.get_richieste_ricevute(self.id_azienda, check_trasporto=is_trasportatore)
         except Exception as exc:
             logger.error("Errore richieste ricevute: %s", exc, exc_info=True)
             return []
 
     def get_richieste_effettuate(self) -> list[RichiestaModel]:
         try:
-            return self.richieste.get_richieste_effettuate(Session().current_user["id_azienda"])
+            return self.richieste.get_richieste_effettuate(self.id_azienda)
         except Exception as exc:
             logger.error("Errore richieste effettuate: %s", exc, exc_info=True)
             return []
 
     def update_richiesta(self, id_richiesta: int, nuovo_stato: str):
         try:
-            self.richieste.update_richiesta(
-                id_richiesta, nuovo_stato, Session().current_user["role"]
-            )
+            self.richieste.update_richiesta(id_richiesta, nuovo_stato, self.ruolo_utente)
         except Exception as exc:
             logger.error("Errore aggiornamento richiesta: %s", exc, exc_info=True)
             raise RuntimeError("Errore aggiornamento richiesta") from exc
 
     def check_utente(self, tipo_operazione: str) -> bool:
-        return tipo_operazione in PERMESSI_OPERAZIONI.get(Session().current_user["role"], [])
+        return tipo_operazione in PERMESSI_OPERAZIONI.get(self.ruolo_utente, [])
 
     def aggiungi_azione_compensativa(self, descrizione: str, co2: float, data: datetime.datetime):
         try:
             self.compensation_action.inserisci_azione(
                 data=data,
-                azienda=Session().current_user["id_azienda"],
+                azienda=self.id_azienda,
                 co2_compensata=co2,
                 nome_azione=descrizione
             )
@@ -220,10 +206,9 @@ class ControllerAzienda:
 
     def get_prodotti_standard(self) -> list[ProductStandardModel]:
         try:
-            ruolo = Session().current_user["role"]
-            if ruolo == "Agricola":
+            if self.ruolo_utente == "Agricola":
                 return self.product.get_prodotti_standard_agricoli()
-            if ruolo == "Trasformatore":
+            if self.ruolo_utente == "Trasformatore":
                 return self.product.get_prodotti_standard_trasformazione()
             raise TypeError("Utente non autorizzato")
         except Exception as exc:

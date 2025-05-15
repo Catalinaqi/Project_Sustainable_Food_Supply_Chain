@@ -1,10 +1,11 @@
 # pylint: disable=no-name-in-module
 # pylint: disable=import-error
+# pylint: disable=no-name-in-module, import-error
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QLabel, QSpinBox, QPushButton, QMessageBox, QComboBox
 )
-from PyQt5.QtCore import  pyqtSignal
+from PyQt5.QtCore import pyqtSignal
 
 from model.info_product_for_choice_model import ProductForChoiceModel
 from model.company_model import CompanyModel
@@ -16,42 +17,37 @@ class RichiestaProdottoView(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.controller = ControllerAzienda()       
-        self.prodotti: list[ProductForChoiceModel] = self.controller.get_prodotti_ordinabili()  
-        self.aziende_trasporto : list[CompanyModel] = self.controller.get_aziende_trasporto()
-
+        self.controller = ControllerAzienda()
+        self.prodotti: list[ProductForChoiceModel] = self.controller.get_prodotti_ordinabili()
+        self.aziende_trasporto: list[CompanyModel] = self.controller.get_aziende_trasporto()
         self.init_ui()
 
     def init_ui(self):
         self.setWindowTitle("Richiedi Prodotto")
         layout = QVBoxLayout()
 
-        # Tabella prodotti
         self.tabella = QTableWidget()
         self.tabella.setColumnCount(3)
         self.tabella.setHorizontalHeaderLabels(["Nome prodotto", "Azienda", "Qt. disponibile"])
-        self.tabella.setSelectionBehavior(self.tabella.SelectRows)
-        self.tabella.setSelectionMode(self.tabella.SingleSelection)
+        self.tabella.setSelectionBehavior(QTableWidget.SelectRows)
+        self.tabella.setSelectionMode(QTableWidget.SingleSelection)
         self.tabella.setEditTriggers(QTableWidget.NoEditTriggers)
 
         self.carica_prodotti()
         layout.addWidget(QLabel("Seleziona un prodotto dalla lista:"))
         layout.addWidget(self.tabella)
 
-        # Quantità richiesta
         layout.addWidget(QLabel("Quantità richiesta:"))
         self.input_quantita = QSpinBox()
         self.input_quantita.setMinimum(1)
         layout.addWidget(self.input_quantita)
 
-        # Azienda di trasporto
         layout.addWidget(QLabel("Seleziona azienda di trasporto:"))
         self.combo_azienda = QComboBox()
         for azienda in self.aziende_trasporto:
             self.combo_azienda.addItem(azienda.Nome, azienda.Id_credenziali)
         layout.addWidget(self.combo_azienda)
 
-        # Bottone richiesta
         self.btn_richiesta = QPushButton("Invia richiesta")
         self.btn_richiesta.clicked.connect(self.invia_richiesta)
         layout.addWidget(self.btn_richiesta)
@@ -63,8 +59,7 @@ class RichiestaProdottoView(QDialog):
         self.tabella.setRowCount(len(self.prodotti))
         for row, prodotto in enumerate(self.prodotti):
             self.tabella.setItem(row, 0, QTableWidgetItem(prodotto.nome_prodotto))
-            self.tabella.setItem(row, 1, QTableWidgetItem(prodotto.nome_azienda +\
-                                                           str(prodotto.id_azienda)))
+            self.tabella.setItem(row, 1, QTableWidgetItem(f"{prodotto.nome_azienda} ({prodotto.id_azienda})"))
             self.tabella.setItem(row, 2, QTableWidgetItem(str(prodotto.quantita)))
             self.tabella.setRowHeight(row, 30)
 
@@ -77,7 +72,7 @@ class RichiestaProdottoView(QDialog):
         prodotto = self.prodotti[row]
         quantita = self.input_quantita.value()
 
-        if quantita > prodotto.quantita:  # Placeholder
+        if quantita > prodotto.quantita:
             QMessageBox.warning(self, "Errore", "Quantità richiesta maggiore della disponibilità.")
             return
 
@@ -86,7 +81,7 @@ class RichiestaProdottoView(QDialog):
 
         try:
             self.controller.invia_richiesta(
-                id_az_ricevente= prodotto.id_azienda,
+                id_az_ricevente=prodotto.id_azienda,
                 id_prodotto=prodotto.id_prodotto,
                 quantita=quantita,
                 id_az_trasporto=id_azienda_trasporto
@@ -95,8 +90,7 @@ class RichiestaProdottoView(QDialog):
                 self, "Successo",
                 f"Richiesta inviata con successo.\nTrasporto affidato a: {nome_azienda}."
             )
-            
             self.salva_richiesta.emit()
             self.accept()
-        except Exception as e:
-            QMessageBox.critical(self, "Errore", f"Errore durante l'invio della richiesta: {str(e)}")
+        except Exception as exc:
+            QMessageBox.critical(self, "Errore", f"Errore durante l'invio della richiesta: {exc}")

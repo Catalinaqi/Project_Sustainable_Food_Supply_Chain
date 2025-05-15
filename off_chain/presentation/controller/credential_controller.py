@@ -1,8 +1,9 @@
 # pylint: disable=import-error
+
 from configuration.log_load_setting import logger
 from domain.exception.authentication_exceptions import PasswordTooShortError, PasswordWeakError
 from domain.exception.database_exceptions import UniqueConstraintError, DatabaseError
-from domain.exception.login_exceptions import HaveToWaitException, ToManyTryLogEXcepition , LoginFailExetion
+from domain.exception.login_exceptions import HaveToWaitException, ToManyTryLogEXcepition, LoginFailExetion
 from persistence.repository_impl.credential_repository_impl import CredentialRepositoryImpl
 from session import Session
 from model.company_model import CompanyModel
@@ -10,85 +11,106 @@ from model.credential_model import UserModel
 
 
 class ControllerAutenticazione:
+    """Controller per la gestione dell'autenticazione e registrazione degli utenti."""
 
     def __init__(self):
         self.credential = CredentialRepositoryImpl()
-        logger.info("BackEnd: Successful initialization of 'class instances' for repository implements")
         self.sessione = Session()
+        logger.info("BackEnd: Inizializzazione completata dei repository")
 
-    # Effettua la registrazione
     def registrazione(self, username, password, tipo, indirizzo):
-        """Tenta di aggiungere un utente, gestendo eventuali errori."""
+        """
+        Registra un nuovo utente.
+
+        Returns:
+            tuple: (successo: bool, messaggio: str, valore opzionale: None)
+        """
         try:
-            
-
-            # Inserisce le credenziali e la chiave segreta nel database
-            # repo1 = CredentialRepositoryImpl()
             self.credential.register(username, password, tipo, indirizzo)
+            return True, "Utente registrato con successo!", None
 
-            # Restituisce il successo insieme alla chiave segreta
-            return True, "Utente registrato con successo!"
-        except PasswordTooShortError as e:
-            return False, str(e), None
-        except PasswordWeakError as e:
-            return False, str(e), None
+        except PasswordTooShortError as exc:
+            return False, str(exc), None
+        except PasswordWeakError as exc:
+            return False, str(exc), None
         except UniqueConstraintError:
             return False, "Errore: Username già esistente.", None
         except DatabaseError:
             return False, "Errore nel database.", None
 
-    # Effettua il login
     def login(self, username, password, otp_code=None):
-        try:
+        """
+        Effettua il login di un utente.
 
-            
+        Returns:
+            bool: True se il login ha successo
+
+        Raises:
+            HaveToWaitException
+            ToManyTryLogEXcepition
+            LoginFailExetion
+        """
+        try:
             self.sessione.can_log()
             credenziali = self.credential.get_user(username)
-            logger.info(f"Username inserito: {username}, Password inserita: {password}")
+            logger.info("Tentativo login - Username: %s", username)
 
-            if credenziali is not None :
-                if credenziali.Password == UserModel.hash_password(password) :
-                    try:
-                        azienda = self.credential.get_azienda_by_id(credenziali.Id_credential)
-                        self.sessione.start_session(azienda)
-                        logger.info(f"Username {username} ha eseguito l'accesso")
-
-                    except Exception as e:
-                        logger.warning(f"Errore durante la creazione dellla sessione: {str(e)}")
-                        return
-                    
-                
+            if credenziali and credenziali.Password == UserModel.hash_password(password):
+                try:
+                    azienda = self.credential.get_azienda_by_id(credenziali.Id_credential)
+                    self.sessione.start_session(azienda)
+                    logger.info("Login effettuato con successo per %s", username)
                     return True
-            else: 
-                raise Exception("qui")
-            
-        
-        except HaveToWaitException as e:  
-                raise e
-        except  ToManyTryLogEXcepition as e:
-                raise e
-        except Exception as e:
-            logger.warning(f"Errore durante il recupero delle credenziali: {str(e)}")
-            logger.info(f"{self.sessione.tentativi}")
+                except Exception as exc:
+                    logger.warning("Errore durante la creazione della sessione: %s", str(exc))
+                    return False
+
             raise LoginFailExetion()
-        
+
+        except HaveToWaitException as exc:
+            raise exc
+        except ToManyTryLogEXcepition as exc:
+            raise exc
+        except Exception as exc:
+            logger.warning("Errore durante il recupero delle credenziali: %s", str(exc))
+            logger.info("Tentativi falliti: %s", self.sessione.tentativi)
+            raise LoginFailExetion()
 
     def get_user(self) -> CompanyModel:
-        try:
-             return self.credential.get_azienda_by_id(Session().current_user["id_azienda"])
-        except Exception as e:
-            logger.error(f"Errore nel'ottenimento del utente {e}")
-            raise e
+        """
+        Restituisce l'azienda associata all'utente loggato.
 
-    def verifica_password(self,old_password: str) -> bool:
+        Returns:
+            CompanyModel
+        """
         try:
-            return self.credential.verifica_password(old_password,Session().current_user["id_azienda"])
-        except Exception as e:
-            logger.error(f"Eccezione {e}")
+            user_id = Session().current_user["id_azienda"]
+            return self.credential.get_azienda_by_id(user_id)
+        except Exception as exc:
+            logger.error("Errore nel recupero dell'utente: %s", str(exc))
+            raise exc
+
+    def verifica_password(self, old_password: str) -> bool:
+        """
+        Verifica che la password corrente sia corretta.
+
+        Returns:
+            bool: True se corretta
+        """
+        try:
+            user_id = Session().current_user["id_azienda"]
+            return self.credential.verifica_password(old_password, user_id)
+        except Exception as exc:
+            logger.error("Errore nella verifica password: %s", str(exc))
             return False
-        
-    def cambia_password(self,password : str):
+
+    def cambia_password(self, password: str):
+        """
+        Cambia la password dell'utente attualmente loggato.
+        """
         try:
-            self.credential.cambia_password(password,Session().current_user["id_azienda"])
-        except Exception as e:
-            raise e           
+            user_id = Session().current_user["id_azienda"]
+            self.credential.cambia_password(password, user_id)
+        except Exception as exc:
+            logger.error("Errore durante il cambio password: %s", str(exc))
+            raise exc

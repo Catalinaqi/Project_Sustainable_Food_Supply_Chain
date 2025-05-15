@@ -51,7 +51,7 @@ class SoglieAziendaView(QWidget):
         testo = testo.lower()
         self.soglie_filtrate = [
             op for op in self.soglie
-            if testo in op.Operazione.lower() or testo in op.Prodotto.lower() or testo in op.Soglia_Massima.lower()
+            if testo in op.tipo.lower() or testo in op.prodotto.lower() or testo in op.soglia_massima.lower()
         ]
         self.aggiorna_tabella()
 
@@ -59,23 +59,18 @@ class SoglieAziendaView(QWidget):
         self.tabella.setRowCount(len(self.soglie_filtrate))
 
         for row, op in enumerate(self.soglie_filtrate):
-            self.tabella.setItem(row, 0, QTableWidgetItem(op.Tipo))
-            self.tabella.setItem(row, 1, QTableWidgetItem(op.Prodotto))
-            self.tabella.setItem(row, 2, QTableWidgetItem(op.Soglia_Massima))
+            self.tabella.setItem(row, 0, QTableWidgetItem(op.tipo))
+            self.tabella.setItem(row, 1, QTableWidgetItem(op.prodotto))
+            self.tabella.setItem(row, 2, QTableWidgetItem(op.soglia_massima))
             
 
             try:
-                soglia = float(op.Soglia_Massima)
+                soglia = float(op.soglia_massima)
                 item_co2 = QTableWidgetItem(str(soglia))
                 item_co2.setData(Qt.UserRole, soglia)  # Sorting numerico
             except Exception as e:
-                print(f"[ERRORE parsing soglie]: {e} su {op.Soglia_Massima}")
-                item_co2 = QTableWidgetItem(op.Soglia_Massima)
+                print(f"[ERRORE parsing soglie]: {e} su {op.soglia_massima}")
+                item_co2 = QTableWidgetItem(op.soglia_massima)
             self.tabella.setItem(row, 2, item_co2)
 
-
-
-    def ricarica_soglie(self):
-        self.soglie = self.controller.lista_soglie(self.id_azienda)
-        self.filtra_soglie(self.filtro_input.text())
 

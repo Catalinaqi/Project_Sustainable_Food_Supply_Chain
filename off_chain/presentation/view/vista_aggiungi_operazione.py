@@ -1,32 +1,31 @@
-# pylint: disable=no-name-in-module
-# pylint: disable=import-error
+# pylint: disable=no-name-in-module, import-error
 from PyQt5.QtWidgets import (
-    QDialog, QVBoxLayout, QLabel, QPushButton, QDateEdit, QLineEdit, QComboBox, QDoubleSpinBox, QListWidget, QListWidgetItem
+    QDialog, QVBoxLayout, QLabel, QPushButton, QDateEdit, QLineEdit, QComboBox,
+    QDoubleSpinBox, QListWidget, QListWidgetItem, QMessageBox
 )
 from PyQt5.QtCore import pyqtSignal, Qt
 from model.prodotto_finito_model import ProdottoLottoModel
 from session import Session
 from presentation.controller.company_controller import PERMESSI_OPERAZIONI, ControllerAzienda
-from PyQt5.QtWidgets import QComboBox , QMessageBox, QDoubleSpinBox , QListWidget, QListWidgetItem, QLabel, QVBoxLayout
 from model.product_standard_model import ProductStandardModel
 
 
 class AggiungiOperazioneView(QDialog):
+    """
+    Finestra per l'inserimento di una nuova operazione di tipo Agricola o Rivenditore,
+    con i relativi dati come quantità, CO2, data e prodotto coinvolto.
+    """
     operazione_aggiunta = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.controller = ControllerAzienda()
-        self.role_azienda : str = Session().current_user["role"]
-        
+        self.role_azienda: str = Session().current_user["role"]
         self.init_ui()
 
     def init_ui(self):
         self.setWindowTitle("Aggiungi Operazione")
-
         layout = QVBoxLayout()
-
-        
 
         layout.addWidget(QLabel("Tipo operazione:"))
         self.input_tipo = QComboBox()
@@ -34,23 +33,20 @@ class AggiungiOperazioneView(QDialog):
         self.input_tipo.addItems(permessi)
         layout.addWidget(self.input_tipo)
 
-
         self.input_testo = QLineEdit()
         self.input_testo.setMaxLength(25)
 
-
         self.input_ricerca_prodotto = QLineEdit()
         self.lista_prodotti = QListWidget()
-        self.lista_prodotti.setSelectionMode(QListWidget.NoSelection)  
+        self.lista_prodotti.setSelectionMode(QListWidget.NoSelection)
 
-        if self.role_azienda == "Agricola" :
-        
+        if self.role_azienda == "Agricola":
             layout.addWidget(QLabel("Seleziona il tipo di prodotto:"))
-
             self.input_combo_prodotto = QComboBox()
-            self.prodotti_agricoli : list[ProductStandardModel] = self.controller.get_prodotti_standard()
+            self.prodotti_agricoli: list[ProductStandardModel] = self.controller.get_prodotti_standard()
+
             for prodotto in self.prodotti_agricoli:
-                self.input_combo_prodotto.addItem(prodotto.Nome_prodotto, prodotto.Id_prodotto)  # nome visibile, ID come userData
+                self.input_combo_prodotto.addItem(prodotto.nome_prodotto, prodotto.id_prodotto)
             layout.addWidget(self.input_combo_prodotto)
 
             self.input_descrizione = QLineEdit()
@@ -58,7 +54,6 @@ class AggiungiOperazioneView(QDialog):
             self.input_descrizione.setMaxLength(50)
             layout.addWidget(QLabel("Descrizione prodotto:"))
             layout.addWidget(self.input_descrizione)
-
 
             self.input_quantita = QDoubleSpinBox()
             self.input_quantita.setMinimum(0.0)
@@ -68,74 +63,49 @@ class AggiungiOperazioneView(QDialog):
             layout.addWidget(QLabel("Inserisci quantità prodotta:"))
             layout.addWidget(self.input_quantita)
 
-
-
-
-
-
-
-        
-
-        if  self.role_azienda == "Trasportatore" or self.role_azienda == "Rivenditore":
-
-            # Se il ruolo è Trasformatore, Trasportatore o Rivenditore, mostra la lista dei prodotti
-
+        elif self.role_azienda in ("Trasportatore", "Rivenditore"):
             layout.addWidget(QLabel("Seleziona il prodotto:"))
 
-            if self.role_azienda in ["Rivenditore"]:  
+            if self.role_azienda == "Rivenditore":
                 self.abilita_selezione_singola()
-
 
             self.input_ricerca_prodotto.setPlaceholderText("Cerca per nome o ID...")
             layout.addWidget(self.input_ricerca_prodotto)
-
-            
             layout.addWidget(self.lista_prodotti)
 
             self.prodotti_completi: list[ProdottoLottoModel] = self.controller.get_prodotti_to_composizione()
-
             self.popola_lista_prodotti(self.prodotti_completi)
-
-            # Collegamento del filtro
             self.input_ricerca_prodotto.textChanged.connect(self.filtra_lista_prodotti)
 
-
             self.input_quantita = QDoubleSpinBox()
-            self.input_quantita.setMinimum(0.0)            
-            self.input_quantita.setMaximum(10000.0)       
-            self.input_quantita.setDecimals(0)          
-            self.input_quantita.setSingleStep(1)                    
+            self.input_quantita.setMinimum(0.0)
+            self.input_quantita.setMaximum(10000.0)
+            self.input_quantita.setDecimals(0)
+            self.input_quantita.setSingleStep(1)
             layout.addWidget(QLabel("Inserisci quantità prodotto:"))
             layout.addWidget(self.input_quantita)
-
-
 
         layout.addWidget(QLabel("Data:"))
         self.input_data = QDateEdit()
         self.input_data.setCalendarPopup(True)
         layout.addWidget(self.input_data)
 
-        
-
         self.input_valore = QDoubleSpinBox()
-        self.input_valore.setMinimum(0.0)            
-        self.input_valore.setMaximum(9999.99)       
-        self.input_valore.setDecimals(2)          
-        self.input_valore.setSingleStep(0.1)                    
+        self.input_valore.setMinimum(0.0)
+        self.input_valore.setMaximum(9999.99)
+        self.input_valore.setDecimals(2)
+        self.input_valore.setSingleStep(0.1)
         layout.addWidget(QLabel("Inserisci un valore CO2:"))
         layout.addWidget(self.input_valore)
-
 
         self.btn_salva = QPushButton("Salva operazione")
         self.btn_salva.clicked.connect(self.salva_operazione)
         layout.addWidget(self.btn_salva)
 
         self.setLayout(layout)
-
         self.resize(400, 300)
         self.raise_()
         self.activateWindow()
-
 
     def salva_operazione(self):
         try:
@@ -144,27 +114,19 @@ class AggiungiOperazioneView(QDialog):
             co2 = self.input_valore.value()
             quantita = self.input_quantita.value()
 
-
-            # Controlli di validità base
             if not tipo:
                 QMessageBox.warning(self, "Errore", "Tipo operazione mancante.")
                 return
-
             if co2 <= 0:
                 QMessageBox.warning(self, "Errore", "Inserisci un valore di CO2 positivo.")
                 return
 
-             # Raccolta dei dati specifici in base al ruolo
             if self.role_azienda == "Agricola":
                 nome_nuovo_prodotto = self.input_combo_prodotto.currentText()
-                if not nome_nuovo_prodotto:
-                    QMessageBox.warning(self, "Errore", "Seleziona una tipologia di prodotto.")
-                    return
-                
                 id_prodotto_base = self.input_combo_prodotto.currentData()
                 descrizione = self.input_descrizione.text().strip()
 
-                if not id_prodotto_base:
+                if not nome_nuovo_prodotto or not id_prodotto_base:
                     QMessageBox.warning(self, "Errore", "Seleziona una tipologia di prodotto.")
                     return
 
@@ -177,8 +139,6 @@ class AggiungiOperazioneView(QDialog):
                     quantita=quantita
                 )
 
-            
-
             elif self.role_azienda == "Rivenditore":
                 prodotti_selezionati = self.get_prodotti_selezionati()
 
@@ -190,55 +150,39 @@ class AggiungiOperazioneView(QDialog):
                     return
 
                 prodotto = prodotti_selezionati[0]
-
                 if quantita <= 0:
                     QMessageBox.warning(self, "Errore", "Inserisci una quantità positiva.")
                     return
-
                 if quantita > prodotto.quantita:
                     QMessageBox.warning(self, "Errore", f"La quantità inserita ({quantita}) supera quella disponibile ({prodotto.quantita}).")
                     return
 
-                id_prodotto = prodotto.id_prodotto
-                numero_lotto = prodotto.id_lotto  # Assicurati che questo attributo esista
-
                 self.controller.salva_operazione_distributore(
                     data=data,
                     co2=co2,
-                    id_prodotto=id_prodotto,
-                    id_lotto_input=numero_lotto,
+                    id_prodotto=prodotto.id_prodotto,
+                    id_lotto_input=prodotto.id_lotto,
                     quantita=quantita
                 )
-
-
 
             else:
                 QMessageBox.critical(self, "Errore", f"Ruolo azienda non gestito: {self.role_azienda}")
                 return
 
-            # Successo
             self.operazione_aggiunta.emit()
             self.accept()
 
-        except PermissionError as e:
-                QMessageBox.critical(self, "Errore di permesso", str(e))
-        except Exception as e:
-                QMessageBox.critical(self, "Errore", f"Errore durante l'aggiunta: {str(e)}")
-        except Exception as e:
-            QMessageBox.critical(self, "Errore", f"Errore durante il salvataggio: {str(e)}")
-
-
-            
-
-
-            
-
-
+        except PermissionError as exc:
+            QMessageBox.critical(self, "Errore di permesso", str(exc))
+        except Exception as exc:
+            QMessageBox.critical(self, "Errore", f"Errore durante l'aggiunta: {str(exc)}")
 
     def popola_lista_prodotti(self, prodotti: list[ProdottoLottoModel]):
         self.lista_prodotti.clear()
         for prodotto in prodotti:
-            item = QListWidgetItem(f"{prodotto.nome} (ID_lotto: {prodotto.id_prodotto}) Quantità{prodotto.quantita}")
+            item = QListWidgetItem(
+                f"{prodotto.nome} (ID_lotto: {prodotto.id_prodotto}) Quantità: {prodotto.quantita}"
+            )
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Unchecked)
             item.setData(Qt.UserRole, prodotto)
@@ -251,8 +195,6 @@ class AggiungiOperazioneView(QDialog):
             if testo in p.nome.lower() or testo in str(p.id_lotto)
         ]
         self.popola_lista_prodotti(prodotti_filtrati)
-
-
 
     def abilita_selezione_singola(self):
         for i in range(self.lista_prodotti.count()):
@@ -268,13 +210,8 @@ class AggiungiOperazioneView(QDialog):
                     item.setCheckState(Qt.Unchecked)
 
     def get_prodotti_selezionati(self) -> list[ProdottoLottoModel]:
-        prodotti = []
-        for i in range(self.lista_prodotti.count()):
-            item = self.lista_prodotti.item(i)
-            if item.checkState() == Qt.Checked:
-                prodotto = item.data(Qt.UserRole)
-                prodotti.append(prodotto)
-        return prodotti
-
-
-
+        return [
+            self.lista_prodotti.item(i).data(Qt.UserRole)
+            for i in range(self.lista_prodotti.count())
+            if self.lista_prodotti.item(i).checkState() == Qt.Checked
+        ]

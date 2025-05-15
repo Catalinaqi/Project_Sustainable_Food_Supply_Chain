@@ -61,7 +61,7 @@ class OperazioniAziendaView(QWidget):
             testo = testo.lower()
             self.operazioni_filtrate = [
                 op for op in self.operazioni
-                if testo in op.Nome_operazione.lower() or testo in op.Nome_prodotto.lower()
+                if testo in op.nome_operazione.lower() or testo in op.nome_prodotto.lower()
             ]
             self.aggiorna_tabella()
 
@@ -69,8 +69,8 @@ class OperazioniAziendaView(QWidget):
         self.tabella.setRowCount(len(self.operazioni_filtrate))
 
         for row, op in enumerate(self.operazioni_filtrate):
-            self.tabella.setItem(row, 0, QTableWidgetItem(op.Nome_operazione))
-            self.tabella.setItem(row, 1, QTableWidgetItem(op.Nome_prodotto))
+            self.tabella.setItem(row, 0, QTableWidgetItem(op.nome_operazione))
+            self.tabella.setItem(row, 1, QTableWidgetItem(op.nome_prodotto))
 
     def apri_aggiungi_operazione(self):
         if Session().current_user["role"] == "Trasformatore":

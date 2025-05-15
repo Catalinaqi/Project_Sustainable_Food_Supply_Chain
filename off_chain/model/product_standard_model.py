@@ -5,5 +5,5 @@ class ProductStandardModel:
     """
     Data model for transporting product information between layers.
     """
-    Id_prodotto: int
-    Nome_prodotto: str
+    id_prodotto: int
+    nome_prodotto: str

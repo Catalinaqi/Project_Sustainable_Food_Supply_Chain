@@ -6,7 +6,7 @@ class ThresholdModel:
     """
     Represents operation thresholds for products.
     """
-    Prodotto: str
-    Soglia_Massima: float
-    Tipo: str
+    prodotto: str
+    soglia_massima: float
+    tipo: str
     

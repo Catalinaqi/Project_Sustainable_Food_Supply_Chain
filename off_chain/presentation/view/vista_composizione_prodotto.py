@@ -33,7 +33,7 @@ class VistaCreaProdottoTrasformato(QDialog):
         self.tipologie_trasformati: list[ProductStandardModel] = self.controller.get_prodotti_standard()
         if self.tipologie_trasformati:
             for tipo in self.tipologie_trasformati:
-                self.combo_tipo_prodotto.addItem(tipo.Nome_prodotto, tipo.Id_prodotto)
+                self.combo_tipo_prodotto.addItem(tipo.nome_prodotto, tipo.id_prodotto)
         layout.addWidget(self.combo_tipo_prodotto)
 
         layout.addWidget(QLabel("Descrizione aggiuntiva (opzionale):"))
