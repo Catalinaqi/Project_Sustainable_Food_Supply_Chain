@@ -100,7 +100,8 @@ class TestOperazioni(unittest.TestCase):
         result = self.db.fetch_one(
             "SELECT COUNT(*) FROM Operazione WHERE Id_lotto = ? AND Id_azienda = ? AND Id_prodotto = ?", 
             (id_lotto, self.az_id_test, self.prod_id_test))
-        self.assertEqual(result, 1, "Operazione non registrata correttamente nel database.")
+        self.assertEqual(result, 1,
+            "Operazione non registrata correttamente nel database.")
 
     def test_registrazione_operazione_azienda_inesistente(self):
         id_azienda_inesistente = self.fake.random_number(digits=10, fix_len=True)
@@ -112,18 +113,17 @@ class TestOperazioni(unittest.TestCase):
         # No need to add to test_data_ids['operazioni'] as it should fail
 
         with self.assertRaises(Exception,
-        msg="Inserimento operazione con Id_azienda inesistente non ha sollevato eccezione."):
-            # This assumes a foreign key constraint on Id_azienda that would cause an error
+            msg="Inserimento operazione con Id_azienda inesistente non ha sollevato eccezione."):
             self.db.execute_query("""
                 INSERT INTO Operazione (Id_azienda, Id_prodotto, Id_lotto, Consumo_CO2, quantita, Tipo)
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (id_azienda_inesistente, self.prod_id_test,
             id_lotto, consumo_co2, quantita, tipo_operazione))
         
-        # Verify it wasn't inserted
         result = self.db.fetch_one(
             "SELECT COUNT(*) FROM Operazione WHERE Id_lotto = ?", (id_lotto,))
-        self.assertEqual(result, 0, "Operazione inserita erroneamente con Id_azienda inesistente.")
+        self.assertEqual(result, 0,
+            "Operazione inserita erroneamente con Id_azienda inesistente.")
 
     def test_registrazione_operazione_prodotto_inesistente(self):
         """Test inserting an operation with a non-existent product ID."""
@@ -181,7 +181,8 @@ class TestOperazioni(unittest.TestCase):
             cred_placeholders = ', '.join(
                 ['?'] * len(self.test_data_ids["credenziali"]))
             self.db.execute_query(
-                f"DELETE FROM Credenziali WHERE Username IN ({cred_placeholders})", tuple(self.test_data_ids["credenziali"]))
+                f"DELETE FROM Credenziali WHERE Username IN ({cred_placeholders})",
+                    tuple(self.test_data_ids["credenziali"]))
         
         self.db.close()
 

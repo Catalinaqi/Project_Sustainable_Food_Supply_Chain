@@ -45,8 +45,6 @@ class TestRegistrazione(unittest.TestCase):
         # Attempt to register the same username again
         with self.assertRaises(Exception,
         msg="La registrazione con username duplicato non ha sollevato un'eccezione."):
-            # This assumes your DB/application logic prevents duplicate usernames and raises an error
-            # If it doesn't raise an error but simply fails to insert, adjust the test accordingly
             self.db.execute_query("""
                 INSERT INTO Credenziali (Username, Password, totp_secret)
                 VALUES (?, ?, ?)
@@ -57,7 +55,7 @@ class TestRegistrazione(unittest.TestCase):
             "SELECT COUNT(*) FROM Credenziali WHERE Username = ?",
             (username,))
         self.assertEqual(result, 1,
-        "Trovato più di un utente con lo stesso username dopo tentativo di registrazione duplicata.")
+            "Trovato più di un utente con lo stesso username dopo tentativo di registrazione duplicata.")
 
     def test_registrazione_password_debole(self):
         username = self.fake.user_name()
@@ -65,15 +63,6 @@ class TestRegistrazione(unittest.TestCase):
         totp_secret = self.fake.sha256()
         self.test_users.append(username)
 
-        # Assuming your application has password strength validation that would prevent this
-        # This test might need to interact with a registration function rather than direct DB insert
-        # For now, we'll simulate the check by asserting the insert *would* fail or be rejected
-        # If direct DB insert is the only way, this test might be more conceptual
-        # or require a check at a higher application layer.
-        # For demonstration, let's assume an application function `register_user` handles this.
-        # Since we are directly interacting with DB, we can't easily test this rule here
-        # unless the DB itself has constraints (which is unlikely for password complexity).
-        # We will skip the actual insertion and assert that such an operation *should* be prevented by the app.
         print(f"INFO: Test per password debole ({password_debole}) per l'utente {username} è concettuale e presume validazione a livello applicativo.")
         pass # Placeholder for actual test if application logic is available
 
