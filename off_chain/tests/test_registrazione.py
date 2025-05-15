@@ -1,6 +1,6 @@
 import unittest
 from faker import Faker
-from configuration.database import Database
+from off_chain.configuration.database import Database
 
 class TestRegistrazione(unittest.TestCase):
 
@@ -12,39 +12,39 @@ class TestRegistrazione(unittest.TestCase):
     def _create_fake_user(self):
         username = self.fake.user_name()
         password = self.fake.password(length=12, special_chars=True, digits=True, upper_case=True, lower_case=True)
-        topt_secret = self.fake.sha256()
-        return username, password, topt_secret
+        totp_secret = self.fake.sha256()
+        return username, password, totp_secret
 
     def test_registrazione_successo(self):
-        username, password, topt_secret = self._create_fake_user()
+        username, password, totp_secret = self._create_fake_user()
         self.test_users.append(username)
 
         # Attempt registration
         self.db.execute_query("""
-            INSERT INTO Credenziali (Username, Password, topt_secret)
+            INSERT INTO Credenziali (Username, Password, totp_secret)
             VALUES (?, ?, ?)
-        """, (username, password, topt_secret))
+        """, (username, password, totp_secret))
 
         # Verify registration
         result = self.db.fetch_one("SELECT COUNT(*) FROM Credenziali WHERE Username = ?", (username,))
         self.assertEqual(result, 1, f"Registrazione fallita per l'utente {username}.")
 
     def test_registrazione_username_duplicato(self):
-        username, password, topt_secret = self._create_fake_user()
+        username, password, totp_secret = self._create_fake_user()
         self.test_users.append(username) # Add to cleanup list
 
         # First registration (should succeed)
         self.db.execute_query("""
-            INSERT INTO Credenziali (Username, Password, topt_secret)
+            INSERT INTO Credenziali (Username, Password, totp_secret)
             VALUES (?, ?, ?)
-        """, (username, password, topt_secret))
+        """, (username, password, totp_secret))
 
         # Attempt to register the same username again
         with self.assertRaises(Exception, msg="La registrazione con username duplicato non ha sollevato un'eccezione."):
             # This assumes your DB/application logic prevents duplicate usernames and raises an error
             # If it doesn't raise an error but simply fails to insert, adjust the test accordingly
             self.db.execute_query("""
-                INSERT INTO Credenziali (Username, Password, topt_secret)
+                INSERT INTO Credenziali (Username, Password, totp_secret)
                 VALUES (?, ?, ?)
             """, (username, "another_password", "another_secret"))
 
@@ -55,7 +55,7 @@ class TestRegistrazione(unittest.TestCase):
     def test_registrazione_password_debole(self):
         username = self.fake.user_name()
         password_debole = "123"
-        topt_secret = self.fake.sha256()
+        totp_secret = self.fake.sha256()
         self.test_users.append(username)
 
         # Assuming your application has password strength validation that would prevent this
@@ -70,7 +70,7 @@ class TestRegistrazione(unittest.TestCase):
         print(f"INFO: Test per password debole ({password_debole}) per l'utente {username} è concettuale e presume validazione a livello applicativo.")
         # If you have an application function:
         # with self.assertRaises(ValueError, msg="Registrazione con password debole permessa."):
-        #     register_user(username, password_debole, topt_secret)
+        #     register_user(username, password_debole, totp_secret)
         pass # Placeholder for actual test if application logic is available
 
     def tearDown(self):

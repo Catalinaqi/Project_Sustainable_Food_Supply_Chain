@@ -1,8 +1,6 @@
 import os
 import yaml
-
-
-from configuration.log_load_setting import logger
+from off_chain.configuration.log_load_setting import logger
 
 
 class DatabaseForYamlLoadOfSetting:

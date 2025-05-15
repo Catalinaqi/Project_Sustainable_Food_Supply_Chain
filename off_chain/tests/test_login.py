@@ -1,6 +1,6 @@
 import unittest
 from faker import Faker
-from configuration.database import Database
+from off_chain.configuration.database import Database
 
 class TestLogin(unittest.TestCase):
 
@@ -12,13 +12,13 @@ class TestLogin(unittest.TestCase):
         # Create a user for successful login tests
         self.valid_username = self.fake.user_name()
         self.valid_password = self.fake.password(length=12, special_chars=True, digits=True, upper_case=True, lower_case=True)
-        topt_secret = self.fake.sha256()
+        totp_secret = self.fake.sha256()
         self.test_users.append(self.valid_username)
 
         self.db.execute_query("""
-            INSERT OR IGNORE INTO Credenziali (Username, Password, topt_secret)
+            INSERT OR IGNORE INTO Credenziali (Username, Password, totp_secret)
             VALUES (?, ?, ?)
-        """, (self.valid_username, self.valid_password, topt_secret))
+        """, (self.valid_username, self.valid_password, totp_secret))
 
     def test_login_successo(self):
         # Attempt login with correct credentials
