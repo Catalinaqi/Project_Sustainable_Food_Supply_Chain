@@ -98,12 +98,18 @@ class VisualizzaRichiesteView(QDialog):
         self.richieste_effettuate = self.controller.get_richieste_effettuate()
         self.tabella_effettuate.setRowCount(len(self.richieste_effettuate))
         for row, richiesta in enumerate(self.richieste_effettuate):
-            self.tabella_effettuate.setItem(row, 0, QTableWidgetItem(richiesta.nome_azienda_ricevente))
-            self.tabella_effettuate.setItem(row, 1, QTableWidgetItem(richiesta.nome_prodotto))
-            self.tabella_effettuate.setItem(row, 2, QTableWidgetItem(str(richiesta.quantita)))
-            self.tabella_effettuate.setItem(row, 3, QTableWidgetItem(richiesta.stato_ricevente))
-            self.tabella_effettuate.setItem(row, 4, QTableWidgetItem(richiesta.stato_trasportatore))
-            self.tabella_effettuate.setItem(row, 5, QTableWidgetItem(str(richiesta.data)))
+            self.tabella_effettuate.setItem(row, 0,\
+                                             QTableWidgetItem(richiesta.nome_azienda_ricevente))
+            self.tabella_effettuate.setItem(row, 1,\
+                                             QTableWidgetItem(richiesta.nome_prodotto))
+            self.tabella_effettuate.setItem(row, 2,\
+                                             QTableWidgetItem(str(richiesta.quantita)))
+            self.tabella_effettuate.setItem(row, 3,\
+                                             QTableWidgetItem(richiesta.stato_ricevente))
+            self.tabella_effettuate.setItem(row, 4,\
+                                             QTableWidgetItem(richiesta.stato_trasportatore))
+            self.tabella_effettuate.setItem(row, 5,\
+                                             QTableWidgetItem(str(richiesta.data)))
 
     def accetta_richiesta(self) -> None:
         """Accetta la richiesta selezionata."""
@@ -124,7 +130,6 @@ class VisualizzaRichiesteView(QDialog):
         if row == -1:
             QMessageBox.warning(self, "Attenzione", "Seleziona una richiesta.")
             return
-
         richiesta = self.richieste_ricevute[row]
         current_role = Session().current_user["role"]
 
@@ -147,7 +152,8 @@ class VisualizzaRichiesteView(QDialog):
                     id_prodotto=richiesta.id_prodotto,
                     quantita=richiesta.quantita,
                     co2=co2,
-                    id_azienda_richiedente=richiesta.id_azienda_richiedente,
+                    id_azienda_richiedente= \
+                        richiesta.id_azienda_richiedente,
                     id_azienda_ricevente=richiesta.id_azienda_ricevente,
                     id_lotto_input=richiesta.id_lotto_input,
                 )

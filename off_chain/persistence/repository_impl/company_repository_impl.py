@@ -1,3 +1,5 @@
+# pylint: disable=no-name-in-module
+# # pylint: disable=import-error
 from abc import ABC
 from typing import Optional, List
 from configuration.database import Database

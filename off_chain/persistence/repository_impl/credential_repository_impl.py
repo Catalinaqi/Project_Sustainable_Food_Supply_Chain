@@ -1,3 +1,5 @@
+# pylint: disable=no-name-in-module
+# # pylint: disable=import-error
 from abc import ABC
 import sqlite3
 from typing import Union, List, Optional

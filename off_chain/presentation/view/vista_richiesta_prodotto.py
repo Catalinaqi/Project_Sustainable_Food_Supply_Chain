@@ -18,8 +18,10 @@ class RichiestaProdottoView(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.controller = ControllerAzienda()
-        self.prodotti: list[ProductForChoiceModel] = self.controller.get_prodotti_ordinabili()
-        self.aziende_trasporto: list[CompanyModel] = self.controller.get_aziende_trasporto()
+        self.prodotti: list[ProductForChoiceModel] =  \
+            self.controller.get_prodotti_ordinabili()
+        self.aziende_trasporto: list[CompanyModel] = \
+              self.controller.get_aziende_trasporto()
         self.init_ui()
 
     def init_ui(self):
@@ -71,7 +73,6 @@ class RichiestaProdottoView(QDialog):
 
         prodotto = self.prodotti[row]
         quantita = self.input_quantita.value()
-
         if quantita > prodotto.quantita:
             QMessageBox.warning(self, "Errore", "Quantità richiesta maggiore della disponibilità.")
             return

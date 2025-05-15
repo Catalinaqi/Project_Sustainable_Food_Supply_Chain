@@ -71,7 +71,7 @@ class HomePage(QMainWindow):
         main_layout.setSpacing(50)
         main_layout.setAlignment(Qt.AlignCenter)
 
-        welcome_msg = f"Ciao {Session().current_user['username']} !\nBenvenuto in SupplyChain.\nPrego selezionare un'opzione dal menu"
+        welcome_msg = f"Ciao {Session().current_user_info['username']} !\nBenvenuto in SupplyChain.\nPrego selezionare un'opzione dal menu"
         self.welcome_label = QLabel(welcome_msg)
         funzioni_utili.insert_label(self.welcome_label, main_layout)
 
@@ -167,5 +167,5 @@ class HomePage(QMainWindow):
     def aggiorna_profilo(self, utente):
         self.utente = utente
         self.welcome_label.setText(
-            f"Ciao {Session().current_user['username']} !\nBenvenuto in SupplyChain.\nPrego selezionare un'opzione dal menu"
+            f"Ciao {Session().current_user_info['username']} !\nBenvenuto in SupplyChain.\nPrego selezionare un'opzione dal menu"
         )

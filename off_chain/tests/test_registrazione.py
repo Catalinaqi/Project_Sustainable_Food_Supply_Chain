@@ -61,7 +61,9 @@ class TestRegistrazione(unittest.TestCase):
         )
 
         # Tentativo duplicato
-        with self.assertRaises(Exception, msg="La registrazione con username duplicato non ha sollevato un'eccezione."):
+        with self.assertRaises(Exception,\
+                                msg="La registrazione con username duplicato non \
+                                      ha sollevato un'eccezione."):
             self.db.execute_query(
                 """
                 INSERT INTO Credenziali (Username, Password, totp_secret)

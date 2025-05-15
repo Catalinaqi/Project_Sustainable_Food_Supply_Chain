@@ -1,5 +1,6 @@
+# pylint: disable=no-name-in-module
+# # pylint: disable=import-error
 from typing import List, Optional
-
 from configuration.database import Database
 from configuration.log_load_setting import logger
 from model.richiesta_model import RichiestaModel

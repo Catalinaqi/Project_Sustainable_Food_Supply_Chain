@@ -76,15 +76,23 @@ class VisualizzaMagazzinoView(QDialog):
     def mostra_materie_prime(self, prodotti: list[ProdottoLottoModel]):
         self.tabella_materie_prime.setRowCount(len(prodotti))
         for row, prodotto in enumerate(prodotti):
-            self.tabella_materie_prime.setItem(row, 0, QTableWidgetItem(prodotto.nome))
-            self.tabella_materie_prime.setItem(row, 1, QTableWidgetItem(prodotto.id_prodotto))
-            self.tabella_materie_prime.setItem(row, 2, QTableWidgetItem(str(prodotto.quantita)))
-            self.tabella_materie_prime.setItem(row, 3, QTableWidgetItem("kg"))  # Placeholder unità
+            self.tabella_materie_prime.setItem(row, 0,\
+                                                QTableWidgetItem(prodotto.nome))
+            self.tabella_materie_prime.setItem(row, 1,\
+                                                QTableWidgetItem(prodotto.id_prodotto))
+            self.tabella_materie_prime.setItem(row, 2,\
+                                                QTableWidgetItem(str(prodotto.quantita)))
+            self.tabella_materie_prime.setItem(row, 3,\
+                                                QTableWidgetItem("kg"))
 
     def mostra_prodotti_finiti(self, prodotti: list[ProdottoLottoModel]):
         self.tabella_prodotti_finiti.setRowCount(len(prodotti))
         for row,prodotto in enumerate(prodotti):
-            self.tabella_prodotti_finiti.setItem(row, 0, QTableWidgetItem(prodotto.nome))
-            self.tabella_prodotti_finiti.setItem(row, 1, QTableWidgetItem(prodotto.id_prodotto))
-            self.tabella_prodotti_finiti.setItem(row, 2, QTableWidgetItem(str(prodotto.quantita)))
-            self.tabella_prodotti_finiti.setItem(row, 3, QTableWidgetItem("kg"))  # Placeholder unità
+            self.tabella_prodotti_finiti.setItem(row, 0,\
+                                                  QTableWidgetItem(prodotto.nome))
+            self.tabella_prodotti_finiti.setItem(row, 1,\
+                                                  QTableWidgetItem(prodotto.id_prodotto))
+            self.tabella_prodotti_finiti.setItem(row, 2,\
+                                                  QTableWidgetItem(str(prodotto.quantita)))
+            self.tabella_prodotti_finiti.setItem(row, 3,\
+                                                  QTableWidgetItem("kg"))

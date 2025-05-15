@@ -70,9 +70,12 @@ class VistaStatoAzienda(QMainWindow):
         self.nome_input.setReadOnly(True)
         self.tipo_input.setReadOnly(True)
 
-        funzioni_utili.add_field_to_form(self.id_azienda_label, self.id_azienda_input, form_layout)
-        funzioni_utili.add_field_to_form(self.nome_label, self.nome_input, form_layout)
-        funzioni_utili.add_field_to_form(self.tipo_label, self.tipo_input, form_layout)
+        funzioni_utili.add_field_to_form(self.id_azienda_label,\
+                                          self.id_azienda_input, form_layout)
+        funzioni_utili.add_field_to_form(self.nome_label,\
+                                         self.nome_input, form_layout)
+        funzioni_utili.add_field_to_form(self.tipo_label,\
+                                          self.tipo_input, form_layout)
 
         if Session().current_user.get("role") != "Certificatore":
             self.co2_consumata_totale_input.setReadOnly(True)

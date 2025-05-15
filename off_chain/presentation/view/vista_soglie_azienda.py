@@ -49,7 +49,8 @@ class SoglieAziendaView(QWidget):
         testo = testo.lower()
         self.soglie_filtrate = [
             op for op in self.soglie
-            if testo in op.tipo.lower() or testo in op.prodotto.lower() or testo in str(op.soglia_massima).lower()
+            if testo in op.tipo.lower() or testo in op.prodotto.lower() 
+              or testo in str(op.soglia_massima).lower()
         ]
         self.aggiorna_tabella()
 

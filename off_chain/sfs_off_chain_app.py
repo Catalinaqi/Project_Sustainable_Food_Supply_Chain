@@ -7,6 +7,9 @@ Handles Docker Desktop and Ganache startup, smart contract deployment,
 and user session management.
 """
 
+# pylint: disable=no-name-in-module
+# # pylint: disable=import-error
+
 # Standard Library Imports
 import json
 import os
