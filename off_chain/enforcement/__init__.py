@@ -1,5 +1,6 @@
 from .safety_enforcer import SafetyEnforcer, SafetyViolationError
-from .guarantee_response_enforcer import GuaranteeResponseEnforcer, GuaranteeResponseError
+from .guarantee_response_enforcer import GuaranteeResponseEnforcer
+from .guarantee_response_enforcer import GuaranteeResponseError
 
 __all__ = [
     'SafetyEnforcer',
