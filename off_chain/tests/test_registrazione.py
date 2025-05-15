@@ -1,3 +1,6 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
 import unittest
 from faker import Faker
 from off_chain.configuration.database import Database

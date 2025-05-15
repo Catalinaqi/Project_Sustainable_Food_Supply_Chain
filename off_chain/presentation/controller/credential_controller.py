@@ -1,4 +1,7 @@
-import pyotp
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 from configuration.log_load_setting import logger
 from domain.exception.authentication_exceptions import PasswordTooShortError, PasswordWeakError
 from domain.exception.database_exceptions import UniqueConstraintError, DatabaseError

@@ -1,10 +1,13 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QTreeWidget, QTreeWidgetItem,
+     QMainWindow, QTreeWidget, QTreeWidgetItem,
     QVBoxLayout, QWidget, QLineEdit, QLabel, QListWidget, QListWidgetItem, QSplitter
 )
 from PyQt5.QtWidgets import QHeaderView
 from PyQt5.QtCore import Qt
-import sys
 from model.certification_model import CertificationModel
 from persistence.repository_impl.product_repository_impl import ProductRepositoryImpl
 from presentation.controller.guest_controller import ControllerGuest

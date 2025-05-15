@@ -1,3 +1,7 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QLabel, QSpinBox, QPushButton, QMessageBox, QComboBox
@@ -23,9 +27,9 @@ class RichiestaProdottoView(QDialog):
         
         self.aziende_trasporto : list[CompanyModel] = self.controller.get_aziende_trasporto()
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         self.setWindowTitle("Richiedi Prodotto")
         layout = QVBoxLayout()
 

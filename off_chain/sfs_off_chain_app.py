@@ -1,3 +1,4 @@
+# Standard Library Imports
 import sys
 import time
 import os
@@ -72,6 +73,7 @@ class BlockchainSetupThread(threading.Thread):
         self.success = False
         self.error_message = None
         self.blockchain_interactor = None
+        self._w3 = None
 
     def update_splash_message(self, message):
         if self.splash_screen:
@@ -93,43 +95,59 @@ class BlockchainSetupThread(threading.Thread):
             time.sleep(5)
 
             self.update_splash_message("Connecting to blockchain...")
-            w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
-            if not wait_for_ganache(w3, max_attempts=30):  # Aumentato a 30 tentativi
+            self._w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
+            if not wait_for_ganache(self._w3, max_attempts=30):
                 raise Exception("Failed to connect to Ganache")
 
-            # Check if contracts are already deployed
-            contract_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                                       "on_chain", "contract_addresses.json")
-            
-            if os.path.exists(contract_file):
-                try:
-                    with open(contract_file, 'r') as f:
-                        contract_data = json.load(f)
-                    # Verify that contracts are accessible
-                    self.update_splash_message("Verifying existing contracts...")
-                    blockchain_interactor = BlockchainInteractor()
-                    self.success = True
-                    return
-                except Exception as e:
-                    logger.warning(f"Could not use existing contracts: {e}")
+            if self._load_or_deploy_contracts():
+                blockchain_interactor = self.created_blockchain_interactor
+                self.success = True
+            else:
+                raise Exception(self.error_message)
 
-            # If necessary, compile and deploy new contracts
-            self.update_splash_message("Compiling smart contracts...")
-            compiled_contracts = compile_contracts()
-            
-            self.update_splash_message("Deploying smart contracts...")
-            deployed_contracts = deploy_contracts(w3, compiled_contracts)
-            save_contract_data(deployed_contracts)
-
-            self.update_splash_message("Initializing blockchain interface...")
-            blockchain_interactor = BlockchainInteractor()
-            
-            self.success = True
-            
         except Exception as e:
             self.error_message = str(e)
             logger.error(f"Blockchain setup error: {e}")
             self.success = False
+
+    def _load_or_deploy_contracts(self) -> bool:
+        """Loads existing contract addresses or compiles and deploys new ones."""
+        if not self._w3:
+            self.error_message = "Web3 not initialized for contract deployment."
+            return False
+
+        contract_file = Path(__file__).resolve().parent.parent / "on_chain" / "contract_addresses.json"
+
+        if contract_file.exists():
+            self.update_splash_message("Verifying existing contracts...")
+            try:
+                self.created_blockchain_interactor = BlockchainInteractor()
+                logger.info("Using existing deployed contracts.")
+                return True
+            except Exception as e:
+                logger.warning(
+                    "Could not use existing contracts from %s: %s. Will attempt redeployment.",
+                    contract_file, e
+                )
+
+        self.update_splash_message("Compiling smart contracts...")
+        compiled_contracts = compile_contracts()
+        if not compiled_contracts:
+            self.error_message = "Smart contract compilation failed."
+            return False
+
+        self.update_splash_message("Deploying smart contracts...")
+        deployed_contracts = deploy_contracts(self._w3, compiled_contracts)
+        if not deployed_contracts:
+            self.error_message = "Smart contract deployment failed."
+            return False
+
+        save_contract_data(deployed_contracts)
+
+        self.update_splash_message("Initializing blockchain interface with new contracts...")
+        self.created_blockchain_interactor = BlockchainInteractor()
+        logger.info("New contracts deployed and interface initialized.")
+        return True
 
 
 def wait_for_ganache(w3, max_attempts=30):

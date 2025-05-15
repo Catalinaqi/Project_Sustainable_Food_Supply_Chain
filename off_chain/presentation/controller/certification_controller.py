@@ -1,3 +1,7 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 from configuration.log_load_setting import logger
 from model.lotto_for_cetification_model import LottoForCertificaion
 from model.certification_for_lotto import CertificationForLotto

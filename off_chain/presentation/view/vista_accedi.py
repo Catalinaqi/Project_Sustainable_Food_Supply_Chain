@@ -1,3 +1,7 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtWidgets import QWidget, QFormLayout, QHBoxLayout, QMainWindow, QAction, QCheckBox, QStackedWidget, \
@@ -272,9 +276,7 @@ class VistaAccedi(QMainWindow):
 
         except Exception as e:
             QMessageBox.warning(self, "SupplyChain", f"{e}")
-    '''
-    Allow the user to enter as a guest
-    '''
+    
 
     def entra_guest(self):
         self.home_guest = HomePageGuest(self.reset)

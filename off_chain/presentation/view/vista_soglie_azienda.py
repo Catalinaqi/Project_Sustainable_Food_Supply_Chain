@@ -1,11 +1,13 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QTableWidget, QTableWidgetItem,
-    QHeaderView, QPushButton
+    QHeaderView
 )
 from PyQt5.QtCore import Qt
-
 from presentation.controller.company_controller import ControllerAzienda
-from presentation.view.vista_aggiungi_operazione import AggiungiOperazioneView
 from session import Session
 from model.threshold_model import ThresholdModel
 
@@ -20,9 +22,9 @@ class SoglieAziendaView(QWidget):
         self.soglie : list[ThresholdModel]= self.controller.lista_soglie() # Mock data
         self.soglie_filtrate = self.soglie.copy()
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         layout = QVBoxLayout()
 
         layout.addWidget(QLabel(f"<b>Soglie dell'azienda:</b> {self.tipo_azienda}"))

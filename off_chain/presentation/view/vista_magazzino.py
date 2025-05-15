@@ -1,3 +1,7 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QLabel, QLineEdit
@@ -15,9 +19,9 @@ class VisualizzaMagazzinoView(QDialog):
         self.prodotti_magazzino_completi: list[MateriaPrimaModel] = self.controller.get_materie_prime_magazzino_azienda()
         self.prodotti_finiti_magazzino: list[ProdottoFinitoModel] = self.controller.get_prodotti_finiti_magazzino_azienda()
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         self.setWindowTitle("Magazzino Azienda")
         layout = QVBoxLayout()
 

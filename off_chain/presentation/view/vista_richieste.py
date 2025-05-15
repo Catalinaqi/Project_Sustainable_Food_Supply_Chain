@@ -1,3 +1,7 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 import datetime
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
@@ -22,9 +26,9 @@ class VisualizzaRichiesteView(QDialog):
 
         self.richieste_effettuate: list[RichiestaModel] = self.controller.get_richieste_effettuate()
 
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         self.setWindowTitle("Gestione Richieste")
 
         layout = QVBoxLayout()

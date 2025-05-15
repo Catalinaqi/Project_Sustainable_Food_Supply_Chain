@@ -1,3 +1,8 @@
+
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 import datetime
 from configuration.log_load_setting import logger
 from model.threshold_model import ThresholdModel

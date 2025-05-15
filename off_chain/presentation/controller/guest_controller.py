@@ -1,3 +1,7 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 from configuration.log_load_setting import logger
 from model.company_model import CompanyModel
 from model.product_model import ProductModel
