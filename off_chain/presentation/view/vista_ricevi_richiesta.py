@@ -3,7 +3,7 @@ from PyQt5.QtGui import QFont, QStandardItemModel, QStandardItem, QIcon
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QLabel, QListView, QHBoxLayout,
                              QPushButton, QMessageBox, QDialog, QDialogButtonBox, QComboBox)
 
-from off_chain.view import funzioni_utili
+from presentation.view import funzioni_utili
 
 
 class VistaRiceviRichiesta(QMainWindow):
