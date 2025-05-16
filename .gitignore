@@ -36,3 +36,6 @@ identifier.sqlite
 # Ignore node_modules
 **/node_modules/
 
+# Ignore build artifacts
+**/package-lock.json
+

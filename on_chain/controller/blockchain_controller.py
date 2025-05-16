@@ -20,6 +20,8 @@ class ActionController:
         """
         try:
             # Check if the HTTP provider is reachable
+
+            self.http_provider='http://ganache:8545'
             self.w3 = Web3(Web3.HTTPProvider(http_provider))
             if not self.w3.is_connected():
                 raise ConnectionError("Unable to connect to the Ethereum network.")
