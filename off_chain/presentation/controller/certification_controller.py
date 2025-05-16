@@ -1,7 +1,8 @@
-# pylint: disable= no-name-in-module,
+# pylint: disable= no-name-in-module
 # pylint: disable= import-error
 # pylint: disable= line-too-long
 # pylint: disable= trailing-whitespace
+# pylint: disable= C0103 # Ignora gli errori di nome variabile/metodo come richiesto
 from configuration.log_load_setting import logger
 from model.lotto_for_cetification_model import LottoForCertificaion
 from model.certification_for_lotto import CertificationForLotto
@@ -30,13 +31,10 @@ class ControllerCertificatore:
         self.company = CompanyRepositoryImpl()
         logger.info("BackEnd: Successful initialization of 'class instances' for repository implements")
 
-
-    # Restituisce il dettaglio dell'azienda selezionata dato l'indice n    
+    # Restituisce il dettaglio dell'azienda selezionata dato l'indice n
     def get_dettaglio_azienda(self, id_azienda):
         # repo = CertificationRepositoryImpl()
         return self.certification.get_numero_certificazioni(id_azienda)
-
-
 
     def certificazione_by_prodotto(self, id_prodotto):
         # repo = CertificationRepositoryImpl()
@@ -52,28 +50,26 @@ class ControllerCertificatore:
         # repo = ProductRepositoryImpl()
         lista_prodotti = self.product.get_lista_prodotti()
         return lista_prodotti
-   
 
     def is_certificato(self, id_prodotto):
-        # repo = CertificationRepositoryImpl()
         return " certificato" """self.product.is_certificato(id_prodotto)"""
-    
-    def get_lotti_certificabili(self)-> list[LottoForCertificaion]:
+
+    def get_lotti_certificabili(self) -> list[LottoForCertificaion]:
         try:
             return self.certification.get_lotti_certificabili()
         except Exception as e:
-            logger.error(f"Errore nel recupero dei lotti: {e}")
+            logger.error(f"Errore nel recupero dei lotti: {e}", exc_info=True)
+            return [] # R1710: Ritorna lista vuota in caso di errore
 
     def get_certificati_lotto(self, id_lotto: int) -> list[CertificationForLotto]:
         try:
             return self.certification.get_certificati_lotto(id_lotto)
         except Exception as e:
-            logger.error(f"Errore nel recupero dei certificati: {e}")
+            logger.error(f"Errore nel recupero dei certificati: {e}", exc_info=True)
+            return [] # R1710: Ritorna lista vuota in caso di errore
 
-    def aggiungi_certificazione(self , id_lotto, descrizione):
+    def aggiungi_certificazione(self, id_lotto, descrizione):
         try:
             self.certification.aggiungi_certificazione(id_lotto, descrizione, Session().current_user["id_azienda"])
         except Exception as e:
-            logger.error(f"Errore nel aggiunta dei certificati: {e}")
-
-
+            logger.error(f"Errore nel aggiunta dei certificati: {e}", exc_info=True)
