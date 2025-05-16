@@ -36,7 +36,7 @@ contract ProductRequest {
         require(bytes(_productName).length > 0, "Product name cannot be empty");
         require(_quantity > 0, "Quantity must be greater than 0");
         require(bytes(_unit).length > 0, "Unit cannot be empty");
-        require(_deadline > block.timestamp + 60, "Deadline must be in the future");
+        require(_deadline > block.timestamp + 60, "Deadline must be at least 1 minute in the future");
 
         requestCounter++;
         uint256 requestId = requestCounter;
