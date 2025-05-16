@@ -9,6 +9,4 @@ class ProdottoLottoModel:
     nome : str
     id_lotto : int
 
-    ProdottoLottoModel
-
     

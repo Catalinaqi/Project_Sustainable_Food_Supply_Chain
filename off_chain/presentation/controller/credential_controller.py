@@ -14,7 +14,7 @@ from model.credential_model import UserModel
 
 class ControllerAutenticazione:
 
-    def _init_(self):
+    def __init__(self):
         self.credential = CredentialRepositoryImpl()
         logger.info("BackEnd: Successful initialization of 'class instances' for repository implements")
         self.sessione = Session()
@@ -43,9 +43,9 @@ class ControllerAutenticazione:
             logger.info(f"Username inserito: {username}, Password inserita: {password}")
 
             if credenziali is not None:
-                if credenziali.Password == UserModel.hash_password(password):
+                if credenziali.password == UserModel.hash_password(password):
                     try:
-                        azienda = self.credential.get_azienda_by_id(credenziali.Id_credential)
+                        azienda = self.credential.get_azienda_by_id(credenziali.id_credential)
                         self.sessione.start_session(azienda)
                         logger.info(f"Username {username} ha eseguito l'accesso")
                         return True # R1710: Coerenza dei return
