@@ -1,4 +1,4 @@
-﻿version: "3.13.2"
+version: "3.13.2"
 services:
   ganache:
     image: trufflesuite/ganache-cli:latest
@@ -18,7 +18,9 @@ services:
       - "--mnemonic"
       - "test test test test test test test test test test test junk"
       - "--gasLimit"
-      - "8000000"
+      - "30000000"
+      - "--allowUnlimitedContractSize"
+      - "true"
     healthcheck:
       test: ["CMD-SHELL", "curl -X POST --silent --fail -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"net_version\",\"params\":[],\"id\":1}' http://localhost:8545 || exit 1"]
       interval: 5s

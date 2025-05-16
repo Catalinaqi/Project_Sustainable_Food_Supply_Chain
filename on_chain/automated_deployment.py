@@ -108,6 +108,15 @@ def deploy_contracts(w3, compiled_contracts):
     deployed_contracts = {}
     account = w3.eth.accounts[0]  # Use the first account as deployer
     
+    # Get the current gas limit from the latest block
+    block = w3.eth.get_block('latest')
+    block_gas_limit = block.gasLimit
+    
+    # Set a high gas limit for contract deployment (80% of block gas limit)
+    # This ensures we have enough gas for large contracts
+    deployment_gas_limit = int(block_gas_limit * 0.8)
+    logger.info(f"Using gas limit of {deployment_gas_limit} for contract deployment")
+    
     for contract_file in compiled_contracts["contracts"].keys():
         for contract_name in compiled_contracts["contracts"][contract_file].keys():
             print(f"Deploying {contract_name}...")
@@ -118,16 +127,42 @@ def deploy_contracts(w3, compiled_contracts):
                 bytecode=contract_data["evm"]["bytecode"]["object"]
             )
             
-            # Deploy contract
-            tx_hash = Contract.constructor().transact({"from": account})
-            tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-            
-            deployed_contracts[contract_name] = {
-                "address": tx_receipt.contractAddress,
-                "abi": contract_data["abi"]
-            }
-            
-            print(f"{contract_name} deployed at: {tx_receipt.contractAddress}")
+            try:
+                # Deploy contract with higher gas limit
+                tx_hash = Contract.constructor().transact({
+                    "from": account,
+                    "gas": deployment_gas_limit
+                })
+                tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+                
+                deployed_contracts[contract_name] = {
+                    "address": tx_receipt.contractAddress,
+                    "abi": contract_data["abi"]
+                }
+                
+                print(f"{contract_name} deployed at: {tx_receipt.contractAddress}")
+                logger.info(f"{contract_name} deployed successfully at {tx_receipt.contractAddress}")
+            except Exception as e:
+                logger.error(f"Failed to deploy {contract_name}: {str(e)}")
+                # Try with even higher gas limit as a fallback
+                try:
+                    logger.info(f"Retrying deployment of {contract_name} with maximum gas limit")
+                    tx_hash = Contract.constructor().transact({
+                        "from": account,
+                        "gas": block_gas_limit  # Use full block gas limit
+                    })
+                    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+                    
+                    deployed_contracts[contract_name] = {
+                        "address": tx_receipt.contractAddress,
+                        "abi": contract_data["abi"]
+                    }
+                    
+                    print(f"{contract_name} deployed at: {tx_receipt.contractAddress} (with max gas)")
+                    logger.info(f"{contract_name} deployed successfully with max gas at {tx_receipt.contractAddress}")
+                except Exception as retry_e:
+                    logger.error(f"Failed to deploy {contract_name} even with max gas: {str(retry_e)}")
+                    # Continue with other contracts
     
     return deployed_contracts
 
