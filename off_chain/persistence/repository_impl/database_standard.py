@@ -10,6 +10,4 @@ class aziende_enum(Enum):
 
 class ordinamento (Enum):
     CRESCENTE = "ASC"
-    DECRESCENTE = "DESC"
-
-   
+    DECRESCENTE = "DESC"   

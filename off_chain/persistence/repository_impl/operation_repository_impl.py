@@ -1,17 +1,22 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 import datetime
 from abc import ABC
 import sqlite3
+from typing import Final
+from pydantic import BaseModel
+import hmac
+import hashlib
+import os
 from configuration.database import Database
 from configuration.log_load_setting import logger
 from model.operation_model import OperationModel
 from model.operation_estesa_model import OperazioneEstesaModel
 from model.materia_prima_model import MateriaPrimaModel
 from persistence.query_builder import QueryBuilder
-from typing import Final
-from pydantic import BaseModel
-import hmac
-import hashlib
-import os
+
 from persistence.repository_impl import db_default_string
 
 

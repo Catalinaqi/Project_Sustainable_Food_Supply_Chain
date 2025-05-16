@@ -1,5 +1,8 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 from abc import ABC
-import sqlite3
 from configuration.database import Database
 from configuration.log_load_setting import logger
 from model.materia_prima_model import MateriaPrimaModel
@@ -37,7 +40,7 @@ class ProductRepositoryImpl( ABC):
             print(result)
             return [ProductStandardModel(*x) for x in result] if result else []
         except Exception as e:
-            logger.warning("Nessun prodotto trovato")
+            logger.warning(f"Nessun prodotto trovato {e}")
             return[]
          
 
@@ -47,7 +50,7 @@ class ProductRepositoryImpl( ABC):
             print(f"risultao----{result}")
             return [ProductStandardModel(*x) for x in result] if result else []
         except Exception as e:
-            logger.warning("Nessun prodotto trovato")
+            logger.warning(f"Nessun prodotto trovato {e}")
             return[]
 
 

@@ -51,8 +51,6 @@ class ControllerCertificatore:
         lista_prodotti = self.product.get_lista_prodotti()
         return lista_prodotti
 
-    def is_certificato(self, id_prodotto):
-        return " certificato" """self.product.is_certificato(id_prodotto)"""
 
     def get_lotti_certificabili(self) -> list[LottoForCertificaion]:
         try:

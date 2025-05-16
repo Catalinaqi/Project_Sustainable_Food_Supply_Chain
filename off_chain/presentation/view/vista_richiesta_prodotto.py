@@ -6,11 +6,9 @@ from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QLabel, QSpinBox, QPushButton, QMessageBox, QComboBox
 )
-from PyQt5.QtCore import Qt, pyqtSignal
-
+from PyQt5.QtCore import  pyqtSignal
 from model.info_product_for_choice_model import ProductForChoiceModel
 from model.company_model import CompanyModel
-from session import Session
 from presentation.controller.company_controller import ControllerAzienda
 
 

@@ -1,3 +1,7 @@
+# pylint: disable= no-name-in-module
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 import unittest
 import sqlite3
 from faker import Faker

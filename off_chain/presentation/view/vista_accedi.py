@@ -5,16 +5,13 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtWidgets import QWidget, QFormLayout, QHBoxLayout, QMainWindow, QAction, QCheckBox, QStackedWidget, \
-    QComboBox
-from domain.exception.login_exceptions import HaveToWaitException, LoginFailExetion, ToManyTryLogEXcepition
+    QComboBox, QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 from presentation.controller.credential_controller import ControllerAutenticazione
 from presentation.view import funzioni_utili
 from presentation.view.home_page_aziende import HomePage
 from presentation.view.home_page_certificatore import HomePageCertificatore
 from presentation.view.home_page_guest import HomePageGuest
 from session import Session
-
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 import pyotp
 
 ''''
@@ -236,7 +233,7 @@ class VistaAccedi(QMainWindow):
 
     def on_tcu_click(self, event):
         QMessageBox.warning(
-            self, "SupplyChain", f"Termini e condizioni d'uso work in progress!")
+            self, "SupplyChain", f"Termini e condizioni d'uso work in progress!{event}")
 
     '''
     Changed between login and registration

@@ -127,7 +127,7 @@ class HomePageCertificatore(QMainWindow):
 
     
 
-    def aggiorna_profilo(self, utente):
+    def aggiorna_profilo(self):
         self.welcome_label.setText(
             f"Ciao {Session().current_user['username']} 👋!\nBenvenuto in SupplyChain.\n"
             f"Prego selezionare un'opzione dal menu"

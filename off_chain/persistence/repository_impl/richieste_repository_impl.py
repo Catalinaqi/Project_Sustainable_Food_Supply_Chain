@@ -1,3 +1,7 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 from configuration.database import Database
 from model.richiesta_model import RichiestaModel
 from persistence.query_builder import QueryBuilder

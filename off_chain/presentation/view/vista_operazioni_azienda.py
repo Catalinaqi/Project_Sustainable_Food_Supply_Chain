@@ -6,8 +6,6 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QTableWidget, QTableWidgetItem,
     QHeaderView, QPushButton
 )
-from PyQt5.QtCore import Qt
-
 from model.operation_estesa_model import OperazioneEstesaModel 
 from presentation.view.vista_composizione_prodotto import VistaCreaProdottoTrasformato
 from presentation.controller.company_controller import ControllerAzienda

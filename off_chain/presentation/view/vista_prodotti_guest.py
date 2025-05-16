@@ -86,7 +86,7 @@ class ProdottiFinitiView(QWidget):
     def applica_filtri(self):
         nome_filtro = self.input_nome.text().lower()
         lotto_filtro = self.input_lotto.text().lower()
-        ordinamento = self.ordina_combo.currentText()
+        
 
         # Filtra
         self.prodotti_filtrati = [
@@ -106,7 +106,7 @@ class ProdottiFinitiView(QWidget):
         self.prodotti_filtrati = self.prodotti.copy()
         self.aggiorna_tabella()
 
-    def mostra_dettagli_prodotto(self, row, column):
+    def mostra_dettagli_prodotto(self, row):
         prodotto = self.prodotti_filtrati[row]
 
         if not isinstance(prodotto, ProdottoFinito):

@@ -96,4 +96,3 @@ class ControllerAutenticazione:
             # W0707: Aggiunto 'from e'
             raise Exception(f"Errore durante il cambio password: {str(e)}") from e
 # C0304: Aggiunta newline finale
-

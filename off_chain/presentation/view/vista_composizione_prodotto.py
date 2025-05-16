@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, pyqtSignal
 from model.product_standard_model import ProductStandardModel
 from presentation.controller.company_controller import ControllerAzienda
-from model.materia_prima_model import MateriaPrimaModel 
+from model.materia_prima_model import MateriaPrimaModel
 
 
 class VistaCreaProdottoTrasformato(QDialog):
