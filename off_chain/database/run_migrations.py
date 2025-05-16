@@ -1,6 +1,9 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 import sqlite3
 import os
-import logging
 from pathlib import Path
 
 def run_migrations(db_path):

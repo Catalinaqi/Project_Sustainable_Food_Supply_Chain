@@ -55,23 +55,24 @@ class OperazioniAziendaView(QWidget):
     def filtra_operazioni(self, testo):
         try:
             testo = testo.strip()
-        except Exception as e :
+        except Exception as err :
+            print(f"Errore durante il filtraggio delle operazioni: {err}")
             return
         if isinstance(testo, str):
 
             testo = testo.lower()
             self.operazioni_filtrate = [
                 op for op in self.operazioni
-                if testo in op.Nome_operazione.lower() or testo in op.Nome_prodotto.lower()
+                if testo in op.nome_operazione.lower() or testo in op.nome_prodotto.lower()
             ]
             self.aggiorna_tabella()
 
     def aggiorna_tabella(self):
         self.tabella.setRowCount(len(self.operazioni_filtrate))
 
-        for row, op in enumerate(self.operazioni_filtrate):
-            self.tabella.setItem(row, 0, QTableWidgetItem(op.Nome_operazione))
-            self.tabella.setItem(row, 1, QTableWidgetItem(op.Nome_prodotto))
+        for row, oper in enumerate(self.operazioni_filtrate):
+            self.tabella.setItem(row, 0, QTableWidgetItem(oper.nome_operazione))
+            self.tabella.setItem(row, 1, QTableWidgetItem(oper.nome_prodotto))
 
     def apri_aggiungi_operazione(self):
         if Session().current_user["role"] == "Trasformatore":
@@ -87,4 +88,3 @@ class OperazioniAziendaView(QWidget):
     def ricarica_operazioni(self):
         self.operazioni = self.controller.lista_operazioni(self.id_azienda)
         self.filtra_operazioni(self.filtro_input.text())
-

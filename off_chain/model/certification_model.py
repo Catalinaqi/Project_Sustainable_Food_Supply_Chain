@@ -7,9 +7,9 @@ class CertificationModel:
     """
     Data model for transporting product information between layers.
     """
-    Id_certificato: int
-    Id_lotto: int
-    Descrizione_certificato: str
-    Nome_azienda: str
-    Data_certificato: datetime
+    id_certificato: int
+    id_lotto: int
+    descrizione_certificato: str
+    nome_azienda: str
+    data_certificato: datetime
 

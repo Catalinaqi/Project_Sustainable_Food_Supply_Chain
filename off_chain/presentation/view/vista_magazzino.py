@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import (
     QLabel, QLineEdit
 )
 from model.prodotto_finito_model import ProdottoLottoModel
-from model.prodotto_finito_model import ProdottoLottoModel
 from presentation.controller.company_controller import ControllerAzienda
 
 

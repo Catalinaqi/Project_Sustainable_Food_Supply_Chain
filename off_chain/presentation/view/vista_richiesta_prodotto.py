@@ -53,7 +53,7 @@ class RichiestaProdottoView(QDialog):
         layout.addWidget(QLabel("Seleziona azienda di trasporto:"))
         self.combo_azienda = QComboBox()
         for azienda in self.aziende_trasporto:
-            self.combo_azienda.addItem(azienda.Nome, azienda.Id_credenziali)  # Mostra nome, ma salva id
+            self.combo_azienda.addItem(azienda.nome, azienda.id_credenziali)  # Mostra nome, ma salva id
         layout.addWidget(self.combo_azienda)
 
         # Bottone richiesta

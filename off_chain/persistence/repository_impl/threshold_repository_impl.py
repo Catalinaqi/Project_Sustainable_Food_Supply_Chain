@@ -20,17 +20,17 @@ class ThresholdRepositoryImpl(ABC):
    
 
     def get_lista_soglie(self) -> list[ThresholdModel]:
-            self.query_builder.select("P.Nome","Soglia_Massima","Operazione").table("Soglie") \
-                            .join("Prodotto AS P","P.Id_prodotto", "Prodotto")
-      
-                
-            query, value = (self.query_builder.get_query() )
-
-            try:
+        self.query_builder.select("P.Nome","Soglia_Massima","Operazione").table("Soglie") \
+                        .join("Prodotto AS P","P.Id_prodotto", "Prodotto")
+    
             
-                return [ThresholdModel(*x) for x in self.db.fetch_results(query, value)]
+        query, value = (self.query_builder.get_query() )
+
+        try:
         
-            except Exception as e:
-               logger.error(f"Errore durante il recupero delle soglie: {e}")
-            return []
+            return [ThresholdModel(*x) for x in self.db.fetch_results(query, value)]
+    
+        except Exception as err:
+            logger.error(f"Errore durante il recupero delle soglie: {err}")
+        return []
         

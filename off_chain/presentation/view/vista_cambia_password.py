@@ -62,7 +62,7 @@ class VistaCambiaPassword(QWidget):
             self.controller.cambia_password(new_password)
             QMessageBox.information(self, "Successo", "Password cambiata con successo.")
             self.close()
-        except Exception as e:
-            QMessageBox.warning(self, "Errore", f"{e}")
+        except Exception as err:
+            QMessageBox.warning(self, "Errore", f"{err}")
 
     

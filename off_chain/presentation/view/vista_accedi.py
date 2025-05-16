@@ -208,11 +208,11 @@ class VistaAccedi(QMainWindow):
         funzioni_utili.add_field_to_form(
             self.conferma_password_label, self.conferma_password_input, form_layout)
 
-        for p in self.password:
-            self.icons_action.append(QAction(QIcon("presentation\\resources\\pass_invisibile.png"), "", p))
-        for index, p in enumerate(self.password):
+        for psw in self.password:
+            self.icons_action.append(QAction(QIcon("presentation\\resources\\pass_invisibile.png"), "", psw))
+        for index, psw in enumerate(self.password):
             self.icons_action[index].triggered.connect(self.change_password_visibility)
-            p.addAction(self.icons_action[index], QLineEdit.TrailingPosition)
+            psw.addAction(self.icons_action[index], QLineEdit.TrailingPosition)
 
         main_layout.addLayout(form_container)
 

@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QTableWidget,
     QTableWidgetItem, QLabel, QHeaderView, QComboBox, QMessageBox
 )
-from PyQt5.QtCore import Qt
 from presentation.view.vista_catena_prodotto import LottoTreeView
 from presentation.controller.guest_controller import ControllerGuest
 from model.prodotto_finito_cliente import ProdottoFinito

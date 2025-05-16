@@ -53,5 +53,3 @@ class VistaRicercaLotti(QWidget):
         finestra = VistaCertificazioniLotto(id_lotto)
         finestra.show()
         self.finestre_aperte.append(finestra)  
-
-

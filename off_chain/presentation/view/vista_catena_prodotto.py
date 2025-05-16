@@ -117,9 +117,9 @@ class LottoTreeView(QMainWindow):
 
         for cert in certificati:
             testo = (
-                f"Lotto: {cert.Id_lotto}"
-                f"📜 {cert.Descrizione_certificato} da {cert.Nome_azienda} "
-                f"(emesso il {cert.Data_certificato}, "
+                f"Lotto: {cert.id_lotto}"
+                f"📜 {cert.descrizione_certificato} da {cert.nome_azienda} "
+                f"(emesso il {cert.data_certificato}, "
                 
             )
             item = QListWidgetItem(testo)

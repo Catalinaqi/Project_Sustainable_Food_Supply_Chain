@@ -8,15 +8,14 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 from model.product_standard_model import ProductStandardModel
-from presentation.controller.company_controller import ControllerAzienda
 from model.prodotto_finito_model import ProdottoLottoModel
-
+from presentation.controller.company_controller import ControllerAzienda
 
 class VistaCreaProdottoTrasformato(QDialog):
 
     operazione_aggiunta = pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self):
         super().__init__()
         self.setWindowTitle("Crea Nuovo Prodotto Trasformato")
         self.controller = ControllerAzienda()
@@ -52,11 +51,11 @@ class VistaCreaProdottoTrasformato(QDialog):
 
         layout.addWidget(QLabel("Seleziona materie prime da utilizzare:"))
         self.lista_materie = QListWidget()
-        for mp in self.materie_prime:
-            item = QListWidgetItem(f"{mp.nome} - Disponibile: {mp.quantita}")  
+        for materia_prima in self.materie_prime:
+            item = QListWidgetItem(f"{materia_prima.nome} - Disponibile: {materia_prima.quantita}")  
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Unchecked)
-            item.setData(Qt.UserRole, mp)  # ✅ Salva l'intero oggetto
+            item.setData(Qt.UserRole, materia_prima)  # ✅ Salva l'intero oggetto
             self.lista_materie.addItem(item)
         layout.addWidget(self.lista_materie)
 
@@ -77,15 +76,15 @@ class VistaCreaProdottoTrasformato(QDialog):
             if item.checkState() == Qt.Checked:
                 materia: ProdottoLottoModel = item.data(Qt.UserRole)
                 if isinstance(materia, ProdottoLottoModel):
-                    q, ok = QInputDialog.getInt(
+                    quantita, succ = QInputDialog.getInt(
                         self,
                         "Quantità usata",
                         f"Quanta quantità usare di {materia.nome}?",
                         min=1,
                         max= materia.quantita,  # Placeholder per la quantità disponibile
                     )
-                    if ok:
-                        self.quantita_usata_per_materia[materia.id_prodotto] = (materia, q)
+                    if succ:
+                        self.quantita_usata_per_materia[materia.id_prodotto] = (materia, quantita)
 
     def crea_prodotto(self):
         id_tipologia = self.combo_tipo_prodotto.currentData()
@@ -102,22 +101,22 @@ class VistaCreaProdottoTrasformato(QDialog):
             QMessageBox.warning(self, "Errore", "Specifica le quantità delle materie prime selezionate.")
             return
 
-        for _, (materia , q) in self.quantita_usata_per_materia.items():
+        for _, (materia , quantita) in self.quantita_usata_per_materia.items():
             if isinstance(materia, ProdottoLottoModel):
-                if q <= 0:
+                if quantita <= 0:
                     QMessageBox.warning(self, "Errore", f"La quantità usata deve essere maggiore di zero per {materia.nome}.")
                     return
-                if q > materia.quantita:
+                if quantita > materia.quantita:
                     QMessageBox.warning(self, "Errore", f"La quantità usata supera la disponibilità di {materia.nome}.")
                     return
 
-        co2, ok = QInputDialog.getInt(
+        co2, suc = QInputDialog.getInt(
             self,
             "Consumo CO₂",
             "Inserisci il consumo di CO₂ (in kg):",
             min=0
         )
-        if not ok:
+        if not suc:
             QMessageBox.information(self, "Annullato", "Creazione del prodotto annullata.")
             return
 
@@ -127,6 +126,3 @@ class VistaCreaProdottoTrasformato(QDialog):
         QMessageBox.information(self, "Salvato", "Prodotto trasformato creato con successo!")
         self.operazione_aggiunta.emit()
         self.accept()
-
-
-

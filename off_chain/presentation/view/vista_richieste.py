@@ -2,16 +2,15 @@
 # pylint: disable= import-error
 # pylint: disable= line-too-long
 # pylint: disable= trailing-whitespace
-import datetime
+
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
-    QPushButton, QMessageBox, QLabel, QGroupBox, QHeaderView , QInputDialog
+    QPushButton, QMessageBox, QGroupBox, QHeaderView , QInputDialog
 )
 
-from PyQt5.QtCore import Qt
+from presentation.controller.company_controller import ControllerAzienda
 from presentation.view.vista_richiesta_prodotto import RichiestaProdottoView
 from session import Session
-from presentation.controller.company_controller import ControllerAzienda
 from model.richiesta_model import RichiestaModel
 
 
@@ -102,10 +101,10 @@ class VisualizzaRichiesteView(QDialog):
         for row, richiesta in enumerate(self.richieste_ricevute):
             self.tabella_ricevute.setItem(row, 0, QTableWidgetItem(richiesta.nome_azienda_richiedente))
             self.tabella_ricevute.setItem(row, 1, QTableWidgetItem(richiesta.nome_prodotto))
-            self.tabella_ricevute.setItem(row, 2, QTableWidgetItem(str(richiesta.Quantita)))
-            self.tabella_ricevute.setItem(row, 3, QTableWidgetItem(richiesta.Stato_ricevente))
-            self.tabella_ricevute.setItem(row, 4, QTableWidgetItem(richiesta.Stato_trasportatore))
-            self.tabella_ricevute.setItem(row, 5, QTableWidgetItem(str(richiesta.Data)))
+            self.tabella_ricevute.setItem(row, 2, QTableWidgetItem(str(richiesta.quantita)))
+            self.tabella_ricevute.setItem(row, 3, QTableWidgetItem(richiesta.stato_ricevente))
+            self.tabella_ricevute.setItem(row, 4, QTableWidgetItem(richiesta.stato_trasportatore))
+            self.tabella_ricevute.setItem(row, 5, QTableWidgetItem(str(richiesta.data)))
 
     def carica_effettuate(self):
         self.richieste_effettuate = self.controller.get_richieste_effettuate()
@@ -113,10 +112,10 @@ class VisualizzaRichiesteView(QDialog):
         for row, richiesta in enumerate(self.richieste_effettuate):
             self.tabella_effettuate.setItem(row, 0, QTableWidgetItem(richiesta.nome_azienda_ricevente))
             self.tabella_effettuate.setItem(row, 1, QTableWidgetItem(richiesta.nome_prodotto))
-            self.tabella_effettuate.setItem(row, 2, QTableWidgetItem(str(richiesta.Quantita)))
-            self.tabella_effettuate.setItem(row, 3, QTableWidgetItem(richiesta.Stato_ricevente))
-            self.tabella_effettuate.setItem(row, 4, QTableWidgetItem(richiesta.Stato_trasportatore))
-            self.tabella_effettuate.setItem(row, 5, QTableWidgetItem(str(richiesta.Data)))
+            self.tabella_effettuate.setItem(row, 2, QTableWidgetItem(str(richiesta.quantita)))
+            self.tabella_effettuate.setItem(row, 3, QTableWidgetItem(richiesta.stato_ricevente))
+            self.tabella_effettuate.setItem(row, 4, QTableWidgetItem(richiesta.stato_trasportatore))
+            self.tabella_effettuate.setItem(row, 5, QTableWidgetItem(str(richiesta.data)))
 
 
     def accetta_richiesta(self):
@@ -135,23 +134,23 @@ class VisualizzaRichiesteView(QDialog):
 
         if Session().current_user["role"] == "Trasportatore":
 
-            if richiesta.Stato_trasportatore != "In attesa":
+            if richiesta.stato_trasportatore != "In attesa":
                 QMessageBox.information(self, "Info", "Questa richiesta è già stata gestita.")
                 return
 
             # --- Nuovo: chiedi CO2 emessa ---
-            co2, ok = QInputDialog.getDouble(
+            co2, succ = QInputDialog.getDouble(
                 self, "CO₂ Emessa", "Inserisci la quantità di CO₂ emessa (kg):", decimals=2
             )
 
-            if not ok:
+            if not succ:
                 return  # L'utente ha annullato
 
             # --- Recupera id_prodotto e quantità dalla richiesta ---
-            id_prodotto = richiesta.Id_prodotto
-            quantita = richiesta.Quantita
-            id_azienda_richiedente = richiesta.Id_azienda_richiedente
-            id_azienda_destinataria = richiesta.Id_azienda_ricevente
+            id_prodotto = richiesta.id_prodotto
+            quantita = richiesta.quantita
+            id_azienda_richiedente = richiesta.id_azienda_richiedente
+            id_azienda_destinataria = richiesta.id_azienda_ricevente
             lotto_input = richiesta.id_lotto_input
 
             try:
@@ -164,14 +163,14 @@ class VisualizzaRichiesteView(QDialog):
                     id_azienda_ricevente=id_azienda_destinataria,
                     id_lotto_input=lotto_input,
                 )
-            except Exception as e:
-                QMessageBox.critical(self, "Errore", f"Errore nel salvataggio CO₂: {str(e)}")
+            except Exception as err:
+                QMessageBox.critical(self, "Errore", f"Errore nel salvataggio CO₂: {str(err)}")
                 return
 
 
         try:
             self.controller.update_richiesta(
-                id_richiesta=richiesta.Id_richiesta,
+                id_richiesta=richiesta.id_richiesta,
                 nuovo_stato=nuovo_stato
             )
             QMessageBox.information(self, "Successo", f"Richiesta  con successo.")
@@ -179,8 +178,8 @@ class VisualizzaRichiesteView(QDialog):
             # Ricarica dati
             #self.richieste_ricevute = self.controller.get_richieste_ricevute(self.id_azienda)
             self.carica_ricevute()
-        except Exception as e:
-            QMessageBox.critical(self, "Errore", f"Errore durante la gestione: {str(e)}")
+        except Exception as err:
+            QMessageBox.critical(self, "Errore", f"Errore durante la gestione: {str(err)}")
 
 
     def apri_invia_richiesta(self):

@@ -72,13 +72,13 @@ class OperationRepositoryImpl(ABC):
             results = self.db.fetch_results(query, value)
             operazioni_estese = [
                     OperazioneEstesaModel(
-                        Id_operazione=row[0],
-                        Id_prodotto=row[1],
-                        Nome_prodotto=row[2],
-                        Data_operazione=row[3],
-                        Consumo_CO2=row[4],
-                        Nome_operazione=row[5],
-                        Quantita_prodotto=row[6],                 
+                        id_operazione=row[0],
+                        id_prodotto=row[1],
+                        nome_prodotto=row[2],
+                        data_operazione=row[3],
+                        consumo_co2=row[4],
+                        nome_operazione=row[5],
+                        quantita_prodotto=row[6],                 
             )
             for row in results
             ]

@@ -72,10 +72,10 @@ class Session:
         """Restituisce una copia sicura dell'utente, senza informazioni sensibili"""
         if self.logged_in:
             return {
-                "id": self._current_user.Id_azienda,
-                "username": self._current_user.Nome,
-                "role": self._current_user.Tipo,
-                "id_azienda" : self._current_user.Id_azienda,
+                "id": self._current_user.id_azienda,
+                "username": self._current_user.nome,
+                "role": self._current_user.tipo,
+                "id_azienda" : self._current_user.id_azienda,
 
                  # Solo info essenziali
             }

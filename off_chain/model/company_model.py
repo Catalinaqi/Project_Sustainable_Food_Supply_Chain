@@ -8,14 +8,14 @@ class CompanyModel:
     """
     Data model for transporting company information between layers.
     """
-    Id_azienda: int
-    Id_credenziali: int
-    Tipo: str
-    Nome: str
-    Indirizzo: str
-    Co2_consumata: Optional[float] = None
-    Co2_compensata: Optional[float] = None
-    Token : int = 0
+    id_azienda: int
+    id_credenziali: int
+    tipo: str
+    nome: str
+    indirizzo: str
+    co2_consumata: Optional[float] = None
+    co2_compensata: Optional[float] = None
+    token : int = 0
     data : datetime = None
 
 

@@ -8,10 +8,12 @@ from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, QFormLay
                              QHBoxLayout, QPushButton, QMessageBox)
 
 from model.company_model import CompanyModel
-from presentation.view.vista_cambia_password import VistaCambiaPassword
 from session import Session
-from presentation.view import funzioni_utili
+
 from presentation.controller.credential_controller import ControllerAutenticazione
+from presentation.view import funzioni_utili
+from presentation.view.vista_cambia_password import VistaCambiaPassword
+
 
 
 class VistaStatoAzienda(QMainWindow):
@@ -25,22 +27,22 @@ class VistaStatoAzienda(QMainWindow):
 
         # Elementi di layout
         self.id_azienda_label = QLabel("ID")
-        self.id_azienda_input = QLineEdit(str(azienda.Id_azienda))
+        self.id_azienda_input = QLineEdit(str(azienda.id_azienda))
 
         self.nome_label = QLabel("Nome")
-        self.nome_input = QLineEdit(str(azienda.Nome))
+        self.nome_input = QLineEdit(str(azienda.nome))
 
         self.tipo_label = QLabel("Tipo")
-        self.tipo_input = QLineEdit(str(azienda.Tipo))
+        self.tipo_input = QLineEdit(str(azienda.tipo))
 
         self.co2_consumata_totale_label = QLabel("CO2 consumata totale")
-        self.co2_consumata_totale_input = QLineEdit(str(azienda.Co2_consumata))
+        self.co2_consumata_totale_input = QLineEdit(str(azienda.co2_consumata))
 
         self.co2_risparmiata_totale_label = QLabel("CO2 risparmiata totale")
-        self.co2_risparmiata_totale_input = QLineEdit(str(azienda.Co2_compensata)) 
+        self.co2_risparmiata_totale_input = QLineEdit(str(azienda.co2_compensata)) 
 
         self.token_label = QLabel("Token accumulati")
-        self.token_label_input = QLineEdit(str(azienda.Token)) 
+        self.token_label_input = QLineEdit(str(azienda.token)) 
 
         self.cambia_password_button = QPushButton('Cambia password')
         self.cambia_password_button.clicked.connect(self.apri_cambia_password)

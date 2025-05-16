@@ -2,6 +2,7 @@
 # pylint: disable= import-error
 # pylint: disable= line-too-long
 # pylint: disable= trailing-whitespace
+# # pylint: disable= attribute-defined-outside-init
 from configuration.database import Database
 
 
