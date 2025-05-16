@@ -2,6 +2,9 @@
 # pylint: disable= import-error
 # pylint: disable= line-too-long
 # pylint: disable= trailing-whitespace
+# pylint: disable= C0103 # Ignora gli errori di nome variabile/metodo come richiesto
+# pylint: disable= R0913 # Ignora 'Too many arguments'
+# pylint: disable= R0917 # Ignora 'Too many positional arguments'
 
 import datetime
 from configuration.log_load_setting import logger # Importato una sola volta
@@ -21,7 +24,6 @@ from persistence.repository_impl.compensation_action_repository_impl import Comp
 from persistence.repository_impl.operation_repository_impl import OperationRepositoryImpl
 from persistence.repository_impl.product_repository_impl import ProductRepositoryImpl
 from persistence.repository_impl.richieste_repository_impl import RichiesteRepositoryImpl
-# from persistence.repository_impl import db_default_string # W0611: Rimosso import inutilizzato
 
 
 PERMESSI_OPERAZIONI = {
@@ -51,33 +53,18 @@ class ControllerAzienda:
         self.richieste = RichiesteRepositoryImpl()
         logger.info("BackEnd: Successful initialization of 'class instances' for repository implements")
 
-    # Restituisce tutte le soglie
     def lista_soglie(self) -> list[ThresholdModel]:
-        # repo = ThresholdRepositoryImpl()
         lista_soglie = self.threshold.get_lista_soglie()
         return lista_soglie
 
-    # W0101, W0107: Rimosso metodo vuoto e pass non necessario
-    # Restituisce il dettaglio della soglia selezionata dato l'indice n
-    # def get_dettaglio_soglia(self, n):
-    #     pass
-
-    # Restituisce gli elementi da visualizzare nella combo box
-    # Restituisce le opzioni per la combo box del dialog per la composizione
-    # R1710: Assicurato che tutti i percorsi ritornino un valore o nessuno. Qui si ritorna sempre.
     def get_prodotti_to_composizione(self) -> list[ProdottoFinitoModel]:
         try:
             return self.product.get_prodotti_finiti_magazzino_azienda(Session().current_user["id_azienda"])
         except Exception as e:
-            logger.error(f"Errore {e}", exc_info=True) # Aggiunto exc_info per tracciabilità
-            return [] # Ritorna lista vuota in caso di errore
-
-    # W0105: Rimosse stringhe inutili che sembravano commenti
-    # """ funzioni Mock"""
-    # """ Funzioni funzionali """
+            logger.error(f"Errore {e}", exc_info=True)
+            return []
 
     def lista_operazioni(self, azienda: int) -> list[OperazioneEstesaModel]:
-        # repo = OperationRepositoryImpl()
         try:
             lista_operazioni = self.operation_repository.get_operazioni_by_azienda(azienda)
             return lista_operazioni
@@ -105,17 +92,10 @@ class ControllerAzienda:
         try:
             prodotti_finiti = self.product.get_prodotti_finiti_magazzino_azienda(Session().current_user["id_azienda"])
             return prodotti_finiti
-        except Exception as e: # Mantenuto 'e' come richiesto
+        except Exception as e:
             logger.error(f"Errore nell'ottenere la lista delle materie prime: {e}", exc_info=True)
             return []
 
-    # R0913, R0917: Questi errori riguardano troppi argomenti.
-    # Per mantenere la funzionalità, non li ho cambiati strutturalmente (es. usando un dataclass),
-    # ma se il codice fosse mio, considererei di raggruppare i parametri.
-    # R1710, R1711: Questo metodo non ritornava nulla esplicitamente.
-    # Se non c'è un valore di ritorno significativo, è meglio non avere un `return None` esplicito
-    # oppure ritornare un booleano per indicare successo/fallimento.
-    # Ho rimosso il return None implicito alla fine.
     def crea_prodotto_trasformato(self, id_tipo: int, descrizione: str, quantita: int,
                                   quantita_usata_per_materia: dict[MateriaPrimaModel, int], co2: int):
         try:
@@ -124,13 +104,9 @@ class ControllerAzienda:
                 id_tipo, descrizione, quantita, quantita_usata_per_materia,
                 id_azienda, co2_consumata=co2
             )
-            # Potrebbe essere utile ritornare True in caso di successo
         except Exception as e:
             logger.error(f"Errore nella creazione del prodotto trasformato: {e}", exc_info=True)
-            # E False o sollevare l'eccezione in caso di errore
 
-    # W0311: Corretta indentazione
-    # R0913, R0917: Vedi commento sopra per crea_prodotto_trasformato
     def salva_operazione_agricola(self, tipo: str, data: datetime,
                                   co2: float, id_tipo_prodotto: int, descrizione: str, quantita: int
                                  ):
@@ -151,11 +127,9 @@ class ControllerAzienda:
         except Exception as e:
             logger.error(f"Errore {e}", exc_info=True)
 
-    # R0913, R0917: Vedi commento sopra per crea_prodotto_trasformato
     def salva_operazione_trasporto(self, id_prodotto: int, id_azienda_ricevente: int,
                                    id_azienda_richiedente: int, quantita: int, co2: float,
                                    id_lotto_input: int):
-        # W0311: Corretta indentazione
         self.operation_repository.inserisci_operazione_trasporto(
             Session().current_user["id_azienda"], id_lotto_input, id_prodotto,
             id_azienda_richiedente, id_azienda_ricevente, quantita, co2
@@ -180,7 +154,6 @@ class ControllerAzienda:
             logger.error(f"Errore nell'ottenere la lista delle aziende di trasporto: {e}", exc_info=True)
             return []
 
-    # R0913, R0917: Vedi commento sopra
     def invia_richiesta(self, id_az_ricevente: int, id_az_trasporto: int,
                         id_prodotto: int, quantita: int):
         try:
@@ -190,13 +163,10 @@ class ControllerAzienda:
             )
         except Exception as e:
             logger.error(f"Errore nell'invio della richiesta: {e}", exc_info=True)
-        # W0107: Rimosso pass non necessario
-        # pass
 
     def get_richieste_ricevute(self) -> list[RichiestaModel]:
         try:
             if Session().current_user["role"] == "Trasportatore":
-                # W0311: Corretta indentazione
                 richieste = self.richieste.get_richieste_ricevute(
                     Session().current_user["id_azienda"], check_trasporto=True
                 )
@@ -219,14 +189,9 @@ class ControllerAzienda:
 
     def update_richiesta(self, id_richiesta: int, nuovo_stato: str):
         try:
-            # W0311: Corretta indentazione
             self.richieste.update_richiesta(id_richiesta, nuovo_stato, Session().current_user["role"])
-        # W0707, W0719: Corretto il re-raise dell'eccezione
-        except Exception as e:
+        except Exception as e: # W0719: Cattura eccezione generica
             logger.error(f"Errore nell'aggiornare la richiesta: {e}", exc_info=True)
-            # È meglio sollevare un'eccezione più specifica o la stessa 'e' con 'from e'
-            # Per mantenere il comportamento originale, si solleva una nuova Exception
-            # ma aggiungendo 'from e' per la catena delle eccezioni.
             raise Exception(f"Errore nell'aggiornare la richiesta: {str(e)}") from e
 
     def check_utente(self, tipo_operazione: str) -> bool:
@@ -241,18 +206,15 @@ class ControllerAzienda:
         except Exception as e:
             logger.error(f"Errore {e}", exc_info=True)
 
-    # R1710: Garantito che tutti i percorsi ritornino un valore
     def get_prodotti_standard(self) -> list[ProductStandardModel]:
         try:
-            # R1705: Semplificato if/elif/else
             role = Session().current_user["role"]
             if role == "Agricola":
                 return self.product.get_prodotti_standard_agricoli()
-            if role == "Trasformatore": # Era elif, cambiato in if dopo return
+            if role == "Trasformatore":
                 return self.product.get_prodotti_standard_trasformazione()
-            # Se non è nessuno dei due ruoli, solleva un errore come prima o ritorna lista vuota
-            # logger.error(f"Utente non autorizzato per prodotti standard: {role}")
             raise TypeError(f"Utente {role} non autorizzato per ottenere prodotti standard")
         except Exception as e:
             logger.error(f"Errore nel ottenimento dei prodotti standard: {e}", exc_info=True)
-            return [] # Ritorna lista vuota in caso di errore generico
+            return []
+# C0304: Aggiunta newline finale

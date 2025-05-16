@@ -99,14 +99,11 @@ class ControllerGuest:
         Carica un prodotto con la sua storia a partire dal suo ID.
         """
         try:
-            prodotto = self.get_fake_prodotto(prodotto_id )  # Simulazione del caricamento del prodotto
+            prodotto = self.get_fake_prodotto(prodotto_id)
             return prodotto
         except Exception as e:
             logger.error(f"Errore durante il caricamento del prodotto con ID {prodotto_id}: {str(e)}")
             return None
-        
-
-    """ Funzioni Mock"""
 
     def get_prodotti(self) -> list[ProdottoFinito]:
         try:
@@ -119,7 +116,5 @@ class ControllerGuest:
         try:
             return self.certification.get_certificati_catena(lotto_id) or []
         except Exception as e:
-                logger.error(f"Errore nel recuperare i certificai {e}")
+            logger.error(f"Errore nel recuperare i certificai {e}")
         
-
-  

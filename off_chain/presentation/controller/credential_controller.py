@@ -67,7 +67,7 @@ class ControllerAzienda:
     # R1710: Assicurato che tutti i percorsi ritornino un valore o nessuno. Qui si ritorna sempre.
     def get_prodotti_to_composizione(self) -> list[ProdottoFinitoModel]:
         try:
-            return self.product.get_prodotti_finiti_magazzino_azienda(Session().current_user["id_azienda"])
+            return self.product.get_prodotti_magazzino(Session().current_user["id_azienda"])
         except Exception as e:
             logger.error(f"Errore {e}", exc_info=True) # Aggiunto exc_info per tracciabilità
             return [] # Ritorna lista vuota in caso di errore
@@ -93,17 +93,17 @@ class ControllerAzienda:
             logger.error(f"Errore nell'ottenere la lista delle azioni compensative: {e}", exc_info=True)
             return []
 
-    def get_materie_prime_magazzino_azienda(self) -> list[MateriaPrimaModel]:
+    def get_materie_magazzino(self) -> list[MateriaPrimaModel]:
         try:
-            materie_prime = self.product.get_materie_prime_magazzino_azienda(Session().current_user["id_azienda"])
+            materie_prime = self.product.get_materie_magazzino(Session().current_user["id_azienda"])
             return materie_prime
         except Exception as e:
             logger.error(f"Errore nell'ottenere la lista delle materie prime: {e}", exc_info=True)
             return []
 
-    def get_prodotti_finiti_magazzino_azienda(self) -> list[ProdottoFinitoModel]:
+    def get_prodotti_magazzino(self) -> list[ProdottoFinitoModel]:
         try:
-            prodotti_finiti = self.product.get_prodotti_finiti_magazzino_azienda(Session().current_user["id_azienda"])
+            prodotti_finiti = self.product.get_prodotti_magazzino(Session().current_user["id_azienda"])
             return prodotti_finiti
         except Exception as e: # Mantenuto 'e' come richiesto
             logger.error(f"Errore nell'ottenere la lista delle materie prime: {e}", exc_info=True)
@@ -227,7 +227,7 @@ class ControllerAzienda:
             # È meglio sollevare un'eccezione più specifica o la stessa 'e' con 'from e'
             # Per mantenere il comportamento originale, si solleva una nuova Exception
             # ma aggiungendo 'from e' per la catena delle eccezioni.
-            raise Exception(f"Errore nell'aggiornare la richiesta: {str(e)}") from e
+            raise Exception(f"Errore nell'aggiornare la richiesta: {str(e)}")
 
     def check_utente(self, tipo_operazione: str) -> bool:
         return tipo_operazione in PERMESSI_OPERAZIONI.get(Session().current_user["role"], [])
