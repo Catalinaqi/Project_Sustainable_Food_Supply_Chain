@@ -7,16 +7,10 @@ import subprocess
 import winreg
 from pathlib import Path
 import json
-
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QApplication, QSplashScreen, QMessageBox
+from PyQt5.QtWidgets import QApplication
 
 from configuration.log_load_setting import logger
-from database.db_migrations import DatabaseMigrations
-from configuration.database import Database
-from session import Session
-from presentation.view.vista_accedi import VistaAccedi
 
 # Import blockchain modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -111,24 +105,24 @@ class BlockchainSetupThread(threading.Thread):
             self.success = False
 
     def _load_or_deploy_contracts(self) -> bool:
-        """Loads existing contract addresses or compiles and deploys new ones."""
+        """Deploys new contracts every time and backs up existing ones."""
         if not self._w3:
             self.error_message = "Web3 not initialized for contract deployment."
             return False
 
         contract_file = Path(__file__).resolve().parent.parent / "on_chain" / "contract_addresses.json"
 
+        # Backup existing contract addresses if they exist
         if contract_file.exists():
-            self.update_splash_message("Verifying existing contracts...")
+            self.update_splash_message("Backing up existing contract addresses...")
+            backup_timestamp = time.strftime("%Y%m%d_%H%M%S")
+            backup_file = contract_file.with_name(f"contract_addresses_backup_{backup_timestamp}.json")
             try:
-                self.created_blockchain_interactor = BlockchainInteractor()
-                logger.info("Using existing deployed contracts.")
-                return True
+                import shutil
+                shutil.copy2(contract_file, backup_file)
+                logger.info(f"Backed up contract addresses to {backup_file}")
             except Exception as e:
-                logger.warning(
-                    "Could not use existing contracts from %s: %s. Will attempt redeployment.",
-                    contract_file, e
-                )
+                logger.warning(f"Failed to backup contract addresses: {e}")
 
         self.update_splash_message("Compiling smart contracts...")
         compiled_contracts = compile_contracts()
@@ -179,56 +173,3 @@ def wait_for_ganache(w3, max_attempts=30):
                 logger.debug(f"Attempt {i+1}/{max_attempts} to connect to Ganache failed: {str(e)}")
             time.sleep(2)
     return False
-
-
-def setup_database():
-    try:
-        DatabaseMigrations.run_migrations()
-    except Exception as e:
-        logger.error(f"Error initializing database: {e}")
-        sys.exit(1)  # Stops the application if there is a critical error
-
-
-if __name__ == "__main__":
-    # Configure the database before starting the graphical interface
-    setup_database()
-    
-    # Starting the PyQt application
-    app = QApplication(sys.argv)
-    logger.info("Frontend: Starting the PyQt application...")
-
-    session = Session()
-    logger.info(f"Start session on {session.start_app}")
-
-    # Show Splash Screen
-    splash = QSplashScreen(QPixmap("presentation/resources/logo_splash.png"), Qt.WindowStaysOnTopHint)
-    splash.show()
-
-    # Start blockchain setup in a separate thread
-    blockchain_setup = BlockchainSetupThread(splash_screen=splash)
-    blockchain_setup.start()
-    
-    # Wait for blockchain setup to complete with timeout
-    blockchain_setup.join(timeout=60)  # Aumentato a 60 secondi timeout
-    
-    if not blockchain_setup.is_alive() and blockchain_setup.success:
-        logger.info("Blockchain setup completed successfully")
-    else:
-        if blockchain_setup.is_alive():
-            logger.error("Blockchain setup timed out")
-            blockchain_setup.join()  # Aspetta comunque il completamento del thread
-        logger.warning("Proceeding without blockchain functionality")
-        if blockchain_setup.error_message:
-            logger.error(f"Blockchain setup failed: {blockchain_setup.error_message}")
-
-    time.sleep(1)
-
-    # Create the main window
-    window = VistaAccedi()
-    window.show()
-    
-    # Hide splash screen
-    splash.finish(window)
-    
-    # Start the application event loop
-    sys.exit(app.exec_())

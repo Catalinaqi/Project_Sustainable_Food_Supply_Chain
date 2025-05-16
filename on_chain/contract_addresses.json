@@ -1,7 +1,7 @@
 {
     "contracts": {
         "CO2Token": {
-            "address": "0x5446eAF07346ad58d341579cEf0346B2D309D738",
+            "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
             "abi": [
                 {
                     "anonymous": false,
@@ -303,7 +303,7 @@
             ]
         },
         "OperationRegistry": {
-            "address": "0x42bac68b99a9782D2dcD1C28e5f100CFD5362486",
+            "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
             "abi": [
                 {
                     "anonymous": false,
@@ -514,7 +514,7 @@
             ]
         },
         "ProductRegistry": {
-            "address": "0xC142Ec6DdC38f00242abaE2D3339753867Bc4EEA",
+            "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
             "abi": [
                 {
                     "anonymous": false,
@@ -763,7 +763,7 @@
             ]
         },
         "ProductRequest": {
-            "address": "0x7f1B842B66B0E2c765fa15C29914d5443c973C56",
+            "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
             "abi": [
                 {
                     "anonymous": false,
@@ -955,7 +955,7 @@
             ]
         },
         "QualityControl": {
-            "address": "0xB5A25D89BeFfA431b46cAd12e1e632DdEC31640a",
+            "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
             "abi": [
                 {
                     "anonymous": false,
@@ -1171,7 +1171,7 @@
             ]
         },
         "SupplyChain": {
-            "address": "0xe0E33E544BB89f0C533f8522eFB2197Ec7F6FB57",
+            "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
             "abi": [
                 {
                     "inputs": [],
@@ -1613,7 +1613,7 @@
             ]
         },
         "SustainabilityMetrics": {
-            "address": "0x14eE80ce74a5C4391Ee0e27CD7Ae9675cAF221A1",
+            "address": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
             "abi": [
                 {
                     "anonymous": false,
@@ -1882,7 +1882,7 @@
             ]
         },
         "UserRegistry": {
-            "address": "0x7D2fC7C2270d18b822B07Dc29F48892fB08bC37b",
+            "address": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
             "abi": [
                 {
                     "anonymous": false,
@@ -2061,6 +2061,6 @@
             ]
         }
     },
-    "timestamp": "2025-05-12 13:09:49",
+    "timestamp": "2025-05-16 09:47:34",
     "network": "ganache"
 }
