@@ -187,15 +187,3 @@ class VisualizzaRichiesteView(QDialog):
         self.finestra_aggiungi = RichiestaProdottoView(self)
         self.finestra_aggiungi.salva_richiesta.connect(self.carica_effettuate)
         self.finestra_aggiungi.exec_()
-
-
-class richiesta():
-    def __init__(self, id_richiesta, id_azienda_richiedente, id_prodotto, quantita, stato, data):
-        self.Id_richiesta = id_richiesta
-        self.Id_azienda_richiedente = id_azienda_richiedente
-        self.Id_azienda_destinataria = 1
-        self.Id_prodotto = id_prodotto
-        self.Quantita = quantita
-        self.Stato = stato
-        self.Data : datetime = data
-        self.Nome_azienda_richiedente = "Azienda A"

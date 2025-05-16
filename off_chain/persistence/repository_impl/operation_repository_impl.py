@@ -14,7 +14,7 @@ from configuration.database import Database
 from configuration.log_load_setting import logger
 from model.operation_model import OperationModel
 from model.operation_estesa_model import OperazioneEstesaModel
-from model.materia_prima_model import MateriaPrimaModel
+from model.prodotto_finito_model import ProdottoLottoModel
 from persistence.query_builder import QueryBuilder
 
 from persistence.repository_impl import db_default_string
@@ -253,7 +253,7 @@ class OperationRepositoryImpl(ABC):
         
         :param nome_prodotto: Nome del prodotto trasformato
         :param quantita_prodotta: Quantità del prodotto trasformato
-        :param materie_prime_usate: dict con chiave qualsiasi e valore (MateriaPrimaModel, quantita_usata)
+        :param materie_prime_usate: dict con chiave qualsiasi e valore (ProdottoLottoModel, quantita_usata)
         """
 
         try:
@@ -265,7 +265,7 @@ class OperationRepositoryImpl(ABC):
             for _, (materia, quantita_usata) in materie_prime_usate.items():
                 # 2a. Diminuisci la quantità di materia prima
 
-                if isinstance(materia, MateriaPrimaModel):
+                if isinstance(materia, ProdottoLottoModel):
 
                     query_update_materia, value = (
                         self.query_builder.
@@ -286,7 +286,7 @@ class OperationRepositoryImpl(ABC):
             value_output_lotto = self.get_next_id_lotto_output()
 
             for _, (materia, quantita_usata) in materie_prime_usate.items():
-                if isinstance(materia, MateriaPrimaModel):
+                if isinstance(materia, ProdottoLottoModel):
                     query_comp = "INSERT INTO ComposizioneLotto (id_lotto_output,id_lotto_input, quantità_utilizzata) VALUES (?, ?, ?)"
                     params = (value_output_lotto, materia.id_lotto, quantita_usata)
 
@@ -327,8 +327,8 @@ class OperationRepositoryImpl(ABC):
             return self.recupera_soglia(tipo_evento ,id_tipo_prodotto)
 
         except sqlite3.IntegrityError as e:
-                print("IntegrityError:", e)
-                self.db.conn.rollback()
+            print("IntegrityError:", e)
+            self.db.conn.rollback()
 
         except Exception as e:
             # Se c'è un errore, rollback dell'intera transazione
@@ -337,19 +337,19 @@ class OperationRepositoryImpl(ABC):
 
 
     def get_next_id_lotto_output(self):
-         try:
+        try:
             result = self.db.fetch_one("SELECT IFNULL(MAX(id_lotto_output), 0) + 1 FROM ComposizioneLotto;")
             value_output_lotto = result or 1
             return value_output_lotto
-         except Exception as e:
-              raise ValueError("Erroe nell'ottenimento del nuovo id lotto")
+        except Exception as e:
+            raise ValueError("Erroe nell'ottenimento del nuovo id lotto")
          
 
     
 
     def token_opeazione(self,co2_consumata :int,tipo_operazione: str, id_prodotto: int) -> int:
         try:
-             return  self.recupera_soglia(tipo_operazione, id_prodotto) - co2_consumata
+            return  self.recupera_soglia(tipo_operazione, id_prodotto) - co2_consumata
         except Exception as e:
             logger.error(f"Errore nel calcolo dei token {e}")
             return 0

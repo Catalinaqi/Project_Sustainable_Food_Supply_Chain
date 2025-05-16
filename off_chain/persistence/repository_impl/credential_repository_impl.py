@@ -1,3 +1,7 @@
+# pylint: disable= no-name-in-module,
+# pylint: disable= import-error
+# pylint: disable= line-too-long
+# pylint: disable= trailing-whitespace
 from abc import ABC
 import sqlite3
 from typing import Union

@@ -9,13 +9,13 @@
 import datetime
 from configuration.log_load_setting import logger # Importato una sola volta
 from model.threshold_model import ThresholdModel
-from model.materia_prima_model import MateriaPrimaModel
+from model.prodotto_finito_model import ProdottoLottoModel
 from model.info_product_for_choice_model import ProductForChoiceModel
 from model.product_standard_model import ProductStandardModel
 from model.company_model import CompanyModel
 from model.operation_estesa_model import OperazioneEstesaModel
 from model.compensation_action_model import CompensationActionModel
-from model.prodotto_finito_model import ProdottoFinitoModel
+from model.prodotto_finito_model import ProdottoLottoModel
 from model.richiesta_model import RichiestaModel
 from session import Session
 from persistence.repository_impl.company_repository_impl import CompanyRepositoryImpl
@@ -57,7 +57,7 @@ class ControllerAzienda:
         lista_soglie = self.threshold.get_lista_soglie()
         return lista_soglie
 
-    def get_prodotti_to_composizione(self) -> list[ProdottoFinitoModel]:
+    def get_prodotti_to_composizione(self) -> list[ProdottoLottoModel]:
         try:
             return self.product.get_prodotti_finiti_magazzino_azienda(Session().current_user["id_azienda"])
         except Exception as e:
@@ -80,7 +80,7 @@ class ControllerAzienda:
             logger.error(f"Errore nell'ottenere la lista delle azioni compensative: {e}", exc_info=True)
             return []
 
-    def get_materie_prime_magazzino_azienda(self) -> list[MateriaPrimaModel]:
+    def get_materie_prime_magazzino_azienda(self) -> list[ProdottoLottoModel]:
         try:
             materie_prime = self.product.get_materie_prime_magazzino_azienda(Session().current_user["id_azienda"])
             return materie_prime
@@ -88,7 +88,7 @@ class ControllerAzienda:
             logger.error(f"Errore nell'ottenere la lista delle materie prime: {e}", exc_info=True)
             return []
 
-    def get_prodotti_finiti_magazzino_azienda(self) -> list[ProdottoFinitoModel]:
+    def get_prodotti_finiti_magazzino_azienda(self) -> list[ProdottoLottoModel]:
         try:
             prodotti_finiti = self.product.get_prodotti_finiti_magazzino_azienda(Session().current_user["id_azienda"])
             return prodotti_finiti
@@ -97,7 +97,7 @@ class ControllerAzienda:
             return []
 
     def crea_prodotto_trasformato(self, id_tipo: int, descrizione: str, quantita: int,
-                                  quantita_usata_per_materia: dict[MateriaPrimaModel, int], co2: int):
+                                  quantita_usata_per_materia: dict[ProdottoLottoModel, int], co2: int):
         try:
             id_azienda = Session().current_user["id_azienda"]
             self.operation_repository.inserisci_prodotto_trasformato(

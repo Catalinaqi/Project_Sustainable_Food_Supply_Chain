@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QPushButton, QDateEdit, QLineEdit, QComboBox, QDoubleSpinBox, QListWidget, QListWidgetItem
 )
 from PyQt5.QtCore import pyqtSignal, Qt
-from model.prodotto_finito_model import ProdottoFinitoModel
+from model.prodotto_finito_model import ProdottoLottoModel
 from session import Session
 from presentation.controller.company_controller import PERMESSI_OPERAZIONI, ControllerAzienda
 from PyQt5.QtWidgets import  QMessageBox
@@ -94,7 +94,7 @@ class AggiungiOperazioneView(QDialog):
             
             layout.addWidget(self.lista_prodotti)
 
-            self.prodotti_completi: list[ProdottoFinitoModel] = self.controller.get_prodotti_to_composizione()
+            self.prodotti_completi: list[ProdottoLottoModel] = self.controller.get_prodotti_to_composizione()
 
             self.popola_lista_prodotti(self.prodotti_completi)
 
@@ -237,7 +237,7 @@ class AggiungiOperazioneView(QDialog):
 
 
 
-    def popola_lista_prodotti(self, prodotti: list[ProdottoFinitoModel]):
+    def popola_lista_prodotti(self, prodotti: list[ProdottoLottoModel]):
         self.lista_prodotti.clear()
         for prodotto in prodotti:
             item = QListWidgetItem(f"{prodotto.nome} (ID_lotto: {prodotto.id_prodotto}) Quantità{prodotto.quantita}")
@@ -269,7 +269,7 @@ class AggiungiOperazioneView(QDialog):
                 if item != item_selezionato and item.checkState() == Qt.Checked:
                     item.setCheckState(Qt.Unchecked)
 
-    def get_prodotti_selezionati(self) -> list[ProdottoFinitoModel]:
+    def get_prodotti_selezionati(self) -> list[ProdottoLottoModel]:
         prodotti = []
         for i in range(self.lista_prodotti.count()):
             item = self.lista_prodotti.item(i)

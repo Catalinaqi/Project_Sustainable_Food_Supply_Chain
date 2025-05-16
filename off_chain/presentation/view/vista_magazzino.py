@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QLabel, QLineEdit
 )
-from model.materia_prima_model import MateriaPrimaModel
-from model.prodotto_finito_model import ProdottoFinitoModel
+from model.prodotto_finito_model import ProdottoLottoModel
+from model.prodotto_finito_model import ProdottoLottoModel
 from presentation.controller.company_controller import ControllerAzienda
 
 
@@ -16,8 +16,8 @@ class VisualizzaMagazzinoView(QDialog):
         super().__init__(parent)
         self.controller = ControllerAzienda()
 
-        self.prodotti_magazzino_completi: list[MateriaPrimaModel] = self.controller.get_materie_prime_magazzino_azienda()
-        self.prodotti_finiti_magazzino: list[ProdottoFinitoModel] = self.controller.get_prodotti_finiti_magazzino_azienda()
+        self.prodotti_magazzino_completi: list[ProdottoLottoModel] = self.controller.get_materie_prime_magazzino_azienda()
+        self.prodotti_finiti_magazzino: list[ProdottoLottoModel] = self.controller.get_prodotti_finiti_magazzino_azienda()
 
         self.init_ui()
 
@@ -73,7 +73,7 @@ class VisualizzaMagazzinoView(QDialog):
         self.mostra_materie_prime(prodotti_materie)
         self.mostra_prodotti_finiti(prodotti_finiti)
 
-    def mostra_materie_prime(self, prodotti: list[MateriaPrimaModel]):
+    def mostra_materie_prime(self, prodotti: list[ProdottoLottoModel]):
         self.tabella_materie_prime.setRowCount(len(prodotti))
         for row, prodotto in enumerate(prodotti):
             self.tabella_materie_prime.setItem(row, 0, QTableWidgetItem(prodotto.nome))
@@ -81,7 +81,7 @@ class VisualizzaMagazzinoView(QDialog):
             self.tabella_materie_prime.setItem(row, 2, QTableWidgetItem(str(prodotto.quantita)))
             self.tabella_materie_prime.setItem(row, 3, QTableWidgetItem("kg"))  # Placeholder unità
 
-    def mostra_prodotti_finiti(self, prodotti: list[ProdottoFinitoModel]):
+    def mostra_prodotti_finiti(self, prodotti: list[ProdottoLottoModel]):
         self.tabella_prodotti_finiti.setRowCount(len(prodotti))
         for row, prodotto in enumerate(prodotti):
             self.tabella_prodotti_finiti.setItem(row, 0, QTableWidgetItem(prodotto.nome))
