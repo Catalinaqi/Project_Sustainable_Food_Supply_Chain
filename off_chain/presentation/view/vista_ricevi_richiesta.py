@@ -25,6 +25,7 @@ class VistaRiceviRichiesta(QMainWindow):
         # Elementi di layout
         self.list_view = QListView()
         self.invia_button = QPushButton("Accetta")
+        self.rifiuta_button = QPushButton("Rifiuta")
 
         self.setWindowIcon(QIcon("images\\logo_centro.png"))
 
@@ -62,6 +63,9 @@ class VistaRiceviRichiesta(QMainWindow):
         funzioni_utili.insert_button(self.invia_button, button_layout)
         self.invia_button.clicked.connect(self.accetta_richiesta)
 
+        funzioni_utili.insert_button(self.rifiuta_button, button_layout)
+        self.rifiuta_button.clicked.connect(self.rifiuta_richiesta)
+
         main_layout.addLayout(button_layout)
 
         outer_layout.addLayout(main_layout)
@@ -88,6 +92,17 @@ class VistaRiceviRichiesta(QMainWindow):
             richiesta = self.lista_prova[selected_item]
 
             QMessageBox.information(self, "Supply Chain", f"{richiesta} accettata")
+        else:
+            QMessageBox.warning(self, "Nessuna selezione", "Nessun item è stato selezionato.")
+
+    def rifiuta_richiesta(self):
+        selected_index = self.list_view.selectedIndexes()
+
+        if selected_index:
+            selected_item = selected_index[0].row()
+            richiesta = self.lista_prova[selected_item]
+
+            QMessageBox.information(self, "Supply Chain", f"{richiesta} rifiutata")
         else:
             QMessageBox.warning(self, "Nessuna selezione", "Nessun item è stato selezionato.")
 
