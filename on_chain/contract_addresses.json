@@ -1,0 +1,165 @@
+{
+  "contracts": {
+    "UserRegistry": {
+      "address": "0x525C7063E7C20997BaaE9bDa922159152D0e8417",
+      "abi": [
+        "event UserDeactivated(address indexed)",
+        "event UserRegistered(address indexed,string,string)",
+        "event UserUpdated(address indexed,string,string)",
+        "function deactivateUser()",
+        "function getUser(address) view returns (string,string,string,bool,uint256)",
+        "function isUserRegistered(address) view returns (bool)",
+        "function registerUser(string,string,string)",
+        "function updateUser(string,string,string)"
+      ]
+    },
+    "ProductRegistry": {
+      "address": "0x38a024C0b412B9d1db8BC398140D00F5Af3093D4",
+      "abi": [
+        "event ProductCreated(uint256 indexed,address indexed,string)",
+        "event ProductDeactivated(uint256 indexed)",
+        "event ProductUpdated(uint256 indexed,string)",
+        "function createProduct(string,string,string,string,string) returns (uint256)",
+        "function deactivateProduct(uint256)",
+        "function getCategoryProducts(string) view returns (uint256[])",
+        "function getProducerProducts(address) view returns (uint256[])",
+        "function getProduct(uint256) view returns (uint256,string,string,string,string,address,uint256,bool,string)",
+        "function updateProduct(uint256,string,string,string,string,string)"
+      ]
+    },
+    "OperationRegistry": {
+      "address": "0x5fc748f1FEb28d7b76fa1c6B07D8ba2d5535177c",
+      "abi": [
+        "event OperationCreated(uint256 indexed,address indexed,string)",
+        "event OperationMetadataUpdated(uint256 indexed,string)",
+        "event OperationStatusUpdated(uint256 indexed,string)",
+        "function createOperation(string,string,string,string) returns (uint256)",
+        "function getOperation(uint256) view returns (uint256,address,string,string,string,uint256,string,string)",
+        "function getUserOperations(address) view returns (uint256[])",
+        "function updateOperationMetadata(uint256,string)",
+        "function updateOperationStatus(uint256,string)"
+      ]
+    },
+    "QualityControl": {
+      "address": "0xB82008565FdC7e44609fA118A4a681E92581e680",
+      "abi": [
+        "event QualityCheckCompleted(uint256 indexed)",
+        "event QualityCheckCreated(uint256 indexed,uint256 indexed,address indexed)",
+        "event QualityCheckUpdated(uint256 indexed,string)",
+        "function createQualityCheck(uint256,string,string,string) returns (uint256)",
+        "function getInspectorQualityChecks(address) view returns (uint256[])",
+        "function getProductQualityChecks(uint256) view returns (uint256[])",
+        "function getQualityCheck(uint256) view returns (uint256,uint256,address,string,string,string,uint256,string)",
+        "function updateQualityCheck(uint256,string,string,string)"
+      ]
+    },
+    "SustainabilityMetrics": {
+      "address": "0x2a810409872AfC346F9B5b26571Fd6eC42EA4849",
+      "abi": [
+        "event MetricRecorded(uint256 indexed,uint256 indexed,string)",
+        "event MetricUpdated(uint256 indexed,uint256)",
+        "event MetricVerified(uint256 indexed,address)",
+        "function getMetric(uint256) view returns (uint256,uint256,address,string,uint256,string,string,uint256,string)",
+        "function getProductMetrics(uint256) view returns (uint256[])",
+        "function getReporterMetrics(address) view returns (uint256[])",
+        "function getTypeMetrics(string) view returns (uint256[])",
+        "function recordMetric(uint256,string,uint256,string,string,string) returns (uint256)",
+        "function updateMetric(uint256,uint256,string,string)",
+        "function verifyMetric(uint256)"
+      ]
+    },
+    "CO2Token": {
+      "address": "0xb9bEECD1A582768711dE1EE7B0A1d582D9d72a6C",
+      "abi": [
+        "event Approval(address indexed,address indexed,uint256)",
+        "event TokensBurned(address indexed,uint256)",
+        "event TokensMinted(address indexed,uint256)",
+        "event Transfer(address indexed,address indexed,uint256)",
+        "function allowance(address,address) view returns (uint256)",
+        "function approve(address,uint256) returns (bool)",
+        "function balanceOf(address) view returns (uint256)",
+        "function decimals() view returns (uint8)",
+        "function name() view returns (string)",
+        "function processOperationCO2(uint256,uint256) returns (bool)",
+        "function rewardCompensatoryAction(uint256)",
+        "function symbol() view returns (string)",
+        "function totalSupply() view returns (uint256)",
+        "function transfer(address,uint256) returns (bool)",
+        "function transferFrom(address,address,uint256) returns (bool)"
+      ]
+    },
+    "ProductRequest": {
+      "address": "0x8A93d247134d91e0de6f96547cB0204e5BE8e5D8",
+      "abi": [
+        "event RequestCompleted(uint256 indexed)",
+        "event RequestCreated(uint256 indexed,address indexed,string)",
+        "event RequestStatusUpdated(uint256 indexed,string)",
+        "function createRequest(string,uint256,string,uint256) returns (uint256)",
+        "function getRequest(uint256) view returns (uint256,address,string,uint256,string,uint256,string,uint256,uint256)",
+        "function getUserRequests(address) view returns (uint256[])",
+        "function updateRequestStatus(uint256,string)"
+      ]
+    },
+    "SupplyChainCO2": {
+      "address": "0x40918Ba7f132E0aCba2CE4de4c4baF9BD2D7D849",
+      "abi": [
+        "constructor()",
+        "error AccessControlBadConfirmation()",
+        "error AccessControlUnauthorizedAccount(address,bytes32)",
+        "error OwnableInvalidOwner(address)",
+        "error OwnableUnauthorizedAccount(address)",
+        "event LotCreated(uint256,string,address,uint256)",
+        "event OwnershipTransferred(address indexed,address indexed)",
+        "event RoleAdminChanged(bytes32 indexed,bytes32 indexed,bytes32 indexed)",
+        "event RoleGranted(bytes32 indexed,address indexed,address indexed)",
+        "event RoleRevoked(bytes32 indexed,address indexed,address indexed)",
+        "event TransformationLogged(uint256,uint256,address,uint256)",
+        "event TransportLogged(uint256,address,uint256,string,string)",
+        "function DEFAULT_ADMIN_ROLE() view returns (bytes32)",
+        "function OPERATOR_ROLE() view returns (bytes32)",
+        "function createLot(string,uint256)",
+        "function getRoleAdmin(bytes32) view returns (bytes32)",
+        "function grantOperatorRole(address)",
+        "function grantRole(bytes32,address)",
+        "function hasRole(bytes32,address) view returns (bool)",
+        "function logTransformation(uint256,string,uint256)",
+        "function logTransport(uint256,uint256,string,string)",
+        "function lotCounter() view returns (uint256)",
+        "function lots(uint256) view returns (uint256,string,address,uint256,uint256,bool)",
+        "function owner() view returns (address)",
+        "function renounceOwnership()",
+        "function renounceRole(bytes32,address)",
+        "function revokeOperatorRole(address)",
+        "function revokeRole(bytes32,address)",
+        "function supportsInterface(bytes4) view returns (bool)",
+        "function transferOwnership(address)",
+        "function transformations(uint256,uint256) view returns (uint256,uint256,address,uint256,uint256)",
+        "function transports(uint256,uint256) view returns (uint256,address,uint256,uint256,string,string)"
+      ]
+    },
+    "SupplyChain": {
+      "address": "0xF32D39ff9f6Aa7a7A64d7a4F00a54826Ef791a55",
+      "abi": [
+        "constructor()",
+        "event ContractUpgraded(string,address)",
+        "event OperatorAuthorized(address indexed)",
+        "event OperatorRevoked(address indexed)",
+        "function authorizeOperator(address)",
+        "function authorizedOperators(address) view returns (bool)",
+        "function createOperation(string,string,string,string) returns (uint256)",
+        "function createProductRequest(string,uint256,string,uint256) returns (uint256)",
+        "function getOperationInfo(uint256) view returns (uint256,address,string,string,string,uint256,string,string)",
+        "function getRequestInfo(uint256) view returns (uint256,address,string,uint256,string,uint256,string,uint256,uint256)",
+        "function getUserInfo(address) view returns (string,string,string,bool,uint256)",
+        "function initialize(address,address,address)",
+        "function operationRegistry() view returns (address)",
+        "function owner() view returns (address)",
+        "function productRequest() view returns (address)",
+        "function registerUser(string,string,string) returns (bool)",
+        "function revokeOperator(address)",
+        "function upgradeContract(string,address)",
+        "function userRegistry() view returns (address)"
+      ]
+    }
+  }
+}
