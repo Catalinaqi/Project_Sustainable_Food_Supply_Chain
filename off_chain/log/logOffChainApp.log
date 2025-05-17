@@ -1,0 +1,201 @@
+<<<<<<< Updated upstream
+=======
+2025-05-17 15:30:34,513 - app_logger - INFO - [log_load_setting.py:69] - BackEnd: INITIAL LOADING OF GLOBAL - LOGGER
+2025-05-17 15:30:34,513 - app_logger - INFO - [log_load_setting.py:70] - BackEnd: Logger initialized successfully (File logging: enabled)
+2025-05-17 15:30:35,920 - app_logger - INFO - [database.py:24] - BackEnd: get_connection: Name database is: sfs_chain_database.db
+2025-05-17 15:30:35,920 - app_logger - INFO - [database.py:25] - BackEnd: get_connection: Path for the database is: C:\Users\fabio\Documents\GitHub\Project_Sustainable_Food_Supply_Chain\off_chain\database\sfs_chain_database.db
+2025-05-17 15:30:35,920 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Richiesta with params: ()
+2025-05-17 15:30:35,925 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Magazzino with params: ()
+2025-05-17 15:30:35,926 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS ComposizioneLotto with params: ()
+2025-05-17 15:30:35,926 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Azioni_compensative with params: ()
+2025-05-17 15:30:35,926 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Certificato with params: ()
+2025-05-17 15:30:35,927 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Operazione with params: ()
+2025-05-17 15:30:35,927 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Prodotto with params: ()
+2025-05-17 15:30:35,927 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Soglie with params: ()
+2025-05-17 15:30:35,928 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Azienda with params: ()
+2025-05-17 15:30:35,928 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: DROP TABLE IF EXISTS Credenziali with params: ()
+2025-05-17 15:30:35,928 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: 
+            CREATE TABLE  Credenziali (
+                Id_credenziali INTEGER PRIMARY KEY AUTOINCREMENT,
+                Username TEXT UNIQUE NOT NULL,
+                Password TEXT NOT NULL                
+            )
+             with params: ()
+2025-05-17 15:30:35,929 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: 
+            CREATE TABLE  Soglie (
+                Operazione TEXT NOT NULL,
+                Prodotto INTEGER NOT NULL,
+                Soglia_Massima INTEGER NOT NULL,
+                firma TEXT NOT NULL,
+                PRIMARY KEY (Operazione, Prodotto)
+            )
+             with params: ()
+2025-05-17 15:30:35,929 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: 
+            CREATE TABLE  Azienda (
+                Id_azienda INTEGER PRIMARY KEY AUTOINCREMENT,
+                Id_credenziali INTEGER NOT NULL,
+                Tipo TEXT CHECK(Tipo IN ('Agricola', 'Trasportatore', 'Trasformatore', 'Rivenditore', 'Certificatore')),
+                Nome TEXT NOT NULL,
+                Indirizzo TEXT NOT NULL,
+                Co2_emessa REAL NOT NULL DEFAULT 0,
+                Co2_compensata REAL NOT NULL DEFAULT 0,
+                Token INTEGER NOT NULL DEFAULT 100,
+                CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (Id_credenziali) REFERENCES Credenziali(Id_credenziali) ON DELETE CASCADE
+            )
+             with params: ()
+2025-05-17 15:30:35,930 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: 
+            CREATE TABLE  Prodotto (
+                Id_prodotto INTEGER PRIMARY KEY AUTOINCREMENT,
+                Nome TEXT NOT NULL,
+                Stato INTEGER,
+                Data_di_inserimento TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+             with params: ()
+2025-05-17 15:30:35,930 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: 
+            CREATE TABLE  Operazione (
+                Id_operazione INTEGER PRIMARY KEY AUTOINCREMENT,
+                Id_azienda INTEGER NOT NULL,
+                Id_prodotto INTEGER NOT NULL,
+                Id_lotto INTEGER UNIQUE NOT NULL,
+                Data_operazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                Consumo_CO2 REAL NOT NULL,
+                quantita REAL NOT NULL CHECK(quantita > 0),
+                Tipo TEXT CHECK(tipo IN ('produzione', 'trasporto', 'trasformazione', 'vendita')) NOT NULL,
+                FOREIGN KEY (Id_azienda) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE,
+                FOREIGN KEY (Id_prodotto) REFERENCES Prodotto(Id_prodotto) ON DELETE CASCADE
+            )
+             with params: ()
+2025-05-17 15:30:35,931 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: 
+            CREATE TABLE ComposizioneLotto (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_lotto_output INTEGER NOT NULL,
+                id_lotto_input INTEGER NOT NULL,
+                quantità_utilizzata REAL NOT NULL CHECK(quantità_utilizzata > 0),
+                FOREIGN KEY (id_lotto_input) REFERENCES Operazione(Id_lotto)
+            )
+             with params: ()
+2025-05-17 15:30:35,932 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: 
+            CREATE TABLE  Certificato (
+                Id_certificato INTEGER PRIMARY KEY AUTOINCREMENT,
+                Id_lotto INTEGER NOT NULL,
+                Descrizione TEXT,
+                Id_azienda_certificatore INTEGER NOT NULL,
+                Data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (Id_azienda_certificatore) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
+            )
+             with params: ()
+2025-05-17 15:30:35,933 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: 
+            CREATE TABLE  Azioni_compensative (
+                Id_azione INTEGER PRIMARY KEY AUTOINCREMENT,
+                Data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                Id_azienda INTEGER NOT NULL,
+                Co2_compensata REAL NOT NULL,
+                Nome_azione TEXT NOT NULL,
+                FOREIGN KEY (Id_azienda) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
+            )
+             with params: ()
+2025-05-17 15:30:35,934 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: 
+            CREATE TABLE Magazzino (
+                id_azienda TEXT NOT NULL,
+                id_lotto TEXT NOT NULL,
+                quantita REAL NOT NULL CHECK(quantita >= 0),
+                PRIMARY KEY (id_azienda, id_lotto),
+                FOREIGN KEY (id_azienda) REFERENCES Azienda(Id_azienda),
+                FOREIGN KEY (id_lotto) REFERENCES Operazione(Id_lotto)
+)
+             with params: ()
+2025-05-17 15:30:35,935 - app_logger - INFO - [database.py:116] - BackEnd: execute_transaction: Info executing query: 
+            CREATE TABLE  Richiesta (
+                Id_richiesta INTEGER PRIMARY KEY AUTOINCREMENT,
+                Id_richiedente INTEGER NOT NULL,
+                Id_ricevente INTEGER NOT NULL,
+                Id_trasportatore INTEGER NOT NULL,
+                Id_prodotto INTEGER NOT NULL,
+                Quantita REAL NOT NULL,
+                Stato_ricevente TEXT CHECK(Stato_ricevente IN ('In attesa', 'Accettata', 'Rifiutata')),
+                Stato_trasportatore TEXT CHECK(Stato_trasportatore IN ('In attesa', 'Accettata', 'Rifiutata')),
+                Data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (Id_richiedente) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
+                FOREIGN KEY (Id_ricevente) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
+                FOREIGN KEY (Id_trasportatore) REFERENCES Azienda(Id_azienda) ON DELETE CASCADE
+            )
+             with params: ()
+2025-05-17 15:30:35,940 - app_logger - INFO - [db_migrations.py:153] - BackEnd: run_migrations: Migrations completed successfully.
+2025-05-17 15:30:36,570 - app_logger - INFO - [db_migrations.py:397] - Seed dei dati iniziali completato.
+2025-05-17 15:30:36,571 - app_logger - INFO - [db_migrations.py:164] - BackEnd: run_migrations: Seed dei dati iniziali completato.
+2025-05-17 15:30:36,571 - app_logger - INFO - [main.py:25] - Starting Hardhat blockchain environment...
+2025-05-17 15:30:36,572 - app_logger - INFO - [blockchain_manager.py:33] - [HARDHAT] Starting Hardhat node...
+2025-05-17 15:30:36,581 - app_logger - INFO - [blockchain_manager.py:47] - [HARDHAT] Hardhat node process started
+2025-05-17 15:30:36,581 - app_logger - INFO - [blockchain_manager.py:56] - [HARDHAT] Waiting for Hardhat node to be ready...
+2025-05-17 15:30:36,597 - app_logger - INFO - [blockchain_manager.py:67] - [HARDHAT] Hardhat node is ready (attempt 1/30)
+2025-05-17 15:30:36,604 - app_logger - INFO - [blockchain_manager.py:132] - Backed up contract addresses to C:\Users\fabio\Documents\GitHub\Project_Sustainable_Food_Supply_Chain\on_chain\contract_addresses_backup_20250517_153036.json
+2025-05-17 15:30:44,751 - app_logger - INFO - [blockchain_manager.py:151] - [ETHERS.JS] Contracts deployed successfully
+2025-05-17 15:30:44,752 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Starting deployment process...
+2025-05-17 15:30:44,752 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying contracts with the account: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+2025-05-17 15:30:44,752 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying UserRegistry...
+2025-05-17 15:30:44,752 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] UserRegistry deployed to: 0x36b58F5C1969B7b6591D752ea6F5486D069010AB
+2025-05-17 15:30:44,752 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying ProductRegistry...
+2025-05-17 15:30:44,752 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] ProductRegistry deployed to: 0x8198f5d8F8CfFE8f9C413d98a0A55aEB8ab9FbB7
+2025-05-17 15:30:44,752 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying OperationRegistry...
+2025-05-17 15:30:44,753 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] OperationRegistry deployed to: 0x0355B7B8cb128fA5692729Ab3AAa199C1753f726
+2025-05-17 15:30:44,753 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying QualityControl...
+2025-05-17 15:30:44,753 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] QualityControl deployed to: 0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB
+2025-05-17 15:30:44,753 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying SustainabilityMetrics...
+2025-05-17 15:30:44,753 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] SustainabilityMetrics deployed to: 0xf4B146FbA71F41E0592668ffbF264F1D186b2Ca8
+2025-05-17 15:30:44,753 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying CO2Token...
+2025-05-17 15:30:44,753 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] CO2Token deployed to: 0x172076E0166D1F9Cc711C77Adf8488051744980C
+2025-05-17 15:30:44,753 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying ProductRequest...
+2025-05-17 15:30:44,753 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] ProductRequest deployed to: 0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B
+2025-05-17 15:30:44,754 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying SupplyChainCO2...
+2025-05-17 15:30:44,754 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] SupplyChainCO2 deployed to: 0xBEc49fA140aCaA83533fB00A2BB19bDdd0290f25
+2025-05-17 15:30:44,754 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying SupplyChain...
+2025-05-17 15:30:44,754 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] SupplyChain deployed to: 0xD84379CEae14AA33C123Af12424A37803F885889
+2025-05-17 15:30:44,754 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Initializing SupplyChain...
+2025-05-17 15:30:44,754 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] SupplyChain initialized successfully
+2025-05-17 15:30:44,754 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Contract addresses and ABIs saved to C:\Users\fabio\Documents\GitHub\Project_Sustainable_Food_Supply_Chain\on_chain\contract_addresses.json
+2025-05-17 15:30:44,754 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deployment completed successfully!
+2025-05-17 15:30:45,354 - app_logger - INFO - [blockchain_manager.py:110] - [ETHERS.JS] Blockchain interactor initialized successfully
+2025-05-17 15:30:45,577 - app_logger - INFO - [main.py:43] - Hardhat blockchain environment and ethers.js contracts deployed successfully
+2025-05-17 15:30:45,622 - app_logger - INFO - [gui_manager.py:16] - Frontend: Starting the PyQt application...
+2025-05-17 15:30:45,622 - app_logger - INFO - [gui_manager.py:18] - Start session on 2025/05/17/15-30
+2025-05-17 15:30:46,372 - app_logger - INFO - [blockchain_manager.py:33] - [HARDHAT] Starting Hardhat node...
+2025-05-17 15:30:46,379 - app_logger - INFO - [blockchain_manager.py:47] - [HARDHAT] Hardhat node process started
+2025-05-17 15:30:46,382 - app_logger - INFO - [blockchain_manager.py:56] - [HARDHAT] Waiting for Hardhat node to be ready...
+2025-05-17 15:30:46,402 - app_logger - INFO - [blockchain_manager.py:67] - [HARDHAT] Hardhat node is ready (attempt 1/30)
+2025-05-17 15:30:46,414 - app_logger - INFO - [blockchain_manager.py:132] - Backed up contract addresses to C:\Users\fabio\Documents\GitHub\Project_Sustainable_Food_Supply_Chain\on_chain\contract_addresses_backup_20250517_153046.json
+2025-05-17 15:30:54,662 - app_logger - INFO - [blockchain_manager.py:151] - [ETHERS.JS] Contracts deployed successfully
+2025-05-17 15:30:54,662 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Starting deployment process...
+2025-05-17 15:30:54,662 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying contracts with the account: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+2025-05-17 15:30:54,662 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying UserRegistry...
+2025-05-17 15:30:54,662 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] UserRegistry deployed to: 0xfbC22278A96299D91d41C453234d97b4F5Eb9B2d
+2025-05-17 15:30:54,663 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying ProductRegistry...
+2025-05-17 15:30:54,663 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] ProductRegistry deployed to: 0x46b142DD1E924FAb83eCc3c08e4D46E82f005e0E
+2025-05-17 15:30:54,663 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying OperationRegistry...
+2025-05-17 15:30:54,663 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] OperationRegistry deployed to: 0xC9a43158891282A2B1475592D5719c001986Aaec
+2025-05-17 15:30:54,663 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying QualityControl...
+2025-05-17 15:30:54,663 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] QualityControl deployed to: 0x1c85638e118b37167e9298c2268758e058DdfDA0
+2025-05-17 15:30:54,664 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying SustainabilityMetrics...
+2025-05-17 15:30:54,664 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] SustainabilityMetrics deployed to: 0x367761085BF3C12e5DA2Df99AC6E1a824612b8fb
+2025-05-17 15:30:54,664 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying CO2Token...
+2025-05-17 15:30:54,664 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] CO2Token deployed to: 0x4C2F7092C2aE51D986bEFEe378e50BD4dB99C901
+2025-05-17 15:30:54,664 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying ProductRequest...
+2025-05-17 15:30:54,665 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] ProductRequest deployed to: 0x7A9Ec1d04904907De0ED7b6839CcdD59c3716AC9
+2025-05-17 15:30:54,665 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying SupplyChainCO2...
+2025-05-17 15:30:54,665 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] SupplyChainCO2 deployed to: 0x49fd2BE640DB2910c2fAb69bB8531Ab6E76127ff
+2025-05-17 15:30:54,665 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deploying SupplyChain...
+2025-05-17 15:30:54,665 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] SupplyChain deployed to: 0x4631BCAbD6dF18D94796344963cB60d44a4136b6
+2025-05-17 15:30:54,665 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Initializing SupplyChain...
+2025-05-17 15:30:54,666 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] SupplyChain initialized successfully
+2025-05-17 15:30:54,666 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Contract addresses and ABIs saved to C:\Users\fabio\Documents\GitHub\Project_Sustainable_Food_Supply_Chain\on_chain\contract_addresses.json
+2025-05-17 15:30:54,666 - app_logger - INFO - [blockchain_manager.py:155] - [ETHERS.JS] Deployment completed successfully!
+2025-05-17 15:30:55,260 - app_logger - INFO - [blockchain_manager.py:110] - [ETHERS.JS] Blockchain interactor initialized successfully
+2025-05-17 15:30:55,261 - app_logger - INFO - [gui_manager.py:32] - Hardhat blockchain environment setup completed successfully
+2025-05-17 15:30:56,262 - app_logger - INFO - [credential_repository_impl.py:32] - BackEnd: Successfully initializing the instance for CredentialRepositoryImpl.
+2025-05-17 15:30:56,263 - app_logger - INFO - [credential_controller.py:19] - BackEnd: Successful initialization of 'class instances' for repository implements
+2025-05-17 15:30:59,113 - app_logger - INFO - [credential_repository_impl.py:38] - []
+2025-05-17 15:30:59,114 - app_logger - WARNING - [credential_repository_impl.py:41] - Errore durante il recupero delle credenziali nel rep: list index out of range
+2025-05-17 15:30:59,114 - app_logger - INFO - [credential_controller.py:43] - Username inserito: , Password inserita: 
+2025-05-17 15:30:59,114 - app_logger - WARNING - [credential_controller.py:67] - Tentativo di login fallito: Login fallito: Utente non trovato
+2025-05-17 15:30:59,114 - app_logger - INFO - [credential_controller.py:68] - Tentativi di login: 2
+>>>>>>> Stashed changes

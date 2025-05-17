@@ -1,0 +1,59 @@
+# Standard Library Imports
+import sys
+import os
+import threading
+import time
+
+from configuration.log_load_setting import logger
+from database.db_migrations import DatabaseMigrations
+from configuration.database import Database
+from session import Session
+
+# Import the modules we've created
+from blockchain_manager import BlockchainSetupThread, blockchain_interactor
+from gui_manager import setup_gui
+
+def setup_database():
+    try:
+        DatabaseMigrations.run_migrations()
+    except Exception as e:
+        logger.error(f"Error initializing database: {e}")
+        sys.exit(1)  # Stops the application if there is a critical error
+
+def setup_blockchain():
+    # Start the blockchain setup in a separate thread
+    logger.info("Starting Hardhat blockchain environment...")
+    blockchain_thread = BlockchainSetupThread()
+    blockchain_thread.start()
+    
+    # Wait for the blockchain setup to complete
+    max_wait_time = 60  # Maximum wait time in seconds
+    wait_interval = 1   # Check interval in seconds
+    elapsed_time = 0
+    
+    while blockchain_thread.is_alive() and elapsed_time < max_wait_time:
+        time.sleep(wait_interval)
+        elapsed_time += wait_interval
+    
+    if blockchain_thread.is_alive():
+        logger.warning("Hardhat blockchain setup is taking longer than expected, continuing with application startup")
+    elif not blockchain_thread.success:
+        logger.error(f"Hardhat blockchain setup failed: {blockchain_thread.error_message}")
+    else:
+        logger.info("Hardhat blockchain environment and ethers.js contracts deployed successfully")
+
+if __name__ == "__main__":
+    # Configure the database before starting the graphical interface
+    setup_database()
+    
+    # Setup blockchain in a separate thread
+    setup_blockchain()
+    
+    # Create a session
+    session = Session()
+    
+    # Setup GUI and get application instance
+    app, window = setup_gui(session)
+    
+    # Start the application event loop
+    sys.exit(app.exec_())
