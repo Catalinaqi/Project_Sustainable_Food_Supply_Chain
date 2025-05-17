@@ -58,7 +58,7 @@ class HomePage(QMainWindow):
 
         # Elementi di layout
         self.logo = QLabel()
-        self.welcome_label = QLabel(f"Ciao {self.utente[3]} 👋!\nBenvenuto in SupplyChain.\n"
+        self.welcome_label = QLabel(f"Ciao {self.utente['username']} 👋!\nBenvenuto in SupplyChain.\n"
                                     f"Prego selezionare un'opzione dal menu")
         self.button_operazioni = QPushButton('Operazioni')
         self.button_azioni_compensative = QPushButton('Azioni compensative')
@@ -210,9 +210,7 @@ class HomePage(QMainWindow):
     def show_stato(self):
         self.inactivity_timer.stop()
         self.hide()
-        self.stato = VistaStatoAzienda(
-            self.aggiorna_profilo, self.utente, self.controller
-        )
+        self.stato = VistaStatoAzienda(self.aggiorna_profilo)
         self.stato.closed.connect(self.mostra)
         self.stato.show()
 

@@ -38,11 +38,11 @@ class CompensationActionRepositoryImpl( ABC):
             results = self.db.fetch_results(query, value)
             lista_op= [
                     CompensationActionModel(
-                        Id_azione=row[0],
-                        Id_azienda=row[1],
-                        Data_azione=row[2],
-                        Co2_compensata=row[3],
-                        Nome_azione=row[4],               
+                        id_azione=row[0],
+                        id_azienda=row[1],
+                        data_azione=row[2],
+                        co2_compensata=row[3],
+                        nome_azione=row[4],               
                 )
                 for row in results
                 ]

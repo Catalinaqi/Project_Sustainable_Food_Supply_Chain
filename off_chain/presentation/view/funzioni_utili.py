@@ -138,7 +138,13 @@ def config_menu(menu, items, button):
 
 
 def config_menubar(self, stringa, img, _str2, tasti, menu_bar):
-    action = QAction(QIcon(img), _str2, parent=self)
+    menu = menu_bar.addMenu(stringa)
+    action = QAction(QIcon(img), _str2, self)
     action.setShortcut(tasti)
-    menu_bar.addMenu(stringa).addAction(action)
+    menu.addAction(action)
     return action
+
+
+def timeout():
+    """Restituisce il timeout di inattività in millisecondi (30 minuti)"""
+    return 30 * 60 * 1000  # 30 minuti in millisecondi

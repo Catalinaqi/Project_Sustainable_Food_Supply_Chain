@@ -2,7 +2,7 @@
 # pylint: disable= import-error
 # pylint: disable= line-too-long
 # pylint: disable= trailing-whitespace
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont, QStandardItemModel, QStandardItem, QIcon
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QLabel, QListView, QHBoxLayout,
                              QPushButton)
@@ -13,6 +13,10 @@ from presentation.controller.company_controller import ControllerAzienda
 
 
 class VistaSoglie(QMainWindow):
+    """
+    Window displaying CO2 thresholds
+    """
+    closed = pyqtSignal()
     def __init__(self, certificatore=None):
         super().__init__()
 
@@ -27,6 +31,13 @@ class VistaSoglie(QMainWindow):
         self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         self.init_ui()
+        
+    def closeEvent(self, event):
+        """
+        Override the close event to emit the closed signal
+        """
+        self.closed.emit()
+        super().closeEvent(event)
 
     def init_ui(self):
         self.setWindowTitle('SupplyChain')

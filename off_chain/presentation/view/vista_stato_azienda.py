@@ -2,7 +2,7 @@
 # pylint: disable= import-error
 # pylint: disable= line-too-long
 # pylint: disable= trailing-whitespace
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, QFormLayout, QLineEdit,
                              QHBoxLayout, QPushButton, QMessageBox)
@@ -17,6 +17,10 @@ from presentation.view.vista_cambia_password import VistaCambiaPassword
 
 
 class VistaStatoAzienda(QMainWindow):
+    """
+    Window displaying company status information
+    """
+    closed = pyqtSignal()
     def __init__(self, callback):
         super().__init__()
 
@@ -50,6 +54,13 @@ class VistaStatoAzienda(QMainWindow):
         self.setWindowIcon(QIcon("presentation\\resources\\logo_centro.png"))
 
         self.init_ui()
+        
+    def closeEvent(self, event):
+        """
+        Override the close event to emit the closed signal
+        """
+        self.closed.emit()
+        super().closeEvent(event)
 
     def init_ui(self):
         self.setWindowTitle('SupplyChain')

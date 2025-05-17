@@ -254,19 +254,22 @@ class VistaAccedi(QMainWindow):
         password = self.password_input.text()
 
         try:
-        # Verifica le credenziali dell'utente
-            utente = self.controller.login(username, password)
+            # Verifica le credenziali dell'utente
+            login_success = self.controller.login(username, password)
         
-
-            if  utente:
+            if login_success:
                 QMessageBox.information(self, "SupplyChain", "Accesso effettuato correttamente!")
 
+                # Ottieni i dati dell'utente dalla sessione dopo il login
+                session_user = Session().current_user
+                
                 # Procedi con il resto del login come prima
-                if Session().current_user["role"] == 'Certificatore':
+                if session_user["role"] == 'Certificatore':
                     self.home_certificatore = HomePageCertificatore(self.reset)
                     self.home_certificatore.show()
                 else:
-                    self.home_page = HomePage(self.reset, utente)
+                    # Passa il dizionario session_user invece dell'oggetto CompanyModel
+                    self.home_page = HomePage(self.reset, session_user)
                     self.home_page.show()
 
                 self.setVisible(False)  # Nascondi la finestra di login       
@@ -306,7 +309,7 @@ class VistaAccedi(QMainWindow):
                 QMessageBox.warning(
                     self, "SupplyChain", "Conferma password errata!")
             else:
-                success, message = self.controller.registrazione(
+                success, message, secret_key = self.controller.registrazione(
                     username, password, tipo, indirizzo
                 )
                 if success:
