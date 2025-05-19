@@ -21,6 +21,8 @@ This project implements a blockchain-based solution for tracking sustainable foo
 ## Prerequisites
 ### Off-Chain Components
 - Python 3.13+
+- Poetry
+- PyQt5
 - Node.js 18+ (for blockchain interaction and dashboard frontend)
 
 ### On-Chain Components
